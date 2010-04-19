@@ -162,25 +162,29 @@ local function OverlayPanel(panel)
         panel:AddControl("Label", {Text = "WARNING: The following options will get you BANNED on most non-Sandbox game modes."})
     end
     
-    panel:AddControl("CheckBox", {
+    local c = panel:AddControl("CheckBox", {
         Label = "Show Name Tags",
         Command = "name_tags"
     })
+    c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("CheckBox", {
         Label = "Show Player Bounding Boxes",
         Command = "player_boxes"
     })
+    c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("CheckBox", {
         Label = "Show Player Orientation Markers",
         Command = "player_markers"
     })
+    c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("CheckBox", {
         Label = "Show Player Line of Sights",
         Command = "trace_aims"
     })
+    c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
 end
 
 --- PopulateToolMenu hook.
