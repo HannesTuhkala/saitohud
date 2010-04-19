@@ -46,7 +46,7 @@ function SaitoHUD.DrawEntityInfo()
         return
     end
     
-    local lines = SaitoHUD.GetEntityInfoLines(showPlayerInfo:GetBool())
+    local lines = SaitoHUD.GetEntityInfoLines(showPlayerInfo:GetBool(),drawEntityInfo:GetBool())
     
     if table.Count(lines) > 0 then
         local color = Color(255, 255, 255, 255)
@@ -394,9 +394,8 @@ concommand.Add("dump_info", function(ply, cmd, args)
 end)
 
 hook.Add("HUDPaint", "SaitoHUDOverlays", function()
-    if drawEntityInfo:GetBool() then
-        SaitoHUD.DrawEntityInfo()
-    end
+    SaitoHUD.DrawEntityInfo()
+    
     if not SaitoHUD.AntiUnfairTriggered() then
         SaitoHUD.DrawOverlays()
         if drawNameTags:GetBool() then
