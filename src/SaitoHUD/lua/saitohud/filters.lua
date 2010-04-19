@@ -48,6 +48,7 @@ end
 
 local entityFilter = {}
 
+-- Directive names and the number of arguments that each directive takes
 entityFilter.directives = {
     ["mindist"] = 1,
     ["maxdist"] = 1,
@@ -85,7 +86,8 @@ function entityFilter.UpdateFilterDefList(filterDef, key, item)
     end
 end
 
---- Builds a filter context.
+--- Builds a filter context. Note that this will modify the table of tokens,
+-- and so a copy should be made if you wish to keep the original.
 -- @param tokens List of filter arguments
 -- @return Filter context
 function entityFilter.Build(tokens, nilForNull)    
