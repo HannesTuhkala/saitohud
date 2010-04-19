@@ -17,7 +17,7 @@
 -- $Id$
 
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
-local sampleResolution = CreateClientConVar("sample_resolution", "1", true, false)
+local sampleResolution = CreateClientConVar("sample_resolution", "100", true, false)
 local sampleRandomColor = CreateClientConVar("sample_randomcolor", "0", true, false)
 local sampleFade = CreateClientConVar("sample_fade", "0", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
@@ -59,23 +59,19 @@ SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
 
 local SamplingContext = {}
 
-function SamplingContext:new(ent)
-	local r =0
-	local g = 255
-	local b = 255
-	
-	if SaitoHUD.sampleRandomColor then
-		r = math.Rand(100,255)
-		g = math.Rand(100,255)
-		b = math.Rand(100,255)
-	end
-	
+function SamplingContext:new(ent, color, randomColor)
+    if color == nil then
+        if randomColor then
+            color = HSVToColor(math.random(0, 255), 1, 1)
+        else
+            color = Color(0, 255, 255, 255)
+        end
+    end
+    
     local instance = {
         ["ent"] = ent,
         ["points"] = {},
-		["r"] = r,
-		["g"] = g,
-		["b"] = b,
+		["color"] = color,
     }
     
     setmetatable(instance, self)
@@ -108,17 +104,18 @@ function SamplingContext:Draw(drawNodes)
     local dim = 5
     local currentPos = self.ent:GetPos()
     local lastPt = nil
-	surface.SetDrawColor(self.r, self.g, self.b,255)
     
+	surface.SetDrawColor(self.color.r, self.color.g, self.color.b, 255)
     
-    for _, pt in pairs(self.points) do
+    for k, pt in pairs(self.points) do
         if lastPt != nil and lastPt != pt then 
             local from = lastPt:ToScreen()
             local to = pt:ToScreen()
             
             if from.visible and to.visible then
 				if SaitoHUD.sampleFade then
-					surface.SetDrawColor(self.r, self.g, self.b,(_ / #self.points) * 255)
+					surface.SetDrawColor(self.color.r, self.color.g, self.color.b,
+                                         (k / #self.points) * 255)
 				end
 				
                 surface.DrawLine(from.x, from.y, to.x, to.y)
@@ -170,12 +167,12 @@ function SaitoHUD.AddSample(ent)
         end
     end
     
-    local ctx = SamplingContext:new(ent)
+    local ctx = SamplingContext:new(ent, nil, SaitoHUD.sampleRandomColor)
     table.insert(SaitoHUD.samplers, ctx)
 end
 
 function SaitoHUD.SetSample(ent)
-    local ctx = SamplingContext:new(ent)
+    local ctx = SamplingContext:new(ent, nil, SaitoHUD.sampleRandomColor)
     SaitoHUD.samplers = {ctx}
 end
 
