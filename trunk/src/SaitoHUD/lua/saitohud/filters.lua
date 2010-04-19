@@ -169,8 +169,16 @@ function entityFilter.Build(tokens, nilForNull)
         elseif token == ")" then
             Error("Parenthesis mismatch")
         else
-            directive = "class"
-            i = i - 1 -- We added a token unexpectedly
+            local a, b = string.match(token, "^([^:]+)~(.*)$")
+            print(token, a, b)
+            if a ~= nil then
+                directive = a
+                tokens[i] = b
+                i = i - 1 -- We added a token unexpectedly
+            else
+                directive = "class"
+                i = i - 1 -- We added a token unexpectedly
+            end
         end
         
         if directive ~= nil then
