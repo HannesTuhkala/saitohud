@@ -32,7 +32,7 @@ cvars.AddChangeCallback("sample_size", function(cv, old, new)
 end)
 
 cvars.AddChangeCallback("sample_thick", function(cv, old, new)
-	SaitoHUD.drawSampleThick = drawSampleThick:GetFloat()
+	SaitoHUD.drawSampleThick = sampleThick:GetBool()
 end)
 
 cvars.AddChangeCallback("sample_nodes", function(cv, old, new)
