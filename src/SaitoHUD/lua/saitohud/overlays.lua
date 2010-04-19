@@ -17,6 +17,7 @@
 -- $Id$
 
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
+local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
 local playerMarkers = CreateClientConVar("player_markers", "0", true, false)
@@ -45,7 +46,7 @@ function SaitoHUD.DrawEntityInfo()
         return
     end
     
-    local lines = SaitoHUD.GetEntityInfoLines()
+    local lines = SaitoHUD.GetEntityInfoLines(showPlayerInfo:GetBool())
     
     if table.Count(lines) > 0 then
         local color = Color(255, 255, 255, 255)

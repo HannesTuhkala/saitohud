@@ -109,6 +109,11 @@ local function OverlayPanel(panel)
     })
     
     panel:AddControl("CheckBox", {
+        Label = "Player Info on Entity Info",
+        Command = "entity_info_player"
+    })
+    
+    panel:AddControl("CheckBox", {
         Label = "Name Tags",
         Command = "name_tags"
     })
