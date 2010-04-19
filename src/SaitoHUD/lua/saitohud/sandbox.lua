@@ -21,6 +21,7 @@ local function SandboxListGest(item)
     
     table.insert(menu, {["text"] = "Easy Precision Tool", ["action"] = "tool_easy_precision"})
     table.insert(menu, {["text"] = "Weld Tool", ["action"] = "tool_weld"})
+    table.insert(menu, {["text"] = "Remover Tool", ["action"] = "tool_remover"})
     table.insert(menu, {["text"] = "No Collide Tool", ["action"] = "tool_nocollide"})
     table.insert(menu, {["text"] = "Adv. Duplicator Tool", ["action"] = "tool_adv_duplicator"})
     table.insert(menu, {["text"] = "Expression 2 Tool", ["action"] = "tool_wire_expression2"})
