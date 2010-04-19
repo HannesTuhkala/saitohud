@@ -82,20 +82,29 @@ function SaitoHUD.GetEntityInfoLines()
     
     if ValidEntity(tr.Entity) then
         local r, g, b, a = tr.Entity:GetColor();
-        
-        lines = {
-            "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
-            "Hit Pos: " .. tostring(tr.HitPos),
-            "Class: " .. tostring(tr.Entity:GetClass()),
-            "Position: " .. tostring(tr.Entity:GetPos()),
-            "Size: " .. tostring(tr.Entity:OBBMaxs()-tr.Entity:OBBMins()),
-            "Angle: " .. tostring(tr.Entity:GetAngles()),
-            "Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
-            "Model: " .. tostring(tr.Entity:GetModel()),
-            "Material: " .. tostring(tr.Entity:GetMaterial()),
-            "Velocity: " .. tostring(tr.Entity:GetVelocity()),
-            "Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
-        }
+		
+		GroupString = "N/A"
+		if tr.Entity:IsPlayer() then
+			GroupString = tr.Entity:GetUserGroup()
+		end
+		
+		lines = {
+			"#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
+			"Hit Pos: " .. tostring(tr.HitPos),
+			"Class: " .. tostring(tr.Entity:GetClass()),
+			"Group: " .. GroupString,
+			"",
+			"Position: " .. tostring(tr.Entity:GetPos()),
+			"Size: " .. tostring(tr.Entity:OBBMaxs()-tr.Entity:OBBMins()),
+			"Angle: " .. tostring(tr.Entity:GetAngles()),
+			"",
+			"Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
+			"Model: " .. tostring(tr.Entity:GetModel()),
+			"Material: " .. tostring(tr.Entity:GetMaterial()),
+			"",
+			"Velocity: " .. tostring(tr.Entity:GetVelocity()),
+			"Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
+		}
     else
         if tr.Hit then
             lines = {
