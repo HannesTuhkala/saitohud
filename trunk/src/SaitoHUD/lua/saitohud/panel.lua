@@ -78,7 +78,7 @@ local function SamplingPanel(panel)
     })
     
     panel:AddControl("Slider", {
-        Label = "Resolution (ms)",
+        Label = "Resolution (ms):",
         Command = "sample_resolution",
         Type = "integer",
         min = "1",
@@ -86,31 +86,53 @@ local function SamplingPanel(panel)
     })
     
     panel:AddControl("Slider", {
-        Label = "Data Point History Size",
+        Label = "Data Point History Size:",
         Command = "sample_size",
         Type = "integer",
         min = "1",
         max = "500"
     })
     
-    panel:AddControl("Label", {Text = "Sample"})
-    local SampleEntry = panel:AddControl("DTextEntry",{})
-    SampleEntry:SetTall(20)
-    SampleEntry:SetWide(100)
-    SampleEntry:SetEnterAllowed(true)
-    SampleEntry.OnEnter = function()
-        LocalPlayer():ConCommand("sample " .. SampleEntry:GetValue())
+    panel:AddControl("Label", {Text = "Sample Player Name:"})
+    local sampleEntry = panel:AddControl("DTextEntry",{})
+    sampleEntry:SetTall(20)
+    sampleEntry:SetWide(100)
+    sampleEntry:SetEnterAllowed(true)
+    sampleEntry.OnEnter = function()
+        LocalPlayer():ConCommand("sample " .. sampleEntry:GetValue())
     end
     
-    panel:AddControl("Label", {Text = "Remove Sample"})
-    local RemoveEntry = panel:AddControl("DTextEntry",{})
-    RemoveEntry:SetTall(20)
-    RemoveEntry:SetWide(100)
-    RemoveEntry:SetEnterAllowed(true)
-    RemoveEntry.OnEnter = function()
-        LocalPlayer():ConCommand("sample_remove " .. RemoveEntry:GetValue())
+    panel:AddControl("Label", {Text = "Remove Player by Name:"})
+    local removeEntry = panel:AddControl("DTextEntry",{})
+    removeEntry:SetTall(20)
+    removeEntry:SetWide(100)
+    removeEntry:SetEnterAllowed(true)
+    removeEntry.OnEnter = function()
+        LocalPlayer():ConCommand("sample_remove " .. removeEntry:GetValue())
     end
     
+    panel:AddControl("Label", {Text = "Sample by Filter:"})
+    local sampleFilterEntry = panel:AddControl("DTextEntry",{})
+    sampleFilterEntry:SetTall(20)
+    sampleFilterEntry:SetWide(100)
+    sampleFilterEntry:SetEnterAllowed(true)
+    sampleFilterEntry.OnEnter = function()
+        LocalPlayer():ConCommand("sample_filter " .. sampleFilterEntry:GetValue())
+    end
+    
+    panel:AddControl("Label", {Text = "Remove by Filter:"})
+    local removeFilterEntry = panel:AddControl("DTextEntry",{})
+    removeFilterEntry:SetTall(20)
+    removeFilterEntry:SetWide(100)
+    removeFilterEntry:SetEnterAllowed(true)
+    removeFilterEntry.OnEnter = function()
+        LocalPlayer():ConCommand("sample_remove_filter " .. removeFilterEntry:GetValue())
+    end
+    
+    local button = panel:AddControl("Button", {
+        Label = "Remove All Samplers",
+        Command = "sample_clear",
+    })
 end
 
 local function OverlayPanel(panel)
@@ -127,39 +149,8 @@ local function OverlayPanel(panel)
         Command = "entity_info_player"
     })
     
-    panel:AddControl("Label", {Text = "Enter your filters below and press ENTER. The textboxes below will not show the last filter."})
-    
-    panel:AddControl("Label", {Text = "Triads Filter"})
-    local triadsEntry = panel:AddControl("DTextEntry",{})
-    triadsEntry:SetTall(20)
-    triadsEntry:SetWide(100)
-    triadsEntry:SetEnterAllowed(true)
-    triadsEntry.OnEnter = function()
-        LocalPlayer():ConCommand("triads_filter " .. triadsEntry:GetValue())
-    end
-    
-    panel:AddControl("Label", {Text = "Overlay Filter"})
-    local overlayEntry = panel:AddControl("DTextEntry",{})
-    overlayEntry:SetTall(20)
-    overlayEntry:SetWide(100)
-    overlayEntry:SetEnterAllowed(true)
-    overlayEntry.OnEnter = function()
-        LocalPlayer():ConCommand("overlay_filter " .. overlayEntry:GetValue())
-    end
-    
-    panel:AddControl("Label", {Text = "BBox Filter"})
-    local bboxEntry = panel:AddControl("DTextEntry",{})
-    bboxEntry:SetTall(20)
-    bboxEntry:SetWide(100)
-    bboxEntry:SetEnterAllowed(true)
-    bboxEntry.OnEnter = function()
-        LocalPlayer():ConCommand("bbox_filter " .. bboxEntry:GetValue())
-    end
-    
     if SaitoHUD.AntiUnfairTriggered() then
-        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
-    else
-        panel:AddControl("Label", {Text = "WARNING: The following options will get you BANNED on most non-Sandbox game modes."})
+        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and some of the following options do not take effect."})
     end
     
     local c = panel:AddControl("CheckBox", {
@@ -185,6 +176,33 @@ local function OverlayPanel(panel)
         Command = "trace_aims"
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    
+    panel:AddControl("Label", {Text = "Triads Filter:"})
+    local triadsEntry = panel:AddControl("DTextEntry",{})
+    triadsEntry:SetTall(20)
+    triadsEntry:SetWide(100)
+    triadsEntry:SetEnterAllowed(true)
+    triadsEntry.OnEnter = function()
+        LocalPlayer():ConCommand("triads_filter " .. triadsEntry:GetValue())
+    end
+    
+    panel:AddControl("Label", {Text = "Overlay Filter:"})
+    local overlayEntry = panel:AddControl("DTextEntry",{})
+    overlayEntry:SetTall(20)
+    overlayEntry:SetWide(100)
+    overlayEntry:SetEnterAllowed(true)
+    overlayEntry.OnEnter = function()
+        LocalPlayer():ConCommand("overlay_filter " .. overlayEntry:GetValue())
+    end
+    
+    panel:AddControl("Label", {Text = "Bounding Box Filter:"})
+    local bboxEntry = panel:AddControl("DTextEntry",{})
+    bboxEntry:SetTall(20)
+    bboxEntry:SetWide(100)
+    bboxEntry:SetEnterAllowed(true)
+    bboxEntry.OnEnter = function()
+        LocalPlayer():ConCommand("bbox_filter " .. bboxEntry:GetValue())
+    end
 end
 
 --- PopulateToolMenu hook.

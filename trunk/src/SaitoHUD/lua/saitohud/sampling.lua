@@ -264,6 +264,32 @@ function Sample(ply, cmd, args)
     end
 end
 
+--- Console command to sample by entity filter.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function SampleFilter(ply, cmd, args)
+    if not sampleMultiple:GetBool() then
+        LocalPlayer():ChatPrint("Note: Multiple entity sampling is disabled")
+        return
+    end
+    
+    local filter = SaitoHUD.entityFilter.Build(args, true)
+    local refPos = SaitoHUD.GetRefPos()
+    local count = 0
+    
+    for _, ent in pairs(ents.GetAll()) do
+        if ValidEntity(ent) then
+            if filter.f(ent, refPos) then
+                SaitoHUD.AddSample(ent)
+                count = count + 1
+            end
+        end
+    end
+    
+    Msg(tostring(count) .. " entities were matched\n")
+end
+
 --- Console commands to sample by ID.
 -- @param ply Player
 -- @param cmd Command
@@ -336,6 +362,29 @@ function RemoveSampleID(ply, cmd, args)
     end
 end
 
+--- Console command to remove samples entity filter.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function RemoveSampleFilter(ply, cmd, args)
+    local filter = SaitoHUD.entityFilter.Build(args, true)
+    local refPos = SaitoHUD.GetRefPos()
+    local count = 0
+    
+    for _, ent in pairs(ents.GetAll()) do
+        if ValidEntity(ent) then
+            if filter.f(ent, refPos) then
+                if SaitoHUD.HasSample(ent) then
+                    SaitoHUD.RemoveSample(ent)
+                    count = count + 1
+                end
+            end
+        end
+    end
+    
+    Msg(tostring(count) .. " samplers were removed\n")
+end
+
 --- Console command to clear samples.
 -- @param ply Player
 -- @param cmd Command
@@ -382,9 +431,11 @@ function DrawSamples()
 end
 
 concommand.Add("sample", Sample, SaitoHUD.ConsoleAutocompletePlayer)
+concommand.Add("sample_filter", SampleFilter)
 concommand.Add("sample_id", SampleID)
 concommand.Add("sample_remove", RemoveSample, SaitoHUD.ConsoleAutocompletePlayer)
 concommand.Add("sample_remove_id", RemoveSampleID)
+concommand.Add("sample_remove_filter", RemoveSampleFilter)
 concommand.Add("sample_clear", ClearSamples) 
 concommand.Add("sample_list", ListSamples)
 
