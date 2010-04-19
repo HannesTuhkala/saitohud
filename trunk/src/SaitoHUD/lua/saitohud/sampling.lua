@@ -260,7 +260,7 @@ function Sample(ply, cmd, args)
             LocalPlayer():ChatPrint("No player was found by that name.")
         end
     else
-        Msg("Invalid number of arguments")
+        Msg("Invalid number of arguments\n")
     end
 end
 
@@ -286,7 +286,7 @@ function SampleID(ply, cmd, args)
             LocalPlayer():ChatPrint("No entity was found by that index.")
         end
     else
-        Msg("Invalid number of arguments")
+        Msg("Invalid number of arguments\n")
     end
 end
 
@@ -313,7 +313,7 @@ function RemoveSample(ply, cmd, args)
             LocalPlayer():ChatPrint("No player was found by that name.")
         end
     else
-        Msg("Invalid number of arguments")
+        Msg("Invalid number of arguments\n")
     end
 end
 
@@ -332,7 +332,7 @@ function RemoveSampleID(ply, cmd, args)
             LocalPlayer():ChatPrint("No entity was found by that index.")
         end
     else
-        Msg("Invalid number of arguments")
+        Msg("Invalid number of arguments\n")
     end
 end
 
@@ -381,9 +381,9 @@ function DrawSamples()
     end
 end
 
-concommand.Add("sample", Sample, ConsoleAutocompletePlayer)
+concommand.Add("sample", Sample, SaitoHUD.ConsoleAutocompletePlayer)
 concommand.Add("sample_id", SampleID)
-concommand.Add("sample_remove", RemoveSample, ConsoleAutocompletePlayer)
+concommand.Add("sample_remove", RemoveSample, SaitoHUD.ConsoleAutocompletePlayer)
 concommand.Add("sample_remove_id", RemoveSampleID)
 concommand.Add("sample_clear", ClearSamples) 
 concommand.Add("sample_list", ListSamples)
