@@ -90,7 +90,7 @@ end
 -- and so a copy should be made if you wish to keep the original.
 -- @param tokens List of filter arguments
 -- @return Filter context
-function entityFilter.Build(tokens, nilForNull)    
+function entityFilter.Build(tokens, nilForNull)
     local ORBranches = {}
     local ANDBranches = {}
     local filterDef = {}
@@ -112,10 +112,10 @@ function entityFilter.Build(tokens, nilForNull)
         local directive = nil
         
         -- Handle touching paranthesis
-        if token:sub(1, 1) == "(" then
+        if token:sub(1, 1) == "(" and token ~= "(" then
             table.insert(tokens, i + 1, token:sub(2))
             tokens[i] = "("
-        elseif token:sub(-1) == ")" then
+        elseif token:sub(-1) == ")" and token ~= ")" then
             table.insert(tokens, i, token:sub(1, -2))
             tokens[i + 1] = "("
         end
@@ -170,7 +170,6 @@ function entityFilter.Build(tokens, nilForNull)
             Error("Parenthesis mismatch")
         else
             local a, b = string.match(token, "^([^:]+)~(.*)$")
-            print(token, a, b)
             if a ~= nil then
                 directive = a
                 tokens[i] = b
