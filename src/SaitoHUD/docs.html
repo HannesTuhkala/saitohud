@@ -71,7 +71,7 @@ pre, code {
   <p>To match other properties, such as model path or material, use the syntax of <code>@type pattern</code>, like so:</p>
 <pre>highlight_ents wire -light @model gate @model -ram</pre>
   <p>That would match all entities that have class names containing &quot;wire&quot; but do not have class names containing &quot;light&quot;, and have &quot;gate&quot; in their model path, but not &quot;ram&quot; in their model path.</p>
-  <p>SaitoHUD supports the following extra properties to filter by:</p>
+  <p>SaitoHUD supports the following  properties to filter by:</p>
   <ul>
     <li>@id</li>
     <li>@mindist (alias: @min)</li>
@@ -79,10 +79,12 @@ pre, code {
     <li>@model (alias: @mdl)</li>
     <li>@material (alias @mat)</li>
   </ul>
-  <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you. @id only allows you to select one entity at a time.</p>
+  <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you.</p>
   <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>highlight_ents *</code> or <code>highlight_ents @mdl *</code> or even <code>highlight_ents @mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
   <p>To do &quot;OR&quot;, merely use write or/OR. You may also use parentheses. An explicit AND/and can also be written. OR has a higher precedence than AND. See the following example, which also uses explicit ANDs:</p>
-  <pre>bbox_filter wire and (expr or gate @mdl cpu) or @mdl barrel</pre>
+  <pre>highlight_ents wire and (expr or gate @mdl cpu) or @mdl barrel</pre>
+  <p>There is also an alternative syntax for the  properties:</p>
+  <pre>highlight_ents wire and (expr or gate mdl=cpu) or mdl=barrel</pre>
   <p>The results of the filtering operation are cached for very brief amounts of time to significantly increase performance.</p>
   <h2>List Gestures</h2>
   <p>SaitoHUD provides a quick list menu that can be accessed with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
@@ -104,6 +106,12 @@ pre, code {
     <td>bool</td>
     <td>1</td>
     <td>Draws information about the entity that you are looking on.</td>
+  </tr>
+  <tr>
+    <td><code>entity_info_player</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>In addition to entity information, additional player information can also be displayed.</td>
   </tr>
   <tr>
     <td><code>name_tags</code></td>
@@ -202,6 +210,24 @@ pre, code {
     <td>bool</td>
     <td>0</td>
     <td>Allows for sampling of more than one entity or player at a time.</td>
+  </tr>
+  <tr>
+    <td><code>sample_random_color</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Use a random color.</td>
+  </tr>
+  <tr>
+    <td><code>sample_fade</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Fade out old data points when drawing.</td>
+  </tr>
+  <tr>
+    <td><code>sample_thick</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Draw thicker lines.</td>
   </tr>
 </table>
 <h3>Commands</h3>
