@@ -18,6 +18,17 @@
 
 local ignoreHooks = CreateClientConVar("saitohud_ignore_hooks", "0", false, false)
 
+--- Checks whether the anti-unfair mode is triggered.
+function SaitoHUD.AntiUnfairTriggered()
+    if type(GAMEMODE) == nil then return false end
+    if LocalPlayer():IsAdmin() or LocalPlayer():IsSuperAdmin() then return false end
+    local name = tostring(GAMEMODE.Name)
+    local folder = tostring(GAMEMODE.Folder)
+    return __SaitoHUDUnfair == true and 
+        string.find(name:lower(), "sandbox") == nil and 
+        string.find(folder:lower(), "sandbox") == nil
+end
+
 function SaitoHUD.ShouldIgnoreHook()
     return ignoreHooks:GetBool()
 end
@@ -158,3 +169,9 @@ end
 concommand.Add("saitohud_help", function(ply, cmd, args)
     SaitoHUD.OpenHelp()
 end)
+
+--- We store it now so that players can't disable it mid-game -- that's not enough
+-- of a deterrent
+if __SaitoHUDUnfair == nil and not file.Exists("saitohud/no_deterrent.lck") then
+    __SaitoHUDUnfair = true
+end
