@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,6 +17,11 @@
 -- 
 -- $Id$
 
+-- Basic drawing functions.
+
+--- Draws the bounding box of an entity.
+-- @param ent Entity to draw bounding box for
+-- @param color Color to draw the bounding box in
 function SaitoHUD.DrawBBox(ent, color)
     local obbMin = ent:OBBMins()
     local obbMax = ent:OBBMaxs()
@@ -34,6 +40,7 @@ function SaitoHUD.DrawBBox(ent, color)
     local front = ent:LocalToWorld(Vector(0, 0, 40)):ToScreen()
     local front2 = ent:LocalToWorld(Vector(50, 0, 40)):ToScreen()
     
+    -- Odd things happen if not all the points are visible
     local visible = true
     for i = 1, 8 do
         if not p[i].visible then
