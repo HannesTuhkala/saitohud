@@ -46,7 +46,7 @@ end)
 
 SaitoHUD.samplers = {}
 SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
-SaitoHUD.sampleResolution = sampleResolution:GetFloat()
+SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000
 SaitoHUD.sampleSize = sampleSize:GetFloat()
 SaitoHUD.drawSampleThick = sampleThick:GetBool()
 SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
