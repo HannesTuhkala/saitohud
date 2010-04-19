@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SaitoHUD Reference</title>
+<style>
+body {
+  margin: 0;
+  padding: 20px;
+  background: #ffffff;
+  color: #000000;
+}
+body, table, td {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+}
+h1 {
+  font-family: Verdana, Arial, Lucida Grande, Trebuchet MS;
+  font-weight: normal;
+  font-size: 200%;
+  color: #8e0d0d;
+  margin-top: 0;
+}
+h2 {
+  font-family: Arial, Lucida Grande, Trebuchet MS;
+  font-size: 150%;
+  color: #000000
+}
+h3 {
+  font-family: Arial, Lucida Grande, Trebuchet MS;
+  font-size: 110%;
+  color: #000000
+}
+table {
+  border: 1px solid #999999;
+  border-right: 0;
+  border-bottom: 0;
+  width: 100%;
+}
+table th, table td {
+  border: 1px solid #999999;
+  border-top: 0;
+  border-left: 0;
+  padding: 3px 5px 3px 5px;
+  vertical-align: top;
+}
+table th {
+  background: #efefef;
+  text-align: left;
+}
+pre, code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 110%;
+}
+#footer {
+  margin: 20px 0 0 0;
+  color: #444444;
+}
+</style>
+</head>
+
+<body>
+<div id="wrapper">
+  <h1>SaitoHUD Reference  </h1>
+  <p>SaitoHUD is a utility HUD with a wide variety of functions. Note that it does not attempt to protect itself from tampered global functions.</p>
+  <h2>Filters</h2>
+  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. For example, you could match all entities by a certain substring in the model strings of entities. To match entity class names, list the class name substrings to match after the command. For example, if the command was <code>show</code>, the corresponding command that would match class substrings of &quot;wire_&quot; and &quot;expr&quot; would be:</p>
+  <pre>show wire expr</pre>
+  <p>For negation, prepend a hyphen (&quot;-&quot;) before the class name, like so:</p>
+  <pre>show wire -light</pre>
+  <p>To match other properties, such as model path or material, use the syntax of <code>@type pattern</code>, like so:</p>
+<pre>show wire -light @model gate @model -ram</pre>
+  <p>There is an example of negation when filtering by model name in the previous example.</p>
+  <p>SaitoHUD supports the following extra properties to filter by:</p>
+  <ul>
+    <li>@id</li>
+    <li>@mindist (alias: @min)</li>
+    <li>@maxdist (alias: @max)</li>
+    <li>@model (alias: @mdl)</li>
+    <li>@material (alias @mat)</li>
+  </ul>
+  <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you. @id only allows you to select one entity at a time.</p>
+  <p>Use an asterisk (*) if you wish to match all class names, models, or materials. Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments. Note that SaitoHUD's filtering capabilities only supports AND. The results of the filtering operation are cached for very brief amounts of time to significantly increase performance.</p>
+  <h2>List Gestures</h2>
+  <p>SaitoHUD provides a quick list menu that can be accessed with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
+<h2>Overlays</h2>
+<p>The overlays module has functions to displaying the locations of other players, and it is especially useful for server administrators.</p>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><code>entity_info</code></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Draws information about the entity that you are looking on.</td>
+  </tr>
+  <tr>
+    <td><code>name_tags</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Draws the names of players.</td>
+  </tr>
+  <tr>
+    <td><code>player_boxes</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Draws the bounding boxes and direction lines of players.</td>
+  </tr>
+  <tr>
+    <td><code>player_markers</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Draws an arrow under the feet of players indicating the way they face.</td>
+  </tr>
+</table>
+<h3>Commands</h3>
+<p>These commands are very useful for finding &quot;lost&quot; entities.</p>
+<table border="0" cellpadding="0" cellspacing="0">
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Arguments</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><code>triads_filter</code></td>
+    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>Draws 3D coordinate triads at the location of matched entities.</td>
+  </tr>
+  <tr>
+    <td><code>overlay_filter</code></td>
+    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>Draws class names at the location of matched entities.</td>
+  </tr>
+  <tr>
+    <td><code>bbox_filter</code></td>
+    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>Draws bounding boxes at the location of matched entities..</td>
+  </tr>
+  <tr>
+    <td><code>toggle_triads</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Legacy function to toggle triads on all entities on and off.</td>
+  </tr>
+  <tr>
+    <td><code>dump_info</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Dumps the contents of entity information HUD overlay to console for easy copy and paste.</td>
+  </tr>
+</table>
+<h2>Sampling</h2>
+<p>Sampling allows you to trace the path of an entity or player. The path that the entity or player travels is drawn on the screen. By default, you can only sample one entity at a time, but a cvar adjusts this behavior.</p>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><code>sample_draw</code></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Draws the lines tracing the paths of sampled entities.</td>
+  </tr>
+  <tr>
+    <td><code>sample_resolution</code></td>
+    <td>float</td>
+    <td>0.1</td>
+    <td>The interval, in seconds, at which the sampler will take data points.</td>
+  </tr>
+  <tr>
+    <td><code>sample_size</code></td>
+    <td>int</td>
+    <td>100</td>
+    <td>The maximum number of data points to store for a single sampled entity. Older data points will be removed.</td>
+  </tr>
+  <tr>
+    <td><code>sample_nodes</code></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Draws squares at the data points.</td>
+  </tr>
+  <tr>
+    <td><code>sample_multiple</code></td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Allows for sampling of more than one entity or player at a time.</td>
+  </tr>
+</table>
+<h3>Commands</h3>
+<table border="0" cellpadding="0" cellspacing="0">
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Arguments</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><code>sample</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Samples the entity that you are looking at.</td>
+  </tr>
+  <tr>
+    <td><code>sample</code></td>
+    <td nowrap="nowrap"><code>string name</code></td>
+    <td>Samples a player, found by their name.</td>
+  </tr>
+  <tr>
+    <td><code>sample_id</code></td>
+    <td nowrap="nowrap"><code>int id</code></td>
+    <td>Samples an entity, found by entity index.</td>
+  </tr>
+  <tr>
+    <td><code>sample_remove</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Stops sampling the entity that you are looking at.</td>
+  </tr>
+  <tr>
+    <td><code>sample_remove</code></td>
+    <td nowrap="nowrap"><code>string name</code></td>
+    <td>Stops sampling a player, found by their name.</td>
+  </tr>
+  <tr>
+    <td><code>sample_remove_id</code></td>
+    <td nowrap="nowrap"><code>int id</code></td>
+    <td>Stops sampling an entity, found by entity index.</td>
+  </tr>
+  <tr>
+    <td><code>sample_clear</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Stops sampling all entities.</td>
+  </tr>
+  <tr>
+    <td><code>sample_list</code></td>
+    <td nowrap="nowrap"><code>void</code></td>
+    <td>Prints a list of all sampled entities to console.</td>
+  </tr>
+</table>
+<h2>Stranded Game Mode</h2>
+<p>SaitoHUD has the following features for the <em>Stranded</em> game mode:</p>
+<ul>
+  <li>Replaces the resource drawing code with a routine that also colors the name of resources appropriate colors (stone is a grey-ish color).</li>
+  <li>Adds a very useful context-sensitive list gesture menu.</li>
+  </ul>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td><code>stranded_res_seeable</code></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Only draw the names of resources if a trace originating from your eye and ending at the resource does not collide with any other entity. This is how the Stranded game mode handles resource display.</td>
+  </tr>
+  <tr>
+    <td><code>stranded_res_distance</code></td>
+    <td>float</td>
+    <td>500</td>
+    <td>The maximum distance away a resource can be for its resource name will be displayed.</td>
+  </tr>
+</table>
+<h2>Miscellaneous</h2>
+<h3>Cvars</h3>
+  <table border="0" cellspacing="0" cellpadding="0">
+    <col width="1%" />
+    <col width="1%" />
+    <col width="1%" />
+    <tr>
+      <th scope="col">Cvar</th>
+      <th scope="col">Type</th>
+      <th scope="col">Default</th>
+      <th scope="col">Description</th>
+    </tr>
+    <tr>
+      <td><code>trace_aims</code></td>
+      <td>bool</td>
+      <td>0</td>
+      <td>Enable the drawing of lines that trace the aims of players. The lines begin near the eyes of players and end at the surface that the line collides with. If a player is targetted, the color of the line will change.</td>
+    </tr>
+    <tr>
+      <td><code>saitohud_ignore_hooks</code></td>
+      <td>bool</td>
+      <td>0</td>
+      <td>Disables all hooks. Hooks are used to override handling of some SaitoHUD features. For example, there is a hook that allows a plugin to modify the color of the player bounding boxes.</td>
+    </tr>
+    <tr>
+      <td><code>saitohud_modules</code></td>
+      <td>string</td>
+      <td>""</td>
+      <td>List of additional modules to load, separated by commas.</td>
+    </tr>
+  </table>
+  <h3>Commands</h3>
+  <table border="0" cellpadding="0" cellspacing="0">
+    <col width="1%" />
+    <col width="1%" />
+    <tr>
+      <th scope="col">Cvar</th>
+      <th scope="col">Arguments</th>
+      <th scope="col">Description</th>
+    </tr>
+    <tr>
+      <td><code>toggle_hud</code></td>
+      <td><code>void</code></td>
+      <td>Toggles the display of the HUD.</td>
+    </tr>
+    <tr>
+      <td><code>super_flashlight</code></td>
+      <td><code>void</code></td>
+      <td>Toggles a powerful flashlight that illuminates the area immediately around you and the area that you are looking at. This works by creating two dynamic lights, one at your location, and another at the location that your aim vector collides at.</td>
+    </tr>
+    <tr>
+      <td><code>run_string</code></td>
+      <td nowrap="nowrap"><code>string lua(...)</code></td>
+      <td>Runs Lua code. This command does not work well.</td>
+    </tr>
+    <tr>
+      <td><code>run_file</code></td>
+      <td nowrap="nowrap"><code>string path</code></td>
+      <td>Executes a file as Lua code.</td>
+    </tr>
+    <tr>
+      <td><code>saitohud_help</code></td>
+      <td nowrap="nowrap"><code>void</code></td>
+      <td>Shows the SaitoHUD help window.</td>
+    </tr>
+    <tr>
+      <td><code>saitohud_reload</code></td>
+      <td nowrap="nowrap"><code>void</code></td>
+      <td>Reloads SaitoHUD.</td>
+    </tr>
+  </table>
+  
+  <div id="footer">
+    &copy; Copyright 2009-2010 sk89q.
+  </div>
+</div>
+</body>
+</html>
