@@ -46,10 +46,17 @@ local function SamplingPanel(panel)
 		Command = "sample_thick"
 	})
 	
+	
 	panel:AddControl("CheckBox", {
-		Label = "Draw Random Color",
+		Label = "Fade Sample",
+		Command = "sample_fade"
+	})
+	
+	panel:AddControl("CheckBox", {
+		Label = "Random Color",
 		Command = "sample_randomcolor"
 	})
+	
 	
 	panel:AddControl("CheckBox", {
 		Label = "Allow Multiple",
