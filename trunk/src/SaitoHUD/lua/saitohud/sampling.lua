@@ -19,6 +19,7 @@
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
 local sampleResolution = CreateClientConVar("sample_resolution", "0.1", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
+local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
 local sampleNodes = CreateClientConVar("sample_nodes", "1", true, false)
 local sampleMultiple = CreateClientConVar("sample_multiple", "0", true, false)
 
@@ -30,6 +31,10 @@ cvars.AddChangeCallback("sample_size", function(cv, old, new)
 	SaitoHUD.sampleSize = sampleSize:GetFloat()
 end)
 
+cvars.AddChangeCallback("sample_thick", function(cv, old, new)
+	SaitoHUD.drawSampleThick = drawSampleThick:GetFloat()
+end)
+
 cvars.AddChangeCallback("sample_nodes", function(cv, old, new)
 	SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
 end)
@@ -37,6 +42,7 @@ end)
 SaitoHUD.samplers = {}
 SaitoHUD.sampleResolution = sampleResolution:GetFloat()
 SaitoHUD.sampleSize = sampleSize:GetFloat()
+SaitoHUD.drawSampleThick = sampleThick:GetBool()
 SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
 
 local SamplingContext = {}
@@ -88,6 +94,12 @@ function SamplingContext:Draw(drawNodes)
             if from.visible and to.visible then
                 surface.DrawLine(from.x, from.y, to.x, to.y)
                 
+				if SaitoHUD.drawSampleThick then
+					surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
+					surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
+					surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
+				end
+				
                 if SaitoHUD.drawSampleNodes then
                     surface.DrawOutlinedRect(to.x - dim / 2, to.y - dim / 2, dim, dim)
                 end
@@ -169,7 +181,7 @@ concommand.Add("sample", function(ply, cmd, args)
         local tr = SaitoHUD.GetRefTrace()
         
         if ValidEntity(tr.Entity) then
-			if SaitoHud.FindSample(tr.Entity) then
+			if SaitoHUD.FindSample(tr.Entity) then
 				SaitoHUD.RemoveSample(tr.Entity)
 				LocalPlayer():ChatPrint("No longer sampling entity #" ..  tr.Entity:EntIndex() .. ".")
 			else
