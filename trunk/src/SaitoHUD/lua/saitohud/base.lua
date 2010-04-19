@@ -53,7 +53,7 @@ function SaitoHUD.MatchPlayerString(testName)
     end
 end
 
-function SaitoHUD.GetEntityInfoLines()
+function SaitoHUD.GetEntityInfoLines(showPlayerInfo)
     local tr = SaitoHUD.GetRefTrace()
     
     local lines = {}
@@ -62,21 +62,7 @@ function SaitoHUD.GetEntityInfoLines()
         local r, g, b, a = tr.Entity:GetColor();
         lines = {}
         
-        if tr.Entity:IsPlayer() then
-            table.Add(lines,{
-            "Name: " .. tostring(tr.Entity:Name()),
-            "SteamID: " .. tostring(tr.Entity:SteamID()),
-            "Ping: " .. tostring(tr.Entity:Ping()),
-            "Health: " .. tostring(tr.Entity:Health()),
-            "Armor: " .. tostring(tr.Entity:Armor()),
-            "Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
-            "Kills: " .. tostring(tr.Entity:Frags()),
-            "Deaths: " .. tostring(tr.Entity:Deaths()),
-            })
-        end
-        
         table.Add(lines,{
-            "",
             "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
             "Hit Pos: " .. tostring(tr.HitPos),
             "Class: " .. tostring(tr.Entity:GetClass()),
@@ -90,7 +76,19 @@ function SaitoHUD.GetEntityInfoLines()
             "Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
         })
         
-        
+        if showPlayerInfo and tr.Entity:IsPlayer() then
+            table.Add(lines, {
+            "",
+            "Name: " .. tostring(tr.Entity:Name()),
+            "SteamID: " .. tostring(tr.Entity:SteamID()),
+            "Ping: " .. tostring(tr.Entity:Ping()),
+            "Health: " .. tostring(tr.Entity:Health()),
+            "Armor: " .. tostring(tr.Entity:Armor()),
+            "Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
+            "Kills: " .. tostring(tr.Entity:Frags()),
+            "Deaths: " .. tostring(tr.Entity:Deaths()),
+            })
+        end
     else
         if tr.Hit then
             lines = {
