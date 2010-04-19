@@ -111,37 +111,37 @@ function SaitoHUD.ParseCSV(data)
         local line = line:Trim()
         
         if line ~= "" then
-	        local buffer = ""
-	        local escaped = false
-	        local inQuote = false
-	        local fields = {}
-	        
-	        for c = 1, #line do
-	            local char = line:sub(c, c)
-	            if escaped then
-	                buffer = buffer .. char
-	                escaped = false
-	            else
-	                if char == "\\" then
-	                    escaped = true
-	                elseif char == "\"" then
-	                    inQuote = not inQuote
-	                elseif char == "," then
-	                    if inQuote then
-	                        buffer = buffer .. char
-	                    else
-	                        table.insert(fields, buffer)
-	                        buffer = ""
-	                    end
-	                else
-	                    buffer = buffer .. char
-	                end
-	            end
-	        end
-	        
-	        table.insert(fields, buffer)
-	        table.insert(result, fields)
-	   end
+            local buffer = ""
+            local escaped = false
+            local inQuote = false
+            local fields = {}
+            
+            for c = 1, #line do
+                local char = line:sub(c, c)
+                if escaped then
+                    buffer = buffer .. char
+                    escaped = false
+                else
+                    if char == "\\" then
+                        escaped = true
+                    elseif char == "\"" then
+                        inQuote = not inQuote
+                    elseif char == "," then
+                        if inQuote then
+                            buffer = buffer .. char
+                        else
+                            table.insert(fields, buffer)
+                            buffer = ""
+                        end
+                    else
+                        buffer = buffer .. char
+                    end
+                end
+            end
+            
+            table.insert(fields, buffer)
+            table.insert(result, fields)
+       end
     end
     
     return result

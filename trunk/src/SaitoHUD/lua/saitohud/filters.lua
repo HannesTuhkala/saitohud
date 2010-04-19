@@ -106,7 +106,7 @@ function entityFilter.Build(tokens, nilForNull)
         print("Matching all entities")
         return FilterContext.universalFilter()
     end
-	
+    
     while i <= #tokens do
         local token = tokens[i]
         local directive = nil

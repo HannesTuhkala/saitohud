@@ -43,16 +43,16 @@ end
 
 --- Starts list gesture; called from the +listgest concmd.
 local function StartGesture(ply, cmd, args)
-	SaitoHUD.Gesturing = true
+    SaitoHUD.Gesturing = true
     menu = GetMenu()
     lastIndex = 0
-	gui.EnableScreenClicker(true)
+    gui.EnableScreenClicker(true)
 end
 
 --- Ends list gesture; called from the -listgest concmd.
 local function EndGesture(ply, cmd, args)
-	SaitoHUD.Gesturing = false
-	gui.EnableScreenClicker(false)
+    SaitoHUD.Gesturing = false
+    gui.EnableScreenClicker(false)
     surface.PlaySound("ui/buttonclickrelease.wav")
     
     if menu[lastIndex] then
@@ -66,7 +66,7 @@ local function EndGesture(ply, cmd, args)
 end
 
 local function HUDPaint()
-	if not SaitoHUD.Gesturing then return end
+    if not SaitoHUD.Gesturing then return end
     
     local offsetX, offsetY = ScrW() - 210, ScrH() * 0.1
     local mX, mY = gui.MousePos()

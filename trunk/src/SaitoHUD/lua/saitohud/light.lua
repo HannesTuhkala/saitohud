@@ -23,43 +23,43 @@ local lightEnabled = false
 
 --- Renders the dynamic light for the super flashlight.
 local function RenderFlashlight()
-	local light = DynamicLight(123120000) 
+    local light = DynamicLight(123120000) 
     
-	if light then 
-		light.Pos = LocalPlayer():GetEyeTrace().HitPos
-		light.r = 255
-		light.g = 255 
-		light.b = 255
-		light.Brightness = 1
-		light.Size = 2000
-		light.Decay = 0 
-		light.DieTime = CurTime() + 0.3
-	end 
-	local light = DynamicLight(123120001) 
+    if light then 
+        light.Pos = LocalPlayer():GetEyeTrace().HitPos
+        light.r = 255
+        light.g = 255 
+        light.b = 255
+        light.Brightness = 1
+        light.Size = 2000
+        light.Decay = 0 
+        light.DieTime = CurTime() + 0.3
+    end 
+    local light = DynamicLight(123120001) 
     
-	if light then 
-		light.Pos = LocalPlayer():GetPos()
-		light.r = 255
-		light.g = 255 
-		light.b = 255
-		light.Brightness = 1
-		light.Size = 2000
-		light.Decay = 0 
-		light.DieTime = CurTime() + 0.3
-	end 
+    if light then 
+        light.Pos = LocalPlayer():GetPos()
+        light.r = 255
+        light.g = 255 
+        light.b = 255
+        light.Brightness = 1
+        light.Size = 2000
+        light.Decay = 0 
+        light.DieTime = CurTime() + 0.3
+    end 
 end  
 
 --- Toggles the flash light.
 local function ToggleFlashLight()
-	lightEnabled = not lightEnabled
+    lightEnabled = not lightEnabled
     
-	surface.PlaySound("items/flashlight1.wav")
+    surface.PlaySound("items/flashlight1.wav")
     
-	if lightEnabled then
-		hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
-	else
-		hook.Remove("Think", "SaitoHUD.Super.Flashlight")
-	end
+    if lightEnabled then
+        hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
+    else
+        hook.Remove("Think", "SaitoHUD.Super.Flashlight")
+    end
 end
 
 concommand.Add("super_flashlight", ToggleFlashLight)
