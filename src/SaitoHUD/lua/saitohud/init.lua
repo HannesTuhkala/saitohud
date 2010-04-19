@@ -41,6 +41,7 @@ load("stranded")
 load("sandbox")
 load("lua")
 load("cinematography")
+load("panel")
 
 Msg("Loading additional modules...\n")
 
