@@ -281,6 +281,18 @@ pre, code {
     <td>The maximum distance away a resource can be for its resource name will be displayed.</td>
   </tr>
 </table>
+<h2>Sandbox Game Mode</h2>
+<p>For sandbox game modes (and all game modes that not stranded), there is a default sandbox list gesture menu that contains some common tools. To customize this list, create a CSV file at <strong>data/saitohud/sandbox/menu.csv</strong> (in your data/ folder) and make a list of the tools that you wish to have on the menu. The first column is the text that will be shown, while the second column is the console command to run.</p>
+<p>The following is a sample from the default menu.csv file:</p>
+<pre>Title,Command
+Easy Precision Tool,tool_easy_precision
+Weld Tool,tool_weld
+Remover Tool,tool_remover
+No Collide Tool,tool_nocollide
+Adv. Duplicator Tool,tool_adv_duplicator
+Expression 2 Tool,tool_wire_expression2
+Wire Debugger Tool,tool_wire_debugger
+Improved Wire Tool,tool_wire_improved</pre>
 <h2>Miscellaneous</h2>
 <h3>Cvars</h3>
   <table border="0" cellspacing="0" cellpadding="0">
