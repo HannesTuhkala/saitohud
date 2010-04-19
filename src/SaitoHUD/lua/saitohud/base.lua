@@ -60,37 +60,37 @@ function SaitoHUD.GetEntityInfoLines()
     
     if ValidEntity(tr.Entity) then
         local r, g, b, a = tr.Entity:GetColor();
-		lines = {}
-		
-		if tr.Entity:IsPlayer() then
-			table.Add(lines,{
-			"Name: " .. tostring(tr.Entity:Name()),
-			"SteamID: " .. tostring(tr.Entity:SteamID()),
-			"Ping: " .. tostring(tr.Entity:Ping()),
-			"Health: " .. tostring(tr.Entity:Health()),
-			"Armor: " .. tostring(tr.Entity:Armor()),
-			"Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
-			"Kills: " .. tostring(tr.Entity:Frags()),
-			"Deaths: " .. tostring(tr.Entity:Deaths()),
-			})
-		end
-		
-		table.Add(lines,{
-			"",
-			"#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
-			"Hit Pos: " .. tostring(tr.HitPos),
-			"Class: " .. tostring(tr.Entity:GetClass()),
-			"Position: " .. tostring(tr.Entity:GetPos()),
-			"Size: " .. tostring(tr.Entity:OBBMaxs()-tr.Entity:OBBMins()),
-			"Angle: " .. tostring(tr.Entity:GetAngles()),
-			"Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
-			"Model: " .. tostring(tr.Entity:GetModel()),
-			"Material: " .. tostring(tr.Entity:GetMaterial()),
-			"Velocity: " .. tostring(tr.Entity:GetVelocity()),
-			"Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
-		})
-		
-		
+        lines = {}
+        
+        if tr.Entity:IsPlayer() then
+            table.Add(lines,{
+            "Name: " .. tostring(tr.Entity:Name()),
+            "SteamID: " .. tostring(tr.Entity:SteamID()),
+            "Ping: " .. tostring(tr.Entity:Ping()),
+            "Health: " .. tostring(tr.Entity:Health()),
+            "Armor: " .. tostring(tr.Entity:Armor()),
+            "Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
+            "Kills: " .. tostring(tr.Entity:Frags()),
+            "Deaths: " .. tostring(tr.Entity:Deaths()),
+            })
+        end
+        
+        table.Add(lines,{
+            "",
+            "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
+            "Hit Pos: " .. tostring(tr.HitPos),
+            "Class: " .. tostring(tr.Entity:GetClass()),
+            "Position: " .. tostring(tr.Entity:GetPos()),
+            "Size: " .. tostring(tr.Entity:OBBMaxs()-tr.Entity:OBBMins()),
+            "Angle: " .. tostring(tr.Entity:GetAngles()),
+            "Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
+            "Model: " .. tostring(tr.Entity:GetModel()),
+            "Material: " .. tostring(tr.Entity:GetMaterial()),
+            "Velocity: " .. tostring(tr.Entity:GetVelocity()),
+            "Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
+        })
+        
+        
     else
         if tr.Hit then
             lines = {
@@ -117,7 +117,7 @@ function SaitoHUD.ShowHint(msg, t, c)
     if not t then t = 10 end
     if not c then c = NOTIFY_GENERIC end
     GAMEMODE:AddNotify(msg, c, t);
-	surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
+    surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
 end
 
 function SaitoHUD.OpenHelp()

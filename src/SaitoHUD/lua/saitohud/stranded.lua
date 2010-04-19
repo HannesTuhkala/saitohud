@@ -64,86 +64,86 @@ local plantIDs = {
 }
 
 local function HUDPaint()
-	local ply = LocalPlayer()
+    local ply = LocalPlayer()
     local selfPos = ply:GetPos()
-	local shootPos = ply:GetShootPos()
+    local shootPos = ply:GetShootPos()
 
-	for _, v in ipairs(ents.GetAll()) do
-		if v:GetClass() == "gms_resourcedrop" then
-			local pos = v:LocalToWorld(v:OBBCenter())
+    for _, v in ipairs(ents.GetAll()) do
+        if v:GetClass() == "gms_resourcedrop" then
+            local pos = v:LocalToWorld(v:OBBCenter())
             local distance = selfPos:Distance(pos)
-			
-			local data = {}
-			data.start = selfPos
-			data.endpos = pos
-			data.filter = ply
+            
+            local data = {}
+            data.start = selfPos
+            data.endpos = pos
+            data.filter = ply
             local tr = util.TraceLine(data)
 
-			if distance <= resDistance:GetFloat() and (not checkSeeable:GetBool() or 
+            if distance <= resDistance:GetFloat() and (not checkSeeable:GetBool() or 
                 tr.Entity == v) then
-				local text = (v.Res or "Loading") .. ": " .. tostring(v.Amount or 0)
-				local drawLoc = pos:ToScreen()
-				surface.SetFont("ChatFont")
-				local w, h = surface.GetTextSize(text)
- 				draw.RoundedBox(4, drawLoc.x - (w/2) - 3, drawLoc.y - (h/2) - 3,
+                local text = (v.Res or "Loading") .. ": " .. tostring(v.Amount or 0)
+                local drawLoc = pos:ToScreen()
+                surface.SetFont("ChatFont")
+                local w, h = surface.GetTextSize(text)
+                 draw.RoundedBox(4, drawLoc.x - (w/2) - 3, drawLoc.y - (h/2) - 3,
                                 w + 6, h + 6, Color(50, 50, 50, 200))
                 local r, g, b = itemColors[v.Res] and itemColors[v.Res] or
                     HSVToColor((string.byte(text) * 5 + string.byte(text, 3) * 7) % 360, 1, 1)
-				surface.SetTextColor(r, g, b, 200)
-				surface.SetTextPos(drawLoc.x - (w/2), drawLoc.y - (h/2))
-				surface.DrawText(text)
-			end
-		end
+                surface.SetTextColor(r, g, b, 200)
+                surface.SetTextPos(drawLoc.x - (w/2), drawLoc.y - (h/2))
+                surface.DrawText(text)
+            end
+        end
 
-		if CheckName(v, GMS.StructureEntities) then
-			local pos = v:LocalToWorld(v:OBBCenter())
-			local minimum = v:LocalToWorld(v:OBBMins())
-			local maximum = v:LocalToWorld(v:OBBMaxs())
-			local loc = Vector(0, 0, 0)
+        if CheckName(v, GMS.StructureEntities) then
+            local pos = v:LocalToWorld(v:OBBCenter())
+            local minimum = v:LocalToWorld(v:OBBMins())
+            local maximum = v:LocalToWorld(v:OBBMaxs())
+            local loc = Vector(0, 0, 0)
             local distance = selfPos:Distance(pos)
-			local range = (maximum - minimum):Length()
-			if range < 200 then range = 200 end
-			
-			local data = {}
-			data.start = selfPos
-			data.endpos = pos
-			data.filter = ply
+            local range = (maximum - minimum):Length()
+            if range < 200 then range = 200 end
+            
+            local data = {}
+            data.start = selfPos
+            data.endpos = pos
+            data.filter = ply
             local tr = util.TraceLine(data)
             
-			if distance <= range and (tr.Entity == v or not tr.Hit) then
-				local text = v:GetNetworkedString("Name") or "Loading"
-				if v:GetClass() == "gms_buildsite" then
+            if distance <= range and (tr.Entity == v or not tr.Hit) then
+                local text = v:GetNetworkedString("Name") or "Loading"
+                if v:GetClass() == "gms_buildsite" then
                     text = text .. v:GetNetworkedString('Resources')
-				end
+                end
                 
-				if minimum.z <= maximum.z then
-					if shootPos.z > maximum.z then
-						loc.z = maximum.z
-					elseif shootPos.z < minimum.z then
-						loc.z = minimum.z
-					else
-						loc.z = shootPos.z
-					end
-				else
-					if shootPos.z < maximum.z then
-						loc.z = maximum.z
-					elseif shootPos.z > minimum.z then
-						loc.z = minimum.z
-					else
-						loc.z = shootPos.z
-					end
-				end
+                if minimum.z <= maximum.z then
+                    if shootPos.z > maximum.z then
+                        loc.z = maximum.z
+                    elseif shootPos.z < minimum.z then
+                        loc.z = minimum.z
+                    else
+                        loc.z = shootPos.z
+                    end
+                else
+                    if shootPos.z < maximum.z then
+                        loc.z = maximum.z
+                    elseif shootPos.z > minimum.z then
+                        loc.z = minimum.z
+                    else
+                        loc.z = shootPos.z
+                    end
+                end
                 
-				local drawLoc = Vector(pos.x, pos.y, loc.z):ToScreen()
-				surface.SetFont("ChatFont")
-				local w, h = surface.GetTextSize(text)
- 				draw.RoundedBox(4, drawLoc.x - (w/2) - 3, drawLoc.y - (h/2) - 3,
+                local drawLoc = Vector(pos.x, pos.y, loc.z):ToScreen()
+                surface.SetFont("ChatFont")
+                local w, h = surface.GetTextSize(text)
+                 draw.RoundedBox(4, drawLoc.x - (w/2) - 3, drawLoc.y - (h/2) - 3,
                                 w + 6, h + 6, Color(50, 50, 50, 200))
-				surface.SetTextColor(255, 255, 255, 200)
-				surface.SetTextPos(drawLoc.x - (w/2), drawLoc.y - (h/2))
-				surface.DrawText(text)
-			end
-		end
+                surface.SetTextColor(255, 255, 255, 200)
+                surface.SetTextPos(drawLoc.x - (w/2), drawLoc.y - (h/2))
+                surface.DrawText(text)
+            end
+        end
     end
 end
 
@@ -155,7 +155,7 @@ local function HandleKey(ply, key)
             local shootPos = ply:GetShootPos()
             local eyeAngles = ply:EyeAngles()
             
-			local data = {}
+            local data = {}
             data.start = shootPos
             data.endpos = shootPos + eyeAngles:Forward() * 200
             data.filter = ply

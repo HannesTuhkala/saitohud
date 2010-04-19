@@ -51,7 +51,7 @@ function SamplingContext:new(ent, color, randomColor)
     local instance = {
         ["ent"] = ent,
         ["points"] = {},
-		["color"] = color,
+        ["color"] = color,
     }
     
     setmetatable(instance, self)
@@ -95,7 +95,7 @@ function SamplingContext:Draw(drawNodes)
     local currentPos = self.ent:GetPos()
     local lastPt = nil
     
-	surface.SetDrawColor(self.color.r, self.color.g, self.color.b, 255)
+    surface.SetDrawColor(self.color.r, self.color.g, self.color.b, 255)
     
     for k, pt in pairs(self.points) do
         if lastPt != nil and lastPt != pt then 
@@ -103,19 +103,19 @@ function SamplingContext:Draw(drawNodes)
             local to = pt:ToScreen()
             
             if from.visible and to.visible then
-				if sampleFade:GetBool() then
-					surface.SetDrawColor(self.color.r, self.color.g, self.color.b,
+                if sampleFade:GetBool() then
+                    surface.SetDrawColor(self.color.r, self.color.g, self.color.b,
                                          (k / #self.points) * 255)
-				end
-				
+                end
+                
                 surface.DrawLine(from.x, from.y, to.x, to.y)
                 
-				if sampleThick:GetBool() then
-					surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
-					surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
-					surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
-				end
-				
+                if sampleThick:GetBool() then
+                    surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
+                    surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
+                    surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
+                end
+                
                 if sampleNodes:GetBool() then
                     surface.DrawOutlinedRect(to.x - dim / 2, to.y - dim / 2, dim, dim)
                 end
@@ -130,12 +130,12 @@ function SamplingContext:Draw(drawNodes)
         local to = currentPos:ToScreen()
         if from.visible and to.visible then
             surface.DrawLine(from.x, from.y, to.x, to.y)
-			
-			if sampleThick:GetBool() then
-				surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
-				surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
-				surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
-			end
+            
+            if sampleThick:GetBool() then
+                surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
+                surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
+                surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
+            end
         end
     end
     
@@ -198,12 +198,12 @@ end
 -- @param ent Entity
 -- @return Whether it exists
 function SaitoHUD.HasSample(ent)
-	for k, ctx in pairs(SaitoHUD.Samplers) do
+    for k, ctx in pairs(SaitoHUD.Samplers) do
         if ctx.ent == ent then
             return true
         end
     end
-	return false
+    return false
 end
 
 --- Collects data points, and removes any deleted entities from the sample list.
@@ -241,13 +241,13 @@ function Sample(ply, cmd, args)
         local tr = SaitoHUD.GetRefTrace()
         
         if ValidEntity(tr.Entity) then
-			if SaitoHUD.HasSample(tr.Entity) then
-				SaitoHUD.RemoveSample(tr.Entity)
-				LocalPlayer():ChatPrint("No longer sampling entity #" ..  tr.Entity:EntIndex() .. ".")
-			else
-				SaitoHUD.AddSample(tr.Entity)
-				LocalPlayer():ChatPrint("Sampling entity #" ..  tr.Entity:EntIndex() .. ".")
-			end
+            if SaitoHUD.HasSample(tr.Entity) then
+                SaitoHUD.RemoveSample(tr.Entity)
+                LocalPlayer():ChatPrint("No longer sampling entity #" ..  tr.Entity:EntIndex() .. ".")
+            else
+                SaitoHUD.AddSample(tr.Entity)
+                LocalPlayer():ChatPrint("Sampling entity #" ..  tr.Entity:EntIndex() .. ".")
+            end
         else
             LocalPlayer():ChatPrint("Nothing was found in an eye trace!")
         end
