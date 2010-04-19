@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,22 +17,40 @@
 -- 
 -- $Id$
 
+-- This modules provides list gesturing features.
+
 SaitoHUD.Gesturing = false
-SaitoHUD.RegisteredListGests = {}
-SaitoHUD.RegisteredLeftListGests = {}
 
 local menu = {}
 local lastIndex = 0
 
-function StartGesture(ply, cmd, args)
+--- Builds the list gesture menu.
+local function GetMenu()
+    local menu = {}
+    local numHooks = SaitoHUD.CountHooks("SaitoHUDListGestures")
+    local registered = SaitoHUD.CallHookAggregate("SaitoHUDListGestures", numHooks)
+    
+    for _, items in pairs(registered) do
+        table.Merge(menu, items)
+    end
+    
+    table.insert(menu, 1, {
+        text = "Cancel",
+    })
+    
+    return menu
+end
+
+--- Starts list gesture; called from the +listgest concmd.
+local function StartGesture(ply, cmd, args)
 	SaitoHUD.Gesturing = true
     menu = GetMenu()
     lastIndex = 0
 	gui.EnableScreenClicker(true)
 end
-concommand.Add("+listgest", StartGesture)
 
-function EndGesture(ply, cmd, args)
+--- Ends list gesture; called from the -listgest concmd.
+local function EndGesture(ply, cmd, args)
 	SaitoHUD.Gesturing = false
 	gui.EnableScreenClicker(false)
     surface.PlaySound("ui/buttonclickrelease.wav")
@@ -45,26 +64,8 @@ function EndGesture(ply, cmd, args)
         end
     end
 end
-concommand.Add("-listgest", EndGesture)
 
-function GetMenu()
-    local menu = {}
-    for _, lg in pairs(SaitoHUD.RegisteredListGests) do
-        if not lg[2] or table.Count(SaitoHUD.RegisteredListGests) == 1 then
-            table.Merge(menu, lg[1]())
-        end
-    end
-    table.insert(menu, 1, {
-        ["text"] = "Cancel",
-    })
-    return menu
-end
-
-function SaitoHUD.RegisterListGest(f, showIfEmpty)
-    table.insert(SaitoHUD.RegisteredListGests, {f, showIfEmpty})
-end
-
-function HUDPaint()
+local function HUDPaint()
 	if not SaitoHUD.Gesturing then return end
     
     local offsetX, offsetY = ScrW() - 210, ScrH() * 0.1
@@ -72,15 +73,18 @@ function HUDPaint()
     local scX, scY = ScrW() / 2, ScrH() / 2
     local mDistance = math.max(math.abs(scY - mY) - 5, 0)
     local index = 1
+    
     if mY > scY then
         index = math.min(math.floor(mDistance / 15) + 1, table.Count(menu))
     else
         index = 1
         --index = table.Count(menu) - math.min(math.floor(mDistance / 15), table.Count(menu) - 1)
     end
+    
     if index ~= lastIndex then
         surface.PlaySound("weapons/pistol/pistol_empty.wav")
     end
+    
     lastIndex = index
     
     for i, entry in pairs(menu) do
@@ -97,4 +101,7 @@ function HUDPaint()
         surface.DrawText(entry.text)
     end
 end
-hook.Add("HUDPaint", "SaitoHUDListGestHUDPaint", HUDPaint)
+
+concommand.Add("+listgest", StartGesture)
+concommand.Add("-listgest", EndGesture)
+hook.Add("HUDPaint", "SaitoHUD.ListGest", HUDPaint)

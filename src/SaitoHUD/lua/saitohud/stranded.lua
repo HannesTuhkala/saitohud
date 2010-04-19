@@ -177,7 +177,7 @@ local function HandleKey(ply, key)
     lastAttack2 = input.IsMouseDown(MOUSE_RIGHT)
 end
 
-local function StrandedListGest(item)
+local function StrandedMenu(numHooks)
     local ply = LocalPlayer()
     local shootPos = ply:GetShootPos()
     
@@ -291,7 +291,7 @@ local function SetUp()
             end
         end
 
-        SaitoHUD.RegisterListGest(StrandedListGest)
+        hook.Add("SaitoHUDListGestures", "SaitoHUD.Stranded", StrandedMenu)
         hook.Add("HUDPaint", "SaitoHUDStrandedHUDPaint", HUDPaint)
         hook.Remove("HUDPaint", "GMS_ResourceDropsHUD")
         hook.Add("KeyRelease", "SaitoHUDStrandedKeyRelease", HandleKey)
