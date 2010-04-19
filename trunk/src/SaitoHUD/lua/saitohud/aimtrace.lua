@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -18,7 +19,8 @@
 
 local traceAims = CreateClientConVar("trace_aims", "0", true, false)
 
-local function DrawTraceAims()
+--- Actually draws the trace aim lines and endpoint boxes.
+local function DrawTraceAimsHelper()
     for _, ply in pairs(player.GetAll()) do
         local doDraw = true
         
@@ -39,7 +41,9 @@ local function DrawTraceAims()
             local tr = util.TraceLine(data)
             local distance = tr.HitPos:Distance(shootPos)
             
-            cam.Start3D2D(tr.HitPos + tr.HitNormal * 0.2, tr.HitNormal:Angle() + Angle(90, 0, 0), 1)
+            -- Draw the end point
+            cam.Start3D2D(tr.HitPos + tr.HitNormal * 0.2,
+                          tr.HitNormal:Angle() + Angle(90, 0, 0), 1)
             if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
                 surface.SetDrawColor(255, 255, 0, 200)
             else
@@ -48,6 +52,7 @@ local function DrawTraceAims()
             surface.DrawRect(-5, -5, 10, 10)
             cam.End3D2D()
             
+            -- Draw the line
             cam.Start3D2D(shootPos, eyeAngles, 1)
             if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
                 surface.SetDrawColor(255, 255, 0, 255)
@@ -60,10 +65,18 @@ local function DrawTraceAims()
     end
 end
 
-hook.Add("RenderScreenspaceEffects", "SaitoHUDAimTrace", function()
+--- RenderScreenspaceEffects hook that calls DrawTraceAimsHelper. We separate the
+-- actual drawing function away because, for whatever reason, if it creates an
+-- error, the game will be put in an undefined state that only a restart of the
+-- game can fix.
+local function DrawTraceAims()
     if traceAims:GetBool() then
         cam.Start3D(EyePos(), EyeAngles())
-        pcall(DrawTraceAims)
+        -- Wrap the call in pcall() because an error here causes mayhem, so it
+        -- is best if any errors are caught
+        pcall(DrawTraceAimsHelper)
         cam.End3D()
     end
-end)
+end
+
+hook.Add("RenderScreenspaceEffects", "SaitoHUD.AimTrace", DrawTraceAims)
