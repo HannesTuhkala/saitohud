@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
 -- 
 -- $Id$
 
+-- Core SaitoHUD functions.
+
 local ignoreHooks = CreateClientConVar("saitohud_ignore_hooks", "0", false, false)
 
 --- Checks whether the anti-unfair mode is triggered.
@@ -29,18 +32,27 @@ function SaitoHUD.AntiUnfairTriggered()
         string.find(folder:lower(), "sandbox") == nil
 end
 
+--- Returns where hooks are disabled.
 function SaitoHUD.ShouldIgnoreHook()
     return ignoreHooks:GetBool()
 end
 
+--- Gets a player trace. This function should be used in case a SaitoHUD component
+-- changes the origin of the player's camera.
+-- @return Trace result
 function SaitoHUD.GetRefTrace()
     return util.TraceLine(util.GetPlayerTrace(LocalPlayer()))
 end
 
+--- Gets a player's reference location. This function should be used in case a
+-- SaitoHUD component changes the origin of the player's camera.
 function SaitoHUD.GetRefPos()
     return LocalPlayer():GetPos()
 end
 
+--- Returns a Player object by name, or nil if nothing be found.
+-- @param testName Name of player to match
+-- @return Player object
 function SaitoHUD.MatchPlayerString(testName)
     local possibleMatch = nil
     testName = testName:lower()
@@ -64,6 +76,8 @@ function SaitoHUD.MatchPlayerString(testName)
     end
 end
 
+--- Used to get the entity information text.
+-- @return Text
 function SaitoHUD.GetEntityInfoLines(showPlayerInfo)
     local tr = SaitoHUD.GetRefTrace()
     
@@ -112,6 +126,7 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo)
     return lines
 end
 
+--- Dumps the entity information printout to console.
 function SaitoHUD.DumpEntityInfo()
     local lines = SaitoHUD.GetEntityInfoLines()
     
@@ -122,6 +137,10 @@ function SaitoHUD.DumpEntityInfo()
     end
 end
 
+--- Shows a hint.
+-- @param msg Message
+-- @param t Number of seconds, 10 by default
+-- @param c Type of message, NOTIFY_GENERIC by default
 function SaitoHUD.ShowHint(msg, t, c)
     if not t then t = 10 end
     if not c then c = NOTIFY_GENERIC end
@@ -129,6 +148,7 @@ function SaitoHUD.ShowHint(msg, t, c)
     surface.PlaySound("ambient/water/drip" .. math.random(1, 4) .. ".wav")
 end
 
+--- Opens the help window.
 function SaitoHUD.OpenHelp()
     if SaitoHUD.HelpWindow and SaitoHUD.HelpWindow:IsValid() then
         return
@@ -166,12 +186,10 @@ function SaitoHUD.OpenHelp()
     frame:InvalidateLayout(true, true)
 end
 
-concommand.Add("saitohud_help", function(ply, cmd, args)
-    SaitoHUD.OpenHelp()
-end)
+concommand.Add("saitohud_help", function() SaitoHUD.OpenHelp() end)
 
 --- We store it now so that players can't disable it mid-game -- that's not enough
--- of a deterrent
+-- of a deterrent. However, if people wish to disable the feature, they can.
 if __SaitoHUDUnfair == nil and not file.Exists("saitohud/no_deterrent.lck") then
     __SaitoHUDUnfair = true
 end
