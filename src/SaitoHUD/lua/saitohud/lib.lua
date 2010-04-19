@@ -19,11 +19,26 @@
 
 -- Generic library functions.
 
+--- Gets the number of hooks registered.
+-- @param name Name of hook
+-- @return Number of hooks
+function SaitoHUD.CountHooks(name)
+    local ret = nil
+    local hooks = hook.GetTable()[name]
+    
+    if hooks ~= nil then
+        return #hooks
+    else
+        return 0
+    end
+end
+
 --- Calls a hook registered by hook.Add.
 -- Unlike hook.Call, this function return the last non-nil result, or nil if
 -- there was none.
 -- @param name Name of hook
 -- @param args Arguments
+-- @return Last result
 function SaitoHUD.CallHookLast(name, ...)
     local ret = nil
     local hooks = hook.GetTable()[name]
@@ -46,6 +61,7 @@ end
 -- registered, then a table with 0 elements will be returned.
 -- @param name Name of hook
 -- @param args Arguments
+-- @return Table of results
 function SaitoHUD.CallHookAggregate(name, ...)
     local results = {}
     local hooks = hook.GetTable()[name]
@@ -67,6 +83,7 @@ end
 -- the tables into one final table.
 -- @param name Name of hook
 -- @param args Arguments
+-- @return Table of results
 function SaitoHUD.CallHookCombined(name, ...)
     local results = {}
     local hooks = hook.GetTable()[name]
@@ -81,4 +98,51 @@ function SaitoHUD.CallHookCombined(name, ...)
     end
     
     return results
+end
+
+--- Parses a CSV file.
+-- @param data Data to parse
+-- @return Table of rows
+function SaitoHUD.ParseCSV(data)
+    local lines = string.Explode("\n", data:gsub("\r", ""))
+    local result = {}
+    
+    for i, line in pairs(lines) do
+        local line = line:Trim()
+        
+        if line ~= "" then
+	        local buffer = ""
+	        local escaped = false
+	        local inQuote = false
+	        local fields = {}
+	        
+	        for c = 1, #line do
+	            local char = line:sub(c, c)
+	            if escaped then
+	                buffer = buffer .. char
+	                escaped = false
+	            else
+	                if char == "\\" then
+	                    escaped = true
+	                elseif char == "\"" then
+	                    inQuote = not inQuote
+	                elseif char == "," then
+	                    if inQuote then
+	                        buffer = buffer .. char
+	                    else
+	                        table.insert(fields, buffer)
+	                        buffer = ""
+	                    end
+	                else
+	                    buffer = buffer .. char
+	                end
+	            end
+	        end
+	        
+	        table.insert(fields, buffer)
+	        table.insert(result, fields)
+	   end
+    end
+    
+    return result
 end
