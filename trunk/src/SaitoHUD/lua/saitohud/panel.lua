@@ -79,16 +79,24 @@ local function SamplingPanel(panel)
 		max = "500"
 	})
 	
-	panel:AddControl("TextBox", {
-		Label = "Sample",
-		Command = "sample",
-		WaitForEnter = true
-	})
-	panel:AddControl("TextBox", {
-		Label = "Remove Sample",
-		Command = "sample_remove",
-		WaitForEnter = true
-	})
+	panel:AddControl("Label", {Text = "Sample"})
+	local SampleEntry = panel:AddControl("DTextEntry",{})
+	SampleEntry:SetTall(20)
+	SampleEntry:SetWide(100)
+	SampleEntry:SetEnterAllowed(true)
+	SampleEntry.OnEnter = function()
+		LocalPlayer():ConCommand("sample " .. SampleEntry:GetValue())
+	end
+	
+	panel:AddControl("Label", {Text = "Remove Sample"})
+	local RemoveEntry = panel:AddControl("DTextEntry",{})
+	RemoveEntry:SetTall(20)
+	RemoveEntry:SetWide(100)
+	RemoveEntry:SetEnterAllowed(true)
+	RemoveEntry.OnEnter = function()
+		LocalPlayer():ConCommand("sample_remove " .. RemoveEntry:GetValue())
+	end
+	
 end
 
 local function OverlayPanel(panel)
@@ -120,21 +128,32 @@ local function OverlayPanel(panel)
 		Command = "trace_aims"
 	})
 	
-	panel:AddControl("TextBox", {
-		Label = "Triads Filter",
-		Command = "triads_filter",
-		WaitForEnter = true
-	})
-	panel:AddControl("TextBox", {
-		Label = "Overlay Filter",
-		Command = "overlay_filter",
-		WaitForEnter = true
-	})
-	panel:AddControl("TextBox", {
-		Label = "BBox Filter",
-		Command = "bbox_filter",
-		WaitForEnter = true
-	})
+	panel:AddControl("Label", {Text = "Triads Filter"})
+	local TriadsEntry = panel:AddControl("DTextEntry",{})
+	TriadsEntry:SetTall(20)
+	TriadsEntry:SetWide(100)
+	TriadsEntry:SetEnterAllowed(true)
+	TriadsEntry.OnEnter = function()
+		LocalPlayer():ConCommand("triads_filter " .. TriadsEntry:GetValue())
+	end
+	
+	panel:AddControl("Label", {Text = "Overlay Filter"})
+	local OverlayEntry = panel:AddControl("DTextEntry",{})
+	OverlayEntry:SetTall(20)
+	OverlayEntry:SetWide(100)
+	OverlayEntry:SetEnterAllowed(true)
+	OverlayEntry.OnEnter = function()
+		LocalPlayer():ConCommand("overlay_filter " .. OverlayEntry:GetValue())
+	end
+	
+	panel:AddControl("Label", {Text = "BBox Filter"})
+	local BBoxEntry = panel:AddControl("DTextEntry",{})
+	BBoxEntry:SetTall(20)
+	BBoxEntry:SetWide(100)
+	BBoxEntry:SetEnterAllowed(true)
+	BBoxEntry.OnEnter = function()
+		LocalPlayer():ConCommand("bbox_filter " .. BBoxEntry:GetValue())
+	end
 end
 
 --- PopulateToolMenu hook.
