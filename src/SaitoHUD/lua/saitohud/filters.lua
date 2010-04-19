@@ -190,7 +190,7 @@ function entityFilter.Build(tokens, nilForNull)
                     elseif directive == "maxdist" then
                         filterDef.maxDist = tonumber(tokens[i + 1])
                     elseif directive == "id" then
-                        filterDef.id = tonumber(tokens[i + 1])
+                        entityFilter.UpdateFilterDefList(filterDef, "id", tokens[i + 1])
                     elseif directive == "model" then
                         entityFilter.UpdateFilterDefList(filterDef, "model", tokens[i + 1])
                     elseif directive == "material" then
@@ -231,6 +231,7 @@ function entityFilter.Build(tokens, nilForNull)
             if not f(ent, refPos) then return false end
         end
         
+        local id = ent:EntIndex()
         local cls = ent:GetClass()
         local model = ent:GetModel()
         local material = ent:GetMaterial()
@@ -248,14 +249,12 @@ function entityFilter.Build(tokens, nilForNull)
             end
         end
         
-        if filterDef.id and filterDef.id ~= ent:EntIndex() then
-            return false
-        end
-        
+        if not satisfiesList(filterDef.id, tostring(id), false, true) then return false end
         if not satisfiesList(filterDef.cls, cls) then return false end
         if not satisfiesList(filterDef.model, model) then return false end
         if not satisfiesList(filterDef.material, material) then return false end
         
+        if satisfiesList(filterDef.idBlacklist, id, true, true) then return false end
         if satisfiesList(filterDef.clsBlacklist, cls, true) then return false end
         if satisfiesList(filterDef.modelBlacklist, model, true) then return false end
         if satisfiesList(filterDef.materialBlacklist, material, true) then return false end
@@ -284,7 +283,7 @@ end
 -- a substring of any item in a list
 -- @param lst Whitelist
 -- @param v Item to check
-function entityFilter.SatisfiesListSubstring(lst, v, explicit)    
+function entityFilter.SatisfiesListSubstring(lst, v, explicit, strict)    
     if lst == nil then
         if explicit then
             return false
@@ -301,9 +300,17 @@ function entityFilter.SatisfiesListSubstring(lst, v, explicit)
         return true
     end
     
-    for _, test in pairs(lst) do
-        if not v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
-            return false
+    if not strict then
+        for _, test in pairs(lst) do
+            if not v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
+                return false
+            end
+        end
+    else
+        for _, test in pairs(lst) do
+            if v != test then -- TODO: Possibly lowercase text beforehand
+                return false
+            end
         end
     end
     
