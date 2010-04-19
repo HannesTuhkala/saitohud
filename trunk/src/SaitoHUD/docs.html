@@ -64,13 +64,13 @@ pre, code {
   <h1>SaitoHUD Reference  </h1>
   <p>SaitoHUD is a utility HUD with a wide variety of functions. Note that it does not attempt to protect itself from tampered global functions.</p>
   <h2>Filters</h2>
-  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. For example, you could match all entities by a certain substring in the model strings of entities. To match entity class names, list the class name substrings to match after the command. For example, if the command was <code>show</code>, the corresponding command that would match class substrings of &quot;wire_&quot; and &quot;expr&quot; would be:</p>
-  <pre>show wire expr</pre>
-  <p>For negation, prepend a hyphen (&quot;-&quot;) before the class name, like so:</p>
-  <pre>show wire -light</pre>
+  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. For example, you could match all entities that have class names that contain  &quot;prop_&quot; and model paths that contain fire by using the filter <code>prop_ @mdl fire</code>. To match entity class names, list the class name substrings to match after the command. For example, if the command was <code>highlight_ents</code>, the corresponding command that would match class substrings of &quot;wire_&quot; and &quot;expr&quot; would be:</p>
+  <pre>highlight_ents wire expr</pre>
+  <p>If you want to prevent the matching of something, prepend a hyphen (&quot;-&quot;), like so:</p>
+  <pre>highlight_ents wire -light</pre>
   <p>To match other properties, such as model path or material, use the syntax of <code>@type pattern</code>, like so:</p>
-<pre>show wire -light @model gate @model -ram</pre>
-  <p>There is an example of negation when filtering by model name in the previous example.</p>
+<pre>highlight_ents wire -light @model gate @model -ram</pre>
+  <p>That would match all entities that have class names containing &quot;wire&quot; but do not have class names containing &quot;light&quot;, and have &quot;gate&quot; in their model path, but not &quot;ram&quot; in their model path.</p>
   <p>SaitoHUD supports the following extra properties to filter by:</p>
   <ul>
     <li>@id</li>
@@ -80,7 +80,10 @@ pre, code {
     <li>@material (alias @mat)</li>
   </ul>
   <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you. @id only allows you to select one entity at a time.</p>
-  <p>Use an asterisk (*) if you wish to match all class names, models, or materials. Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments. Note that SaitoHUD's filtering capabilities only supports AND. The results of the filtering operation are cached for very brief amounts of time to significantly increase performance.</p>
+  <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>highlight_ents *</code> or <code>highlight_ents @mdl *</code> or even <code>highlight_ents @mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
+  <p>To do &quot;OR&quot;, merely use write or/OR. You may also use parentheses. An explicit AND/and can also be written. OR has a higher precedence than AND. See the following example, which also uses explicit ANDs:</p>
+  <pre>bbox_filter wire and (expr or gate @mdl cpu) or @mdl barrel</pre>
+  <p>The results of the filtering operation are cached for very brief amounts of time to significantly increase performance.</p>
   <h2>List Gestures</h2>
   <p>SaitoHUD provides a quick list menu that can be accessed with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
 <h2>Overlays</h2>
