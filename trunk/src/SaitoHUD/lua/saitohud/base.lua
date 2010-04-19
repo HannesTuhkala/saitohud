@@ -182,21 +182,3 @@ end
 concommand.Add("saitohud_help", function(ply, cmd, args)
     SaitoHUD.OpenHelp()
 end)
-
-local function HelpPanel(panel)
-    panel:ClearControls()
-    panel:AddHeader()
-    
-    local button = panel:AddControl("DButton", {})
-	button:SetText("Help")
-	button.DoClick = function(button)
-		SaitoHUD.OpenHelp()
-	end
-end
-
---- PopulateToolMenu hook.
-local function PopulateToolMenu()
-    spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUDHelp", "Help", "", "", HelpPanel)
-end
-
-hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)

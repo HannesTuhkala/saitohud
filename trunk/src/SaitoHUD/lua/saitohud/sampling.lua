@@ -17,14 +17,14 @@
 -- $Id$
 
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
-local sampleResolution = CreateClientConVar("sample_resolution", "0.1", true, false)
+local sampleResolution = CreateClientConVar("sample_resolution", "100", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
 local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
 local sampleNodes = CreateClientConVar("sample_nodes", "1", true, false)
 local sampleMultiple = CreateClientConVar("sample_multiple", "0", true, false)
 
 cvars.AddChangeCallback("sample_resolution", function(cv, old, new)
-	SaitoHUD.sampleResolution = sampleResolution:GetFloat()
+	SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000 -- Milliseconds for better use with cpanel
 end)
 
 cvars.AddChangeCallback("sample_size", function(cv, old, new)

@@ -94,7 +94,7 @@ function entityFilter.Build(tokens, nilForNull)
     local filterDef = {}
     local i = 1
     
-    if #tokens == 0 then
+    if #tokens == 0 or tokens[1] == "" then
         print("Matching no entities")
         if nilForNull then
             return nil
@@ -104,7 +104,7 @@ function entityFilter.Build(tokens, nilForNull)
         print("Matching all entities")
         return FilterContext.universalFilter()
     end
-    
+	
     while i <= #tokens do
         local token = tokens[i]
         local directive = nil

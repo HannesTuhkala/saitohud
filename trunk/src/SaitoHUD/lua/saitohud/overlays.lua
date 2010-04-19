@@ -393,17 +393,17 @@ concommand.Add("dump_info", function(ply, cmd, args)
 end)
 
 hook.Add("HUDPaint", "SaitoHUDOverlays", function()
-    if drawEntityInfo:GetBool() then
-        SaitoHUD.DrawEntityInfo()
-    end
-    SaitoHUD.DrawOverlays()
-    if drawNameTags:GetBool() then
-        SaitoHUD.DrawNameTags()
-    end
-    if playerBoxes:GetBool() then
-        SaitoHUD.DrawPlayerBoxes()
-    end
-    if playerMarkers:GetBool() then
-        SaitoHUD.DrawPlayerMarkers()
-    end
+	if drawEntityInfo:GetBool() then
+		SaitoHUD.DrawEntityInfo()
+	end
+	SaitoHUD.DrawOverlays()
+	if drawNameTags:GetBool() then
+		SaitoHUD.DrawNameTags()
+	end
+	if playerBoxes:GetBool() then
+		SaitoHUD.DrawPlayerBoxes()
+	end
+	if playerMarkers:GetBool() then
+		SaitoHUD.DrawPlayerMarkers()
+	end
 end)
