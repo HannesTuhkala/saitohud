@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,13 +17,22 @@
 -- 
 -- $Id$
 
+-- This module has features related to video and screenshot taking.
+
 local hideHUD = false
 
-concommand.Add("toggle_hud", function(ply, cmd, args)
+--- Toggles the HUD hiding hook.
+local function ToggleHideHUD(ply, cmd, args)
     hideHUD = not hideHUD
+    
     if hideHUD then
         hook.Add("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD", function() return false end)
     else
         hook.Remove("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
     end
-end)
+end
+
+concommand.Add("toggle_hud", ToggleHideHUD)
+
+-- Undo the hook, in case the HUD was reloaded
+hook.Remove("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
