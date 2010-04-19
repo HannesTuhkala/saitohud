@@ -17,6 +17,8 @@
 -- 
 -- $Id$
 
+-- This module handles the drawing of the aim traces.
+
 local traceAims = CreateClientConVar("trace_aims", "0", true, false)
 
 --- Actually draws the trace aim lines and endpoint boxes.
