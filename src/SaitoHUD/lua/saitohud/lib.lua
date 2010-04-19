@@ -146,3 +146,28 @@ function SaitoHUD.ParseCSV(data)
     
     return result
 end
+
+--- Function to autocomplete console commands with player names.
+-- @param cmd
+-- @param args
+function SaitoHUD.ConsoleAutocompletePlayer(cmd, args)
+    local testName = args or ""
+    if testName:len() > 0 then
+        testName = testName:Trim()
+    end
+    local testNameLength = testName:len()
+    local names = {}
+    
+    for _, ply in pairs(player.GetAll()) do
+        local name = ply:GetName()
+        if name:len() >= testNameLength and 
+           name:sub(1, testNameLength):lower() == testName:lower() then
+            if name:find(" ") or name:find("\"") then
+                name = "\"" .. name:gsub("\"", "\\\"") .. "\""
+            end
+            table.insert(names, cmd .. " " .. name)
+        end
+    end
+    
+    return names
+end
