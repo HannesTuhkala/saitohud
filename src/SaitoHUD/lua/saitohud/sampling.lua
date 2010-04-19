@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,6 +17,8 @@
 -- 
 -- $Id$
 
+-- This module implements the sampling tool.
+
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
 local sampleResolution = CreateClientConVar("sample_resolution", "100", true, false)
 local sampleRandomColor = CreateClientConVar("sample_randomcolor", "0", true, false)
@@ -25,40 +28,17 @@ local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
 local sampleNodes = CreateClientConVar("sample_nodes", "1", true, false)
 local sampleMultiple = CreateClientConVar("sample_multiple", "0", true, false)
 
-cvars.AddChangeCallback("sample_resolution", function(cv, old, new)
-	SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000 -- Milliseconds for better use with cpanel
-end)
+SaitoHUD.Samplers = {}
 
-cvars.AddChangeCallback("sample_fade", function(cv, old, new)
-	SaitoHUD.sampleFade = sampleFade:GetBool()
-end)
-
-cvars.AddChangeCallback("sample_randomcolor", function(cv, old, new)
-	SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
-end)
-
-cvars.AddChangeCallback("sample_size", function(cv, old, new)
-	SaitoHUD.sampleSize = sampleSize:GetFloat()
-end)
-
-cvars.AddChangeCallback("sample_thick", function(cv, old, new)
-	SaitoHUD.drawSampleThick = sampleThick:GetBool()
-end)
-
-cvars.AddChangeCallback("sample_nodes", function(cv, old, new)
-	SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
-end)
-
-SaitoHUD.samplers = {}
-SaitoHUD.sampleFade = sampleFade:GetBool()
-SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
-SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000
-SaitoHUD.sampleSize = sampleSize:GetFloat()
-SaitoHUD.drawSampleThick = sampleThick:GetBool()
-SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
+local lastSample = 0
 
 local SamplingContext = {}
 
+--- Creates a new sampling context.
+-- @param ent Entity
+-- @param color Color object to draw the lines and nodes with
+-- @param randomColor Boolean indicating whether a random color should be used; color
+--                    should be nil
 function SamplingContext:new(ent, color, randomColor)
     if color == nil then
         if randomColor then
@@ -79,21 +59,31 @@ function SamplingContext:new(ent, color, randomColor)
     return instance
 end
 
-function SamplingContext:Log(sampleSize)
+--- Does logging for this sampling context. A size parameter can be given to
+-- specify the number of data points to keep. If the parameter is not specified, then
+-- the number configured via the relevant cvar will be used.
+-- @param size
+function SamplingContext:Log(size)
     if not self.ent or not ValidEntity(self.ent) then
         self.Log = function() end
         self.Draw = function() end
         return false
     end
     
+    if size == nil then
+        size = sampleSize:GetFloat()
+    end
+    
     table.insert(self.points, self.ent:GetPos())
-    while #self.points > SaitoHUD.sampleSize do
+    while #self.points > size do
         table.remove(self.points, 1)
     end
     
     return true
 end
 
+--- Draws the sample.
+-- @param drawNodes Boolean indicating whether the nodes should be drawn
 function SamplingContext:Draw(drawNodes)
     if not self.ent or not ValidEntity(self.ent) then
         self.Log = function() end
@@ -113,20 +103,20 @@ function SamplingContext:Draw(drawNodes)
             local to = pt:ToScreen()
             
             if from.visible and to.visible then
-				if SaitoHUD.sampleFade then
+				if sampleFade:GetBool() then
 					surface.SetDrawColor(self.color.r, self.color.g, self.color.b,
                                          (k / #self.points) * 255)
 				end
 				
                 surface.DrawLine(from.x, from.y, to.x, to.y)
                 
-				if SaitoHUD.drawSampleThick then
+				if sampleThick:GetBool() then
 					surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
 					surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
 					surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
 				end
 				
-                if SaitoHUD.drawSampleNodes then
+                if sampleNodes:GetBool() then
                     surface.DrawOutlinedRect(to.x - dim / 2, to.y - dim / 2, dim, dim)
                 end
             end
@@ -141,7 +131,7 @@ function SamplingContext:Draw(drawNodes)
         if from.visible and to.visible then
             surface.DrawLine(from.x, from.y, to.x, to.y)
 			
-			if SaitoHUD.drawSampleThick then
+			if sampleThick:GetBool() then
 				surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
 				surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
 				surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
@@ -152,32 +142,63 @@ function SamplingContext:Draw(drawNodes)
     return true
 end
 
-function SaitoHUD.RemoveSample(ent)
-    for k, ctx in pairs(SaitoHUD.samplers) do
-        if ctx.ent == ent then
-            table.remove(SaitoHUD.samplers, k)
+--- Adds and removes hooks as required.
+local function Rehook()
+    if #SaitoHUD.Samplers > 0 then
+        hook.Add("Think", "SaitoHUD.Sampling", LogSamples)
+        
+        if sampleDraw:GetBool() then
+            hook.Add("HUDPaint", "SaitoHUD.Sampling", DrawSamples)
+        else
+            hook.Remove("HUDPaint", "SaitoHUD.Sampling")
         end
+    else
+        hook.Remove("Think", "SaitoHUD.Sampling")
+        hook.Remove("HUDPaint", "SaitoHUD.Sampling")
     end
 end
 
+--- Remove an entity from being sampled.
+-- @param ent Entity
+function SaitoHUD.RemoveSample(ent)
+    for k, ctx in pairs(SaitoHUD.Samplers) do
+        if ctx.ent == ent then
+            table.remove(SaitoHUD.Samplers, k)
+        end
+    end
+    
+    Rehook()
+end
+
+--- Add a sampler to the list for an entity.
+-- @param ent Entity
 function SaitoHUD.AddSample(ent)
-    for k, ctx in pairs(SaitoHUD.samplers) do
+    for k, ctx in pairs(SaitoHUD.Samplers) do
         if ctx.ent == ent then
             return
         end
     end
     
-    local ctx = SamplingContext:new(ent, nil, SaitoHUD.sampleRandomColor)
-    table.insert(SaitoHUD.samplers, ctx)
+    local ctx = SamplingContext:new(ent, nil, sampleRandomColor:GetBool())
+    table.insert(SaitoHUD.Samplers, ctx)
+    
+    Rehook()
 end
 
+--- Sets the current sample list to sample only the given entity.
+-- @param ent Entity
 function SaitoHUD.SetSample(ent)
-    local ctx = SamplingContext:new(ent, nil, SaitoHUD.sampleRandomColor)
-    SaitoHUD.samplers = {ctx}
+    local ctx = SamplingContext:new(ent, nil, sampleRandomColor:GetBool())
+    SaitoHUD.Samplers = {ctx}
+    
+    Rehook()
 end
 
-function SaitoHUD.FindSample(ent)
-	for k, ctx in pairs(SaitoHUD.samplers) do
+--- Check to see whether a sampler exists for an entity.
+-- @param ent Entity
+-- @return Whether it exists
+function SaitoHUD.HasSample(ent)
+	for k, ctx in pairs(SaitoHUD.Samplers) do
         if ctx.ent == ent then
             return true
         end
@@ -185,35 +206,42 @@ function SaitoHUD.FindSample(ent)
 	return false
 end
 
+--- Collects data points, and removes any deleted entities from the sample list.
 function SaitoHUD.LogSamples()
-    for k, ctx in pairs(SaitoHUD.samplers) do
+    for k, ctx in pairs(SaitoHUD.Samplers) do
         if not ctx:Log() then
-            table.remove(SaitoHUD.samplers, k)
+            table.remove(SaitoHUD.Samplers, k)
         end
     end
 end
 
+--- Draws the sample on the screen, and removes any entities being sampled if the
+-- entities are no longer valid.
 function SaitoHUD.DrawSamples()
-    for k, ctx in pairs(SaitoHUD.samplers) do
+    for k, ctx in pairs(SaitoHUD.Samplers) do
         if not ctx:Draw() then
-            table.remove(SaitoHUD.samplers, k)
+            table.remove(SaitoHUD.Samplers, k)
         end
     end
 end
 
-concommand.Add("sample", function(ply, cmd, args)
+--- Console command to sample.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function Sample(ply, cmd, args)
     if not sampleMultiple:GetBool() then
-        if table.Count(SaitoHUD.samplers) > 0 then
+        if table.Count(SaitoHUD.Samplers) > 0 then
             LocalPlayer():ChatPrint("Note: Multiple entity sampling is disabled")
         end
-        SaitoHUD.samplers = {}
+        SaitoHUD.Samplers = {}
     end
     
     if table.Count(args) == 0 then
         local tr = SaitoHUD.GetRefTrace()
         
         if ValidEntity(tr.Entity) then
-			if SaitoHUD.FindSample(tr.Entity) then
+			if SaitoHUD.HasSample(tr.Entity) then
 				SaitoHUD.RemoveSample(tr.Entity)
 				LocalPlayer():ChatPrint("No longer sampling entity #" ..  tr.Entity:EntIndex() .. ".")
 			else
@@ -234,14 +262,18 @@ concommand.Add("sample", function(ply, cmd, args)
     else
         Msg("Invalid number of arguments")
     end
-end, ConsoleAutocompletePlayer)
+end
 
-concommand.Add("sample_id", function(ply, cmd, args)
+--- Console commands to sample by ID.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function SampleID(ply, cmd, args)
     if not sampleMultiple:GetBool() then
-        if table.Count(SaitoHUD.samplers) > 0 then
+        if table.Count(SaitoHUD.Samplers) > 0 then
             LocalPlayer():ChatPrint("Note: Multiple entity sampling is disabled")
         end
-        SaitoHUD.samplers = {}
+        SaitoHUD.Samplers = {}
     end
     
     if table.Count(args) == 1 then
@@ -256,9 +288,13 @@ concommand.Add("sample_id", function(ply, cmd, args)
     else
         Msg("Invalid number of arguments")
     end
-end)
- 
-concommand.Add("sample_remove", function(ply, cmd, args)
+end
+
+--- Console command to remove a sample.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function RemoveSample(ply, cmd, args)
     if table.Count(args) == 0 then
         local tr = SaitoHUD.GetRefTrace()
         
@@ -279,9 +315,13 @@ concommand.Add("sample_remove", function(ply, cmd, args)
     else
         Msg("Invalid number of arguments")
     end
-end, ConsoleAutocompletePlayer)
- 
-concommand.Add("sample_remove_id", function(ply, cmd, args)
+end
+
+--- Console command to remove a sample by its ID.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function RemoveSampleID(ply, cmd, args)
     if table.Count(args) == 1 then
         local idx = tonumber(args[1])
         local m = ents.GetByIndex(idx)
@@ -294,20 +334,28 @@ concommand.Add("sample_remove_id", function(ply, cmd, args)
     else
         Msg("Invalid number of arguments")
     end
-end, ConsoleAutocompletePlayer)
- 
-concommand.Add("sample_clear", function(ply, cmd, args)
-    if table.Count(SaitoHUD.samplers) == 0 then
+end
+
+--- Console command to clear samples.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function ClearSamples(ply, cmd, args)
+    if table.Count(SaitoHUD.Samplers) == 0 then
         LocalPlayer():ChatPrint("No samplers are active.")
     else
-        LocalPlayer():ChatPrint(table.Count(SaitoHUD.samplers) .. " sampler(s) removed.")
-        SaitoHUD.samplers = {}
+        LocalPlayer():ChatPrint(table.Count(SaitoHUD.Samplers) .. " sampler(s) removed.")
+        SaitoHUD.Samplers = {}
     end
-end)
- 
-concommand.Add("sample_list", function(ply, cmd, args)
-    if #SaitoHUD.samplers > 0 then
-        for k, ctx in pairs(SaitoHUD.samplers) do
+end
+
+--- Console command to list the objects being sampled.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+function ListSamples(ply, cmd, args)
+    if #SaitoHUD.Samplers > 0 then
+        for k, ctx in pairs(SaitoHUD.Samplers) do
             if ValidEntity(ctx.ent) then
                 print(string.format("#%d %s (%s)", ctx.ent:EntIndex(), ctx.ent:GetClass(), 
                                     ctx.ent:GetModel()))
@@ -316,16 +364,29 @@ concommand.Add("sample_list", function(ply, cmd, args)
     else
         print("Nothing is being sampled.")
     end
-end)
+end
 
-local lastSample = 0
-
-hook.Add("HUDPaint", "SaitoHUDSampling", function()
-    if CurTime() - lastSample > SaitoHUD.sampleResolution then
+--- Hook to log and draw samples.
+function LogSamples()
+    if CurTime() - lastSample > sampleResolution:GetFloat() / 1000 then
         SaitoHUD.LogSamples()
         lastSample = CurTime()
     end
+end
+
+--- Hook to log and draw samples.
+function DrawSamples()
     if sampleDraw:GetBool() then
         SaitoHUD.DrawSamples(true)
     end
-end)
+end
+
+concommand.Add("sample", Sample, ConsoleAutocompletePlayer)
+concommand.Add("sample_id", SampleID)
+concommand.Add("sample_remove", RemoveSample, ConsoleAutocompletePlayer)
+concommand.Add("sample_remove_id", RemoveSampleID)
+concommand.Add("sample_clear", ClearSamples) 
+concommand.Add("sample_list", ListSamples)
+
+-- Need to rehook if sample_draw changes
+cvars.AddChangeCallback("sample_draw", function(cv, old, new) Rehook() end)
