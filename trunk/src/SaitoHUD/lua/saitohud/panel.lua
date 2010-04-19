@@ -64,15 +64,15 @@ local function SamplingPanel(panel)
 	})
 	
 	panel:AddControl("Slider", {
-		Label = "Resolution",
+		Label = "Resolution (ms)",
 		Command = "sample_resolution",
-		Type = "float",
-		min = "0.01",
+		Type = "integer",
+		min = "1",
 		max = "500"
 	})
 	
 	panel:AddControl("Slider", {
-		Label = "Length",
+		Label = "Data Point History Size",
 		Command = "sample_size",
 		Type = "integer",
 		min = "1",
