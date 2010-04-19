@@ -30,7 +30,7 @@ Msg("====== Loading SaitoHUD ======\n")
 
 load("filters") -- Entity filtering engine
 load("lib")
-load("base")
+load("core")
 load("drawing")
 load("light")
 load("listgest")
