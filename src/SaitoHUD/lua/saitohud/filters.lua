@@ -124,10 +124,6 @@ function entityFilter.Build(tokens, nilForNull)
             Error("Unexpected *") 
         elseif token:sub(1, 1) == "@" then
             directive = token:sub(2):lower()
-            
-            if entityFilter.aliases[directive] then
-                directive = entityFilter.aliases[directive]
-            end
         elseif token:lower() == "and" then
             if i == #tokens then
                 Error("Missing condition(s) after explicit AND")
@@ -181,6 +177,10 @@ function entityFilter.Build(tokens, nilForNull)
         end
         
         if directive ~= nil then
+            if entityFilter.aliases[directive] then
+                directive = entityFilter.aliases[directive]
+            end
+            
             if entityFilter.directives[directive] then
                 local reqArgCount = entityFilter.directives[directive]
                 
