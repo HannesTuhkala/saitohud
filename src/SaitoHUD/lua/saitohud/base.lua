@@ -82,8 +82,23 @@ function SaitoHUD.GetEntityInfoLines()
     
     if ValidEntity(tr.Entity) then
         local r, g, b, a = tr.Entity:GetColor();
+		lines = {}
 		
-		lines = {
+		if tr.Entity:IsPlayer() then
+			table.Add(lines,{
+			"Name: " .. tostring(tr.Entity:Name()),
+			"SteamID: " .. tostring(tr.Entity:SteamID()),
+			"Ping: " .. tostring(tr.Entity:Ping()),
+			"Health: " .. tostring(tr.Entity:Health()),
+			"Armor: " .. tostring(tr.Entity:Armor()),
+			"Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
+			"Kills: " .. tostring(tr.Entity:Frags()),
+			"Deaths: " .. tostring(tr.Entity:Deaths()),
+			})
+		end
+		
+		table.Add(lines,{
+			"",
 			"#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
 			"Hit Pos: " .. tostring(tr.HitPos),
 			"Class: " .. tostring(tr.Entity:GetClass()),
@@ -95,7 +110,9 @@ function SaitoHUD.GetEntityInfoLines()
 			"Material: " .. tostring(tr.Entity:GetMaterial()),
 			"Velocity: " .. tostring(tr.Entity:GetVelocity()),
 			"Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
-		}
+		})
+		
+		
     else
         if tr.Hit then
             lines = {
