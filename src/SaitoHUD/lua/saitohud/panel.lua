@@ -27,12 +27,26 @@ local function HelpPanel(panel)
     end
 end
 
+-- local function GeneralPanel(panel)
+    -- panel:ClearControls()
+    -- panel:AddHeader()
+    
+    -- local text = "The following option disables some features on non-Sandbox " ..
+        -- "game modes, and it is merely meant as a deterrent from impulsive cheating."
+    -- panel:AddControl("Label", {Text = text})
+    
+    -- panel:AddControl("CheckBox", {
+        -- Label = "Unfair Usage Deterrent",
+        -- Command = "saitohud_anti_unfair"
+    -- })
+-- end
+
 local function SamplingPanel(panel)
     panel:ClearControls()
     panel:AddHeader()
     
     panel:AddControl("CheckBox", {
-        Label = "Enabled",
+        Label = "Draw Sampled Data",
         Command = "sample_draw"
     })
     
@@ -42,18 +56,18 @@ local function SamplingPanel(panel)
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Draw Thick",
+        Label = "Draw Thick Lines",
         Command = "sample_thick"
     })
     
     
     panel:AddControl("CheckBox", {
-        Label = "Fade Sample",
+        Label = "Fade Samples",
         Command = "sample_fade"
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Random Color",
+        Label = "Use Random Colors",
         Command = "sample_randomcolor"
     })
     
@@ -104,72 +118,82 @@ local function OverlayPanel(panel)
     panel:AddHeader()
     
     panel:AddControl("CheckBox", {
-        Label = "Entity Info",
+        Label = "Show Entity Information",
         Command = "entity_info"
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Player Info on Entity Info",
+        Label = "Show Player Info on Entity Information",
         Command = "entity_info_player"
     })
     
+    panel:AddControl("Label", {Text = "Enter your filters below and press ENTER. The textboxes below will not show the last filter."})
+    
+    panel:AddControl("Label", {Text = "Triads Filter"})
+    local triadsEntry = panel:AddControl("DTextEntry",{})
+    triadsEntry:SetTall(20)
+    triadsEntry:SetWide(100)
+    triadsEntry:SetEnterAllowed(true)
+    triadsEntry.OnEnter = function()
+        LocalPlayer():ConCommand("triads_filter " .. triadsEntry:GetValue())
+    end
+    
+    panel:AddControl("Label", {Text = "Overlay Filter"})
+    local overlayEntry = panel:AddControl("DTextEntry",{})
+    overlayEntry:SetTall(20)
+    overlayEntry:SetWide(100)
+    overlayEntry:SetEnterAllowed(true)
+    overlayEntry.OnEnter = function()
+        LocalPlayer():ConCommand("overlay_filter " .. overlayEntry:GetValue())
+    end
+    
+    panel:AddControl("Label", {Text = "BBox Filter"})
+    local bboxEntry = panel:AddControl("DTextEntry",{})
+    bboxEntry:SetTall(20)
+    bboxEntry:SetWide(100)
+    bboxEntry:SetEnterAllowed(true)
+    bboxEntry.OnEnter = function()
+        LocalPlayer():ConCommand("bbox_filter " .. bboxEntry:GetValue())
+    end
+    
+    if SaitoHUD.AntiUnfairTriggered() then
+        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
+    else
+        panel:AddControl("Label", {Text = "WARNING: The following options will get you BANNED on most non-Sandbox game modes."})
+    end
+    
     panel:AddControl("CheckBox", {
-        Label = "Name Tags",
+        Label = "Show Name Tags",
         Command = "name_tags"
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Player Boxes",
+        Label = "Show Player Bounding Boxes",
         Command = "player_boxes"
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Player Arrows",
+        Label = "Show Player Orientation Markers",
         Command = "player_markers"
     })
     
     panel:AddControl("CheckBox", {
-        Label = "Player Line of Sight",
+        Label = "Show Player Line of Sights",
         Command = "trace_aims"
     })
-    
-    panel:AddControl("Label", {Text = "Triads Filter"})
-    local TriadsEntry = panel:AddControl("DTextEntry",{})
-    TriadsEntry:SetTall(20)
-    TriadsEntry:SetWide(100)
-    TriadsEntry:SetEnterAllowed(true)
-    TriadsEntry.OnEnter = function()
-        LocalPlayer():ConCommand("triads_filter " .. TriadsEntry:GetValue())
-    end
-    
-    panel:AddControl("Label", {Text = "Overlay Filter"})
-    local OverlayEntry = panel:AddControl("DTextEntry",{})
-    OverlayEntry:SetTall(20)
-    OverlayEntry:SetWide(100)
-    OverlayEntry:SetEnterAllowed(true)
-    OverlayEntry.OnEnter = function()
-        LocalPlayer():ConCommand("overlay_filter " .. OverlayEntry:GetValue())
-    end
-    
-    panel:AddControl("Label", {Text = "BBox Filter"})
-    local BBoxEntry = panel:AddControl("DTextEntry",{})
-    BBoxEntry:SetTall(20)
-    BBoxEntry:SetWide(100)
-    BBoxEntry:SetEnterAllowed(true)
-    BBoxEntry.OnEnter = function()
-        LocalPlayer():ConCommand("bbox_filter " .. BBoxEntry:GetValue())
-    end
 end
 
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
     spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUDHelp", "Help", "", "", HelpPanel)
+    --spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUDGeneral", "General", "", "", GeneralPanel)
     spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUDSampling", "Sampling", "", "", SamplingPanel, {SwitchConVar="sample_draw"})
     spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUDOverlays", "Overlay", "", "", OverlayPanel)
 end
 
 function SaitoHUD.UpdatePanels()
     HelpPanel(GetControlPanel("SaitoHUDHelp"))
+    --GeneralPanel(GetControlPanel("SaitoHUDGeneral"))
     SamplingPanel(GetControlPanel("SaitoHUDSampling"))
     OverlayPanel(GetControlPanel("SaitoHUDOverlays"))
 end

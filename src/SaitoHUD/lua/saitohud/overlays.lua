@@ -397,14 +397,16 @@ hook.Add("HUDPaint", "SaitoHUDOverlays", function()
     if drawEntityInfo:GetBool() then
         SaitoHUD.DrawEntityInfo()
     end
-    SaitoHUD.DrawOverlays()
-    if drawNameTags:GetBool() then
-        SaitoHUD.DrawNameTags()
-    end
-    if playerBoxes:GetBool() then
-        SaitoHUD.DrawPlayerBoxes()
-    end
-    if playerMarkers:GetBool() then
-        SaitoHUD.DrawPlayerMarkers()
+    if not SaitoHUD.AntiUnfairTriggered() then
+        SaitoHUD.DrawOverlays()
+        if drawNameTags:GetBool() then
+            SaitoHUD.DrawNameTags()
+        end
+        if playerBoxes:GetBool() then
+            SaitoHUD.DrawPlayerBoxes()
+        end
+        if playerMarkers:GetBool() then
+            SaitoHUD.DrawPlayerMarkers()
+        end
     end
 end)
