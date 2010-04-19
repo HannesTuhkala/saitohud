@@ -66,8 +66,8 @@ local function SamplingPanel(panel)
 	panel:AddControl("Slider", {
 		Label = "Resolution",
 		Command = "sample_resolution",
-		Type = "integer",
-		min = "1",
+		Type = "float",
+		min = "0.01",
 		max = "500"
 	})
 	
