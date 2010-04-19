@@ -165,7 +165,7 @@ function entityFilter.Build(tokens, nilForNull)
         elseif token == ")" then
             Error("Parenthesis mismatch")
         else
-            local a, b = string.match(token, "^([^:]+)~(.*)$")
+            local a, b = string.match(token, "^([^:]+)=(.*)$")
             if a ~= nil then
                 directive = a
                 tokens[i] = b
