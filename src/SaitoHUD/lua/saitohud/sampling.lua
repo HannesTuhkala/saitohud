@@ -17,7 +17,8 @@
 -- $Id$
 
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
-local sampleResolution = CreateClientConVar("sample_resolution", "100", true, false)
+local sampleResolution = CreateClientConVar("sample_resolution", "1", true, false)
+local sampleRandomColor = CreateClientConVar("sample_randomcolor", "0", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
 local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
 local sampleNodes = CreateClientConVar("sample_nodes", "1", true, false)
@@ -25,6 +26,10 @@ local sampleMultiple = CreateClientConVar("sample_multiple", "0", true, false)
 
 cvars.AddChangeCallback("sample_resolution", function(cv, old, new)
 	SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000 -- Milliseconds for better use with cpanel
+end)
+
+cvars.AddChangeCallback("sample_randomcolor", function(cv, old, new)
+	SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
 end)
 
 cvars.AddChangeCallback("sample_size", function(cv, old, new)
@@ -40,6 +45,7 @@ cvars.AddChangeCallback("sample_nodes", function(cv, old, new)
 end)
 
 SaitoHUD.samplers = {}
+SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
 SaitoHUD.sampleResolution = sampleResolution:GetFloat()
 SaitoHUD.sampleSize = sampleSize:GetFloat()
 SaitoHUD.drawSampleThick = sampleThick:GetBool()
@@ -48,9 +54,22 @@ SaitoHUD.drawSampleNodes = sampleNodes:GetBool()
 local SamplingContext = {}
 
 function SamplingContext:new(ent)
+	local r =0
+	local g = 255
+	local b = 255
+	
+	if SaitoHUD.sampleRandomColor then
+		r = math.Rand(100,255)
+		g = math.Rand(100,255)
+		b = math.Rand(100,255)
+	end
+	
     local instance = {
         ["ent"] = ent,
         ["points"] = {},
+		["r"] = r,
+		["g"] = g,
+		["b"] = b,
     }
     
     setmetatable(instance, self)
@@ -84,7 +103,7 @@ function SamplingContext:Draw(drawNodes)
     local currentPos = self.ent:GetPos()
     local lastPt = nil
     
-    surface.SetDrawColor(0, 255, 255, 255)
+    surface.SetDrawColor(self.r, self.g, self.b, 255)
     
     for _, pt in pairs(self.points) do
         if lastPt != nil and lastPt != pt then 
@@ -114,6 +133,12 @@ function SamplingContext:Draw(drawNodes)
         local to = currentPos:ToScreen()
         if from.visible and to.visible then
             surface.DrawLine(from.x, from.y, to.x, to.y)
+			
+			if SaitoHUD.drawSampleThick then
+				surface.DrawLine(from.x + 1, from.y, to.x + 1, to.y)
+				surface.DrawLine(from.x + 1, from.y + 1, to.x + 1, to.y + 1)
+				surface.DrawLine(from.x, from.y + 1, to.x, to.y + 1)
+			end
         end
     end
     
