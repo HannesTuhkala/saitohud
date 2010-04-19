@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,8 +17,11 @@
 -- 
 -- $Id$
 
+-- Module for handling lights
+
 local lightEnabled = false
 
+--- Renders the dynamic light for the super flashlight.
 local function RenderFlashlight()
 	local light = DynamicLight(123120000) 
     
@@ -45,7 +49,8 @@ local function RenderFlashlight()
 	end 
 end  
 
-concommand.Add("super_flashlight", function()
+--- Toggles the flash light.
+local function ToggleFlashLight()
 	lightEnabled = not lightEnabled
     
 	surface.PlaySound("items/flashlight1.wav")
@@ -55,4 +60,9 @@ concommand.Add("super_flashlight", function()
 	else
 		hook.Remove("Think", "SaitoHUD.Super.Flashlight")
 	end
-end)
+end
+
+concommand.Add("super_flashlight", ToggleFlashLight)
+
+-- Remove the hook, in case of a reload
+hook.Remove("Think", "SaitoHUD.Super.Flashlight")
