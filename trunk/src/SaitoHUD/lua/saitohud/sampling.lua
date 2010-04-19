@@ -19,6 +19,7 @@
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
 local sampleResolution = CreateClientConVar("sample_resolution", "1", true, false)
 local sampleRandomColor = CreateClientConVar("sample_randomcolor", "0", true, false)
+local sampleFade = CreateClientConVar("sample_fade", "0", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
 local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
 local sampleNodes = CreateClientConVar("sample_nodes", "1", true, false)
@@ -26,6 +27,10 @@ local sampleMultiple = CreateClientConVar("sample_multiple", "0", true, false)
 
 cvars.AddChangeCallback("sample_resolution", function(cv, old, new)
 	SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000 -- Milliseconds for better use with cpanel
+end)
+
+cvars.AddChangeCallback("sample_fade", function(cv, old, new)
+	SaitoHUD.sampleFade = sampleFade:GetBool()
 end)
 
 cvars.AddChangeCallback("sample_randomcolor", function(cv, old, new)
@@ -45,6 +50,7 @@ cvars.AddChangeCallback("sample_nodes", function(cv, old, new)
 end)
 
 SaitoHUD.samplers = {}
+SaitoHUD.sampleFade = sampleFade:GetBool()
 SaitoHUD.sampleRandomColor = sampleRandomColor:GetBool()
 SaitoHUD.sampleResolution = sampleResolution:GetFloat() / 1000
 SaitoHUD.sampleSize = sampleSize:GetFloat()
@@ -102,8 +108,8 @@ function SamplingContext:Draw(drawNodes)
     local dim = 5
     local currentPos = self.ent:GetPos()
     local lastPt = nil
+	surface.SetDrawColor(self.r, self.g, self.b,255)
     
-    surface.SetDrawColor(self.r, self.g, self.b, 255)
     
     for _, pt in pairs(self.points) do
         if lastPt != nil and lastPt != pt then 
@@ -111,6 +117,10 @@ function SamplingContext:Draw(drawNodes)
             local to = pt:ToScreen()
             
             if from.visible and to.visible then
+				if SaitoHUD.sampleFade then
+					surface.SetDrawColor(self.r, self.g, self.b,(_ / #self.points) * 255)
+				end
+				
                 surface.DrawLine(from.x, from.y, to.x, to.y)
                 
 				if SaitoHUD.drawSampleThick then
