@@ -132,6 +132,15 @@ function SaitoHUD.SetSample(ent)
     SaitoHUD.samplers = {ctx}
 end
 
+function SaitoHUD.FindSample(ent)
+	for k, ctx in pairs(SaitoHUD.samplers) do
+        if ctx.ent == ent then
+            return true
+        end
+    end
+	return false
+end
+
 function SaitoHUD.LogSamples()
     for k, ctx in pairs(SaitoHUD.samplers) do
         if not ctx:Log() then
@@ -160,8 +169,13 @@ concommand.Add("sample", function(ply, cmd, args)
         local tr = SaitoHUD.GetRefTrace()
         
         if ValidEntity(tr.Entity) then
-            SaitoHUD.AddSample(tr.Entity)
-            LocalPlayer():ChatPrint("Sampling entity #" ..  tr.Entity:EntIndex() .. ".")
+			if SaitoHud.FindSample(tr.Entity) then
+				SaitoHUD.RemoveSample(tr.Entity)
+				LocalPlayer():ChatPrint("No longer sampling entity #" ..  tr.Entity:EntIndex() .. ".")
+			else
+				SaitoHUD.AddSample(tr.Entity)
+				LocalPlayer():ChatPrint("Sampling entity #" ..  tr.Entity:EntIndex() .. ".")
+			end
         else
             LocalPlayer():ChatPrint("Nothing was found in an eye trace!")
         end
