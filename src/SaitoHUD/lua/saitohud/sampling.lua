@@ -21,7 +21,7 @@
 
 local sampleDraw = CreateClientConVar("sample_draw", "1", false, false)
 local sampleResolution = CreateClientConVar("sample_resolution", "100", true, false)
-local sampleRandomColor = CreateClientConVar("sample_randomcolor", "0", true, false)
+local sampleRandomColor = CreateClientConVar("sample_random_color", "0", true, false)
 local sampleFade = CreateClientConVar("sample_fade", "0", true, false)
 local sampleSize = CreateClientConVar("sample_size", "100", true, false)
 local sampleThick = CreateClientConVar("sample_thick", "0", true, false)
