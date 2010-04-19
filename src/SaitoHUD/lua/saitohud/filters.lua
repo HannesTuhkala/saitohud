@@ -88,7 +88,9 @@ end
 --- Builds a filter context.
 -- @param tokens List of filter arguments
 -- @return Filter context
-function entityFilter.Build(tokens, nilForNull)
+function entityFilter.Build(tokens, nilForNull)    
+    local ORBranches = {}
+    local ANDBranches = {}
     local filterDef = {}
     local i = 1
     
@@ -107,6 +109,15 @@ function entityFilter.Build(tokens, nilForNull)
         local token = tokens[i]
         local directive = nil
         
+        -- Handle touching paranthesis
+        if token:sub(1, 1) == "(" then
+            table.insert(tokens, i + 1, token:sub(2))
+            tokens[i] = "("
+        elseif token:sub(-1) == ")" then
+            table.insert(tokens, i, token:sub(1, -2))
+            tokens[i + 1] = "("
+        end
+        
         if token == "*" then
             Error("Unexpected *") 
         elseif token:sub(1, 1) == "@" then
@@ -115,55 +126,102 @@ function entityFilter.Build(tokens, nilForNull)
             if entityFilter.aliases[directive] then
                 directive = entityFilter.aliases[directive]
             end
+        elseif token:lower() == "and" then
+            if i == #tokens then
+                Error("Missing condition(s) after explicit AND")
+            elseif i == 1 then
+                Error("Expression starts with an explicit AND")
+            elseif tokens[i + 1]:lower() == "or" then
+                Error("Two logic operators togthether")
+            end
+        elseif token:lower() == "or" then
+            -- Collect the later tokens and add this to an OR branch
+            local moreTokens = {}
+            for k = i + 1, #tokens do
+                table.insert(moreTokens, tokens[k])
+            end
+            if #moreTokens == 0 then
+                Error("Missing condition(s) after OR")
+            end
+            table.insert(ORBranches, entityFilter.Build(moreTokens, false).f)
+            break
+        elseif token == "(" then
+            -- Collect the tokens within the parenthesis
+            local moreTokens = {}
+            local depth = 0
+            for k = i + 1, #tokens do
+                if tokens[k] == "(" then
+                    depth = depth + 1
+                elseif tokens[k] == ")" then
+                    if depth == 0 then
+                        i = k
+                        break
+                    else
+                        depth = depth - 1
+                    end
+                else
+                    table.insert(moreTokens, tokens[k])
+                end
+            end
+            table.insert(ANDBranches, entityFilter.Build(moreTokens, false).f)
+        elseif token == ")" then
+            Error("Parenthesis mismatch")
         else
             directive = "class"
             i = i - 1 -- We added a token unexpectedly
         end
         
-        if entityFilter.directives[directive] then
-            local reqArgCount = entityFilter.directives[directive]
-            
-            if #tokens - i >= reqArgCount then
-                if directive == "mindist" then
-                    filterDef.minDist = tonumber(tokens[i + 1])
-                elseif directive == "maxdist" then
-                    filterDef.maxDist = tonumber(tokens[i + 1])
-                elseif directive == "id" then
-                    filterDef.id = tonumber(tokens[i + 1])
-                elseif directive == "model" then
-                    entityFilter.UpdateFilterDefList(filterDef, "model", tokens[i + 1])
-                elseif directive == "material" then
-                    entityFilter.UpdateFilterDefList(filterDef, "material", tokens[i + 1])
-                elseif directive == "class" then
-                    entityFilter.UpdateFilterDefList(filterDef, "cls", tokens[i + 1])
-                end
+        if directive ~= nil then
+            if entityFilter.directives[directive] then
+                local reqArgCount = entityFilter.directives[directive]
                 
-                i = i + reqArgCount
+                if #tokens - i >= reqArgCount then
+                    if directive == "mindist" then
+                        filterDef.minDist = tonumber(tokens[i + 1])
+                    elseif directive == "maxdist" then
+                        filterDef.maxDist = tonumber(tokens[i + 1])
+                    elseif directive == "id" then
+                        filterDef.id = tonumber(tokens[i + 1])
+                    elseif directive == "model" then
+                        entityFilter.UpdateFilterDefList(filterDef, "model", tokens[i + 1])
+                    elseif directive == "material" then
+                        entityFilter.UpdateFilterDefList(filterDef, "material", tokens[i + 1])
+                    elseif directive == "class" then
+                        entityFilter.UpdateFilterDefList(filterDef, "cls", tokens[i + 1])
+                    end
+                    
+                    i = i + reqArgCount
+                else
+                    Error(string.format("Insufficient number of tokenuments for %s (%d required)",
+                                        directive, reqArgCount))
+                end
             else
-                Error(string.format("Insufficient number of tokenuments for %s (%d required)",
-                                    directive, reqArgCount))
+                Error("Unknown directive: " .. directive)
             end
-        else
-            Error("Unknown directive: " .. directive)
         end
         
         i = i + 1
     end
     
-    for k, v in pairs(filterDef) do
-        if type(v) == "table" then
-            print(k .. ":")
-            for k, v in pairs(v) do
-                print("- " .. v)
-            end
-        else
-            print(k .. ": " .. v)
-        end
-    end
+    -- Now obsolete
+    -- for k, v in pairs(filterDef) do
+        -- if type(v) == "table" then
+            -- print(k .. ":")
+            -- for k, v in pairs(v) do
+                -- print("- " .. v)
+            -- end
+        -- else
+            -- print(k .. ": " .. v)
+        -- end
+    -- end
     
     local satisfiesList = entityFilter.SatisfiesListSubstring
     
     local filterFunc = function(ent, refPos)
+        for _, f in pairs(ANDBranches) do
+            if not f(ent, refPos) then return false end
+        end
+        
         local cls = ent:GetClass()
         local model = ent:GetModel()
         local material = ent:GetMaterial()
@@ -196,7 +254,21 @@ function entityFilter.Build(tokens, nilForNull)
         return true
     end
     
-    return FilterContext:new(filterDef, tokens, filterFunc)
+    -- We have OR branches
+    if #ORBranches > 0 then
+        local newFilterFunc = function(ent, refPos)
+            if filterFunc(ent, refPos) then return true end
+            for _, f in pairs(ORBranches) do
+                if f(ent, refPos) then return true end
+            end
+            
+            return false
+        end
+        
+        return FilterContext:new(filterDef, tokens, newFilterFunc)
+    else
+        return FilterContext:new(filterDef, tokens, filterFunc)
+    end
 end
 
 --- Helper method for the filter function to check whether a string is
@@ -221,12 +293,12 @@ function entityFilter.SatisfiesListSubstring(lst, v, explicit)
     end
     
     for _, test in pairs(lst) do
-        if v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
-            return true
+        if not v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
+            return false
         end
     end
     
-    return false
+    return true
 end
 
 SaitoHUD.FilterContext = FilterContext
