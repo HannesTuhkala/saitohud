@@ -134,7 +134,7 @@ local function OverlayPanel(panel)
     
     entry = AddInput(panel,"Triads Filter:","triads_filter",false,true)
     entry = AddInput(panel,"Overlay Filter:","overlay_filter",false,true)
-    entry = AddInput(panel,"Overlay Filter:","bbox_filter",false,true)
+    entry = AddInput(panel,"Bounding Box Filter:","bbox_filter",false,true)
 end
 
 --- PopulateToolMenu hook.

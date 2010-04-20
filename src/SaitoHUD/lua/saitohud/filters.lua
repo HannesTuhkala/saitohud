@@ -56,6 +56,7 @@ entityFilter.directives = {
     ["material"] = 1,
     ["class"] = 1,
     ["id"] = 1,
+    ["name"] = 1,
 }
 
 entityFilter.aliases = {
@@ -64,6 +65,7 @@ entityFilter.aliases = {
     ["mdl"] = "model",
     ["mat"] = "material",
     ["cls"] = "class",
+    ["nam"] = "name",
 }
 
 --- Helper method to build a list element of a filter definition
@@ -197,6 +199,8 @@ function entityFilter.Build(tokens, nilForNull)
                         entityFilter.UpdateFilterDefList(filterDef, "material", tokens[i + 1])
                     elseif directive == "class" then
                         entityFilter.UpdateFilterDefList(filterDef, "cls", tokens[i + 1])
+                    elseif directive == "name" then
+                        entityFilter.UpdateFilterDefList(filterDef, "name", tokens[i + 1])
                     end
                     
                     i = i + reqArgCount
@@ -237,6 +241,11 @@ function entityFilter.Build(tokens, nilForNull)
         local material = ent:GetMaterial()
         local pos = ent:GetPos()
         
+        local name = ""
+        if ent:IsPlayer() then
+            name = ent:GetName()
+        end
+        
         if pos and refPos then
             local distance = pos:Distance(refPos)
             
@@ -251,11 +260,13 @@ function entityFilter.Build(tokens, nilForNull)
         
         if not satisfiesList(filterDef.id, tostring(id), false, true) then return false end
         if not satisfiesList(filterDef.cls, cls) then return false end
+        if not satisfiesList(filterDef.name, name) then return false end
         if not satisfiesList(filterDef.model, model) then return false end
         if not satisfiesList(filterDef.material, material) then return false end
         
         if satisfiesList(filterDef.idBlacklist, id, true, true) then return false end
         if satisfiesList(filterDef.clsBlacklist, cls, true) then return false end
+        if satisfiesList(filterDef.nameBlacklist, name, true) then return false end
         if satisfiesList(filterDef.modelBlacklist, model, true) then return false end
         if satisfiesList(filterDef.materialBlacklist, material, true) then return false end
         
