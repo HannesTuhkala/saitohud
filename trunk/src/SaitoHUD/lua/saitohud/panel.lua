@@ -15,14 +15,20 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
 -- $Id$
-local function AddInput(panel, text, unfair)
+local function AddInput(panel, text, command, clearOnEnter, unfair)
     panel:AddControl("Label", {Text = text})
     local entry = panel:AddControl("DTextEntry",{})
     entry:SetTall(20)
     entry:SetWide(100)
     entry:SetEnterAllowed(true)
+    entry.OnEnter = function()
+        LocalPlayer():ConCommand(command .." ".. entry:GetValue())
+        if clearOnEnter then
+            entry:SetValue("")
+        end
+    end
     
-    if unfair==1 then
+    if unfair then
         entry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
         entry:SetDrawBackground(not SaitoHUD.AntiUnfairTriggered())
     end
@@ -35,7 +41,7 @@ local function AddToggle(panel, text, command, unfair)
         Label = text,
         Command = command
     })
-    if unfair==1 then
+    if unfair then
         c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     end
     return c
@@ -75,12 +81,12 @@ local function SamplingPanel(panel)
         panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
     end
     
-    AddToggle(panel,"Draw Sampled Data","sample_draw",1)
-    AddToggle(panel,"Draw Nodes","sample_nodes",0)
-    AddToggle(panel,"Draw Thick Lines","sample_thick",0)
-    AddToggle(panel,"Fade Samples","sample_fade",0)
-    AddToggle(panel,"Use Random Colors","sample_random_color",0)
-    AddToggle(panel,"Allow Multiple","sample_multiple",0)
+    AddToggle(panel,"Draw Sampled Data","sample_draw",true)
+    AddToggle(panel,"Draw Nodes","sample_nodes",false)
+    AddToggle(panel,"Draw Thick Lines","sample_thick",false)
+    AddToggle(panel,"Fade Samples","sample_fade",false)
+    AddToggle(panel,"Use Random Colors","sample_random_color",false)
+    AddToggle(panel,"Allow Multiple","sample_multiple",false)
     
     panel:AddControl("Slider", {
         Label = "Resolution (ms):",
@@ -98,25 +104,10 @@ local function SamplingPanel(panel)
         max = "500"
     })
     
-    local entry = AddInput(panel,"Sample Player Name:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("sample " .. entry:GetValue())
-    end
-    
-    local entry = AddInput(panel,"Remove Player by Name:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("sample_remove " .. entry:GetValue())
-    end
-    
-    local entry = AddInput(panel,"Sample by Filter:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("sample_filter " .. entry:GetValue())
-    end
-    
-    local entry = AddInput(panel,"Remove by Filter:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("sample_remove_filter " .. entry:GetValue())
-    end
+    local entry = AddInput(panel,"Sample Player Name:","sample",true,true)
+    local entry = AddInput(panel,"Remove Player by Name:","sample_remove",true,true)
+    local entry = AddInput(panel,"Sample by Filter:","sample_filter",true, true)
+    local entry = AddInput(panel,"Remove by Filter:","sample_remove_filter",true, true)
     
     local button = panel:AddControl("Button", {
         Label = "Remove All Samplers",
@@ -136,25 +127,14 @@ local function OverlayPanel(panel)
         panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
     end
     
-    AddToggle(panel,"Show Name Tags","name_tags",1)
-    AddToggle(panel,"Show Player Bounding Boxes","player_boxes",1)
-    AddToggle(panel,"Show Player Orientation Markers","player_markers",1)
-    AddToggle(panel,"Show Player Line of Sights","trace_aims",1)
+    AddToggle(panel,"Show Name Tags","name_tags",true)
+    AddToggle(panel,"Show Player Bounding Boxes","player_boxes",true)
+    AddToggle(panel,"Show Player Orientation Markers","player_markers",true)
+    AddToggle(panel,"Show Player Line of Sights","trace_aims",true)
     
-    local entry = AddInput(panel,"Triads Filter:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("triads_filter " .. entry:GetValue())
-    end
-    
-    local entry = AddInput(panel,"Overlay Filter:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("triads_filter " .. entry:GetValue())
-    end
-    
-    local entry = AddInput(panel,"Bounding Box Filter:",1)
-    entry.OnEnter = function()
-        LocalPlayer():ConCommand("overlay_filter " .. entry:GetValue())
-    end
+    entry = AddInput(panel,"Triads Filter:","triads_filter",false,true)
+    entry = AddInput(panel,"Overlay Filter:","overlay_filter",false,true)
+    entry = AddInput(panel,"Overlay Filter:","bbox_filter",false,true)
 end
 
 --- PopulateToolMenu hook.
