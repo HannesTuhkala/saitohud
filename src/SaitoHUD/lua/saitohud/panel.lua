@@ -21,11 +21,11 @@ local function AddInput(panel, text, unfair)
     entry:SetTall(20)
     entry:SetWide(100)
     entry:SetEnterAllowed(true)
-  
+    
     if unfair==1 then
         entry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
-        entry:SetDrawBackground(false)
     end
+    
     return entry
 end
 
