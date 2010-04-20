@@ -23,7 +23,7 @@ local lightEnabled = false
 
 --- Renders the dynamic light for the super flashlight.
 local function RenderFlashlight()
-    local light = DynamicLight(123120000) 
+    local light = DynamicLight(123120000)
     
     if light then 
         light.Pos = LocalPlayer():GetEyeTrace().HitPos
@@ -55,7 +55,8 @@ local function ToggleFlashLight()
     
     surface.PlaySound("items/flashlight1.wav")
     
-    if lightEnabled and SaitoHUD.AntiUnfairTriggered() then
+    if lightEnabled and not SaitoHUD.AntiUnfairTriggered() then
+        LocalPlayer():ChatPrint("Light Enabled")
         hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
     else
         SaitoHUD.RemoveHook("Think", "SaitoHUD.Super.Flashlight")
