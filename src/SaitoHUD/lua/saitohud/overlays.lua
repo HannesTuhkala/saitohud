@@ -20,7 +20,7 @@
 
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
 local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
-local drawFriendTags = CreateClientConVar("friend_tags", "0", true, false)
+local alwaysDrawFriendTags = CreateClientConVar("friend_tags_always", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local simpleNameTags = CreateClientConVar("name_tags_simple", "0", true, false)
 local rainbowFriends = CreateClientConVar("name_tags_rainbow_friends", "0", true, false)
@@ -260,7 +260,7 @@ function NameTagsPaint()
             local shadowColor = Color(0, 0, 0, 255)
             local bold = false
             
-            if drawNameTags:GetBool() or (drawFriendTags:GetBool() and friendIDs[steamID]) then       
+            if drawNameTags:GetBool() or (alwaysDrawFriendTags:GetBool() and friendIDs[steamID]) then       
                 if SaitoHUD.NameTagsColorHook and not SaitoHUD.ShouldIgnoreHook() then
                     color, shadowColor = SaitoHUD.NameTagsColorHook(ply)
                 else
@@ -502,7 +502,7 @@ Rehook = function()
     end
     
     -- Name tags
-    if (drawNameTags:GetBool() or drawFriendTags:GetBool()) and not SaitoHUD.AntiUnfairTriggered() then
+    if (drawNameTags:GetBool() or alwaysDrawFriendTags:GetBool()) and not SaitoHUD.AntiUnfairTriggered() then
         hook.Add("HUDPaint", "SaitoHUD.NameTags", NameTagsPaint)
     else
         SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.NameTags")
@@ -532,7 +532,7 @@ concommand.Add("dump_info", function() SaitoHUD.DumpEntityInfo() end)
 -- Need to rehook
 cvars.AddChangeCallback("entity_info", Rehook)
 cvars.AddChangeCallback("entity_info_player", Rehook)
-cvars.AddChangeCallback("name_tags", Rehook)
+cvars.AddChangeCallback("name_tags_always", Rehook)
 cvars.AddChangeCallback("friend_tags", Rehook)
 cvars.AddChangeCallback("player_boxes", Rehook)
 cvars.AddChangeCallback("player_markers", Rehook)

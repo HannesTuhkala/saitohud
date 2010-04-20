@@ -128,7 +128,7 @@ local function OverlayPanel(panel)
     end
     
     AddToggle(panel,"Show Name Tags","name_tags",true)
-    AddToggle(panel,"Always Show Friend Tags","friend_tags",true)
+    AddToggle(panel,"Always Show Friend Tags","friend_tags_always",true)
     AddToggle(panel,"Show Player Bounding Boxes","player_boxes",true)
     AddToggle(panel,"Show Player Orientation Markers","player_markers",true)
     AddToggle(panel,"Show Player Line of Sights","trace_aims",true)
