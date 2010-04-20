@@ -85,9 +85,17 @@ pre, code {
   <h1>SaitoHUD Documentation  </h1>
   <ol>
     <li><a href="#general">General Information</a></li>
-    <li><a href="#entity-filters">Entity Filters</a></li>
-    <li><a href="#gesture-menu">Gesture Menu</a></li>
-    <li><a href="#hud-overlays">HUD Overlays</a></li>
+    <li><a href="#concepts">Concepts</a>
+<ol>
+        <li><a href="#entity-filters">Entity Filters</a></li>
+        <li><a href="#gesture-menu">Gesture Menu</a></li>
+      </ol>
+    </li>
+    <li><a href="#info-displays">Information Displays</a></li>
+    <li><a href="#player-identification">Player Identification</a>
+<ol>
+    <li><a href="#highlighting-friends">Highlighting Friends</a></li></ol></li>
+    <li><a href="#entity-highlighting">Entity Highlighting</a></li>
     <li><a href="#sampling">Sampling</a></li>
     <li><a href="#stranded">Stranded Game Mode</a></li>
     <li><a href="#sandbox">Sandbox Game Mode</a>
@@ -99,7 +107,8 @@ pre, code {
   </ol>
 <h2><a id="general">General Information</a></h2>
 <p>Many SaitoHUD functions are disabled when you are playing on non-Sandbox game modes. This is to reduce the temptation of cheating, even if you may not usually cheat. These functions will be marked by <span class="cheat-deterrent">*</span> in this document.</p>
-<h2><a>Entity Filters</a></h2>
+<h2><a id="concepts">Concepts</a></h2>
+<h3><a id="entity-filters">Entity Filters</a></h3>
   <p>Some of SaitoHUD's commands support <em>entity filters</em>, which allow you to specify a criteria by which to match entities. You list a set of conditions separated by spaces, with each condition being in the format of <code>property=value</code>. For an entity to match a filter, all conditions must be satisfied. For example, if you wanted to only select entities with &quot;wire&quot; in their class name and &quot;gate&quot; in the model paths, the following filter would be used:</p>
   <pre>class=wire model=gate</pre>
   <p>Note how they match <em>substrings</em>. By default, it is assumed that you mean class, so the following filter would have sufficed:</p>
@@ -121,21 +130,61 @@ pre, code {
   <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>*</code> or <code>@mdl *</code> or even <code>@mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
   <p>If you want at least one condition to match, but you do not need all conditions to match, you can can seperate the conditions with &quot;or&quot;. ORs have operator precedence over ANDs. So far, you have not seen AND explicitly written because it is assumed, but you may write it if it clarifies the filter string. See the filters below, which all do the same thing:</p>
   <pre>wire and (expr or gate mdl=cpu) or mdl=barrel<br>wire and (expr or gate @mdl cpu) or @mdl barrel<br>wire ( expr or gate @mdl cpu ) or @mdl barrel</pre>
-  <h2><a id="gesture-menu">Gesture Menu</a></h2>
+  <h3><a id="gesture-menu">Gesture Menu</a></h3>
   <p>SaitoHUD provides a quick context-sensitive menu that can be opened with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
   <p>As long as the bound button is held down, the menu will appear in the top right. Scroll through the menu by moving your mouse, and lift your finger off the bound button to once you have selected an item. Note that you may have to move the mouse slightly after you have lifted your finger for a selection to take effect.</p>
-<h2><a id="hud-overlays">HUD Overlays</a></h2>
-<p>There are the following functions:</p>
+<h2><a id="info-displays">Information Displays</a></h2>
+<p>SaitoHUD has the following information displays:</p>
 <ul>
-  <li>The entity information overlay displays a large amount of useful entity-related information on your HUD on the right side. It can be configured to show additional player-specific properties as well.</li>
-  <li>Name tags display the names of all players on the server on your HUD. The distance that the player is away from you is also visible.<span class="cheat-deterrent">*</span></li>
-  <li>Player bounding boxes show the bounding boxes of players on your HUD.<span class="cheat-deterrent">*</span></li>
-  <li>Player markers display a small arrow beneath the feet of players on your HUD, indicating orientation.<span class="cheat-deterrent">*</span></li>
-  <li>Triads, or 3D coordinate origin markers, can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
-  <li>The class names of entities can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
-  <li>Bounding boxes of entities can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
-  </ul>
-<p>The results of the filtering operations for the relevant functions are cached for very brief amounts of time to significantly increase performance.</p>
+  <li>Information about the entity that you are looking at.</li>
+  <li>Information about the player that you are looking at.</li>
+</ul>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>entity_info</td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Draws information about the entity that you are looking on.</td>
+  </tr>
+  <tr>
+    <td>entity_info_player</td>
+    <td>bool</td>
+    <td>0</td>
+    <td>In addition to entity information, additional player information can also be displayed.</td>
+  </tr>
+</table>
+<h3>Commands</h3>
+<table border="0" cellpadding="0" cellspacing="0">
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Arguments</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>dump_info</td>
+    <td nowrap="nowrap">void</td>
+    <td>Dumps the contents of entity information HUD overlay to console for easy copy and paste.</td>
+  </tr>
+</table>
+<h2><a id="player-identification">Player Indentification</a></h2>
+<p>Players can be identified with:</p>
+<ul>
+  <li>Name tags visible on the HUD. The distance that the player is away from you is also displayed.<span class="cheat-deterrent">*</span> </li>
+  <li>Player bounding boxes that show the bounding boxes of players on your HUD.<span class="cheat-deterrent">*</span></li>
+  <li>Player markers that display a small arrow beneath the feet of players on your HUD, indicating orientation.<span class="cheat-deterrent">*</span></li>
+</ul>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
   <col width="1%" />
@@ -208,6 +257,19 @@ pre, code {
     <td>Draws an arrow under the feet of players indicating the way they face.</td>
   </tr>
 </table>
+<h3><a id="highlighting-friends">Highlighting Friends</a></h3>
+<p>Name tags for friends can be colored differently and bolded for easier identification.</p>
+<p>In order for SaitoHUD to know who is a friend of yours, you need to create a friends list. Create a CSV file at <strong>data/saitohud/friends.csv</strong> and in it, put nicknames for your friends, Steam IDs of your friends, and red, green, and blue components to color their in-game name tags with.</p>
+<p>See the following example:</p>
+<pre>Nickname,SteamID,R,G,B<br>Great Friend,STEAM_0:0:0000001,255,255,0<br>Another Friend,STEAM_0:0:0000002,255,0,0</pre>
+<h2><a id="entity-highlighting">Entity Highlighting</a></h2>
+<p>Entities can be highlighted based on an <a href="#entity-filters">entity filter</a> with:</p>
+<ul>
+  <li>Triads, or 3D coordinate origin markers, that are displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  <li>HUD displays of entity class names at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  <li>Bounding boxes of entities that aredisplayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+</ul>
+<p>The results of the filtering operations for the following functions are cached for very brief amounts of time to significantly increase performance.</p>
 <h3>Commands</h3>
 <table border="0" cellpadding="0" cellspacing="0">
   <col width="1%" />
@@ -236,11 +298,6 @@ pre, code {
     <td>toggle_triads<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">void</td>
     <td>Legacy function to toggle triads on all entities on and off.</td>
-  </tr>
-  <tr>
-    <td>dump_info</td>
-    <td nowrap="nowrap">void</td>
-    <td>Dumps the contents of entity information HUD overlay to console for easy copy and paste.</td>
   </tr>
 </table>
 <h2><a id="sampling">Sampling</a></h2>
