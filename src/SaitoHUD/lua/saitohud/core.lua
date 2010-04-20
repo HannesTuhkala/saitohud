@@ -105,8 +105,13 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
         
         if not SaitoHUD.AntiUnfairTriggered() and 
             showPlayerInfo and tr.Entity:IsPlayer() then
+            if showEntityInfo then
+                table.insert(lines, "")
+            else
+                table.insert(lines, "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]")
+            end
+            
             table.Add(lines, {
-                "",
                 "Name: " .. tostring(tr.Entity:Name()),
                 "SteamID: " .. tostring(tr.Entity:SteamID()),
                 "Ping: " .. tostring(tr.Entity:Ping()),
