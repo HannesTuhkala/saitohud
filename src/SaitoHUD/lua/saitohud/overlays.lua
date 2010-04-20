@@ -430,40 +430,36 @@ local function Rehook()
     if showPlayerInfo:GetBool() or drawEntityInfo:GetBool() then
         hook.Add("HUDPaint", "SaitoHUD.EntityInfo", EntityInfoPaint)
     else
-        hook.Remove("HUDPaint", "SaitoHUD.EntityInfo")
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.EntityInfo")
     end
     
     -- Filters
-    if not SaitoHUD.AntiUnfairTriggered() and 
-        (triadsFilter or overlayFilter or bboxFilter) then
-            hook.Add("HUDPaint", "SaitoHUD.Overlays", OverlaysPaint)
-        else
-            hook.Remove("HUDPaint", "SaitoHUD.Overlays")
-        end
+    if (triadsFilter or overlayFilter or bboxFilter) and not
+        SaitoHUD.AntiUnfairTriggered() then
+        hook.Add("HUDPaint", "SaitoHUD.Overlays", OverlaysPaint)
+    else
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.Overlays")
     end
     
     -- Name tags
-    if not SaitoHUD.AntiUnfairTriggered() and drawNameTags:GetBool() then
-            hook.Add("HUDPaint", "SaitoHUD.NameTags", NameTagsPaint)
-        else
-            hook.Remove("HUDPaint", "SaitoHUD.NameTags")
-        end
+    if drawNameTags:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
+        hook.Add("HUDPaint", "SaitoHUD.NameTags", NameTagsPaint)
+    else
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.NameTags")
     end
     
     -- Player bounding boxes
-    if not SaitoHUD.AntiUnfairTriggered() and playerBoxes:GetBool() then
-            hook.Add("HUDPaint", "SaitoHUD.PlayerBBoxes", PlayerBBoxesPaint)
-        else
-            hook.Remove("HUDPaint", "SaitoHUD.PlayerBBoxes")
-        end
+    if playerBoxes:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
+        hook.Add("HUDPaint", "SaitoHUD.PlayerBBoxes", PlayerBBoxesPaint)
+    else
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.PlayerBBoxes")
     end
     
     -- Player orientation markers
-    if not SaitoHUD.AntiUnfairTriggered() and playerMarkers:GetBool() then
-            hook.Add("HUDPaint", "SaitoHUD.PlayerMarkers", PlayerMarkersPaint)
-        else
-            hook.Remove("HUDPaint", "SaitoHUD.PlayerMarkers")
-        end
+    if playerMarkers:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
+        hook.Add("HUDPaint", "SaitoHUD.PlayerMarkers", PlayerMarkersPaint)
+    else
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.PlayerMarkers")
     end
 end
 

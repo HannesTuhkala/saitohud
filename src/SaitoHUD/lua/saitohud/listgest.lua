@@ -31,7 +31,7 @@ local function GetMenu()
     local registered = SaitoHUD.CallHookAggregate("SaitoHUDProvideMenu", numHooks)
     
     for _, items in pairs(registered) do
-        table.Merge(menu, items)
+        table.Add(menu, items)
     end
     
     table.insert(menu, 1, {

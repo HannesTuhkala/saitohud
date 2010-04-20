@@ -104,7 +104,7 @@ local function SamplingPanel(panel)
     sampleEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample " .. sampleEntry:GetValue())
     end
-    sampleEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    sampleEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Remove Player by Name:"})
     local removeEntry = panel:AddControl("DTextEntry",{})
@@ -114,7 +114,7 @@ local function SamplingPanel(panel)
     removeEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_remove " .. removeEntry:GetValue())
     end
-    removeEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    removeEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Sample by Filter:"})
     local sampleFilterEntry = panel:AddControl("DTextEntry",{})
@@ -124,7 +124,7 @@ local function SamplingPanel(panel)
     sampleFilterEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_filter " .. sampleFilterEntry:GetValue())
     end
-    sampleFilterEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    sampleFilterEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Remove by Filter:"})
     local removeFilterEntry = panel:AddControl("DTextEntry",{})
@@ -134,7 +134,7 @@ local function SamplingPanel(panel)
     removeFilterEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_remove_filter " .. removeFilterEntry:GetValue())
     end
-    removeFilterEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    removeFilterEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     local button = panel:AddControl("Button", {
         Label = "Remove All Samplers",
@@ -167,19 +167,19 @@ local function OverlayPanel(panel)
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    c = panel:AddControl("CheckBox", {
+    local c = panel:AddControl("CheckBox", {
         Label = "Show Player Bounding Boxes",
         Command = "player_boxes"
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    c = panel:AddControl("CheckBox", {
+    local c = panel:AddControl("CheckBox", {
         Label = "Show Player Orientation Markers",
         Command = "player_markers"
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    c = panel:AddControl("CheckBox", {
+    local c = panel:AddControl("CheckBox", {
         Label = "Show Player Line of Sights",
         Command = "trace_aims"
     })
@@ -193,7 +193,7 @@ local function OverlayPanel(panel)
     triadsEntry.OnEnter = function()
         LocalPlayer():ConCommand("triads_filter " .. triadsEntry:GetValue())
     end
-    triadsEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    triadsEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Overlay Filter:"})
     local overlayEntry = panel:AddControl("DTextEntry",{})
@@ -203,7 +203,7 @@ local function OverlayPanel(panel)
     overlayEntry.OnEnter = function()
         LocalPlayer():ConCommand("overlay_filter " .. overlayEntry:GetValue())
     end
-    overlayEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    overlayEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Bounding Box Filter:"})
     local bboxEntry = panel:AddControl("DTextEntry",{})
@@ -213,7 +213,7 @@ local function OverlayPanel(panel)
     bboxEntry.OnEnter = function()
         LocalPlayer():ConCommand("bbox_filter " .. bboxEntry:GetValue())
     end
-    bboxEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
+    bboxEntry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
 end
 
 --- PopulateToolMenu hook.

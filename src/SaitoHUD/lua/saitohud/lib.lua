@@ -19,6 +19,17 @@
 
 -- Generic library functions.
 
+--- Safely remove a hook.
+-- @param name Name of hook
+function SaitoHUD.RemoveHook(name, id)
+    local ret = nil
+    local hooks = hook.GetTable()[name]
+    
+    if hooks ~= nil then
+        hook.Remove(name, id)
+    end
+end
+
 --- Gets the number of hooks registered.
 -- @param name Name of hook
 -- @return Number of hooks
@@ -27,7 +38,10 @@ function SaitoHUD.CountHooks(name)
     local hooks = hook.GetTable()[name]
     
     if hooks ~= nil then
-        return #hooks
+        local count = 0
+        for _, _ in pairs(hooks) do count = count + 1 end
+        
+        return count
     else
         return 0
     end

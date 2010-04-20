@@ -28,11 +28,11 @@ local function ToggleHideHUD(ply, cmd, args)
     if hideHUD then
         hook.Add("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD", function() return false end)
     else
-        hook.Remove("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
+        SaitoHUD.RemoveHook("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
     end
 end
 
 concommand.Add("toggle_hud", ToggleHideHUD)
 
 -- Undo the hook, in case the HUD was reloaded
-hook.Remove("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
+SaitoHUD.RemoveHook("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
