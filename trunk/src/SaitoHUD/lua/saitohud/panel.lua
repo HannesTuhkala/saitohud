@@ -155,4 +155,4 @@ end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
 
-SaitoHUD.UpdatePanels()
+--SaitoHUD.UpdatePanels()
