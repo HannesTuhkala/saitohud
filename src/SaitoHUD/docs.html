@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>SaitoHUD Reference</title>
+<title>SaitoHUD Documentation</title>
 <style>
 body {
   margin: 0;
@@ -15,20 +15,31 @@ body, table, td {
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 9pt;
 }
+a:link, a:visited {
+  color: #444444;
+}
+a:hover, a:active {
+  color: #D01A55;
+}
 h1 {
   margin: 0 0 20px 0;
   font-family: Arial, Helvetica, Helvetica;
   font-weight: bold;
   font-size: 160%;
-  color: #260083;
-}h2 {
+  color: #585947;
+}
+h2 {
+  margin: 30px 0 20px 0;
+	padding: 6px 0 0 0;
   font-family: Arial, Lucida Grande, Trebuchet MS;
   font-size: 130%;
-  color: #000000
+  color: #D01A55;
+	border-top: 1px solid #999999;
 }
 h3 {
+  margin: 20px 0 20px 0;
   font-family: Arial, Lucida Grande, Trebuchet MS;
-  font-size: 110%;
+  font-size: 120%;
   color: #000000
 }
 table {
@@ -45,7 +56,7 @@ table th, table td {
   vertical-align: top;
 }
 table th {
-  background: #e4fffd;
+  background: #CCCEA9;
   text-align: left;
 }
 pre, code {
@@ -61,19 +72,39 @@ pre, code {
 #footer-id {
 	float: right;
 }
+.cheat-deterrent {
+		background: #FFFFA6;
+		color: #444444;
+		font-size: 7pt;
+}
 </style>
 </head>
 
 <body>
 <div id="wrapper">
-  <h1>SaitoHUD Reference  </h1>
-  <p>SaitoHUD is a utility HUD with a wide variety of functions. Note that it does not attempt to protect itself from tampered global functions.</p>
-  <h2>Filters</h2>
-  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. You list a set of conditions separated by spaces, with each condition being in the format of <code>property=value</code>. For an entity to match a filter, all conditions must be satisfied. For example, if you wanted to only select entities with &quot;wire&quot; in their class name and &quot;gate&quot; in the model paths, the following filter would be used:</p>
+  <h1>SaitoHUD Documentation  </h1>
+  <ol>
+    <li><a href="#general">General Information</a></li>
+    <li><a href="#entity-filters">Entity Filters</a></li>
+    <li><a href="#gesture-menu">Gesture Menu</a></li>
+    <li><a href="#hud-overlays">HUD Overlays</a></li>
+    <li><a href="#sampling">Sampling</a></li>
+    <li><a href="#stranded">Stranded Game Mode</a></li>
+    <li><a href="#sandbox">Sandbox Game Mode</a>
+      <ol>
+        <li><a href="#sandbox-customize-menu">Customizing the Gesture Menu</a></li>
+      </ol>
+    </li>
+    <li><a href="#miscellaneous">Miscellaneous</a></li>
+  </ol>
+<h2><a id="general">General Information</a></h2>
+<p>Many SaitoHUD functions are disabled when you are playing on non-Sandbox game modes. This is to reduce the temptation of cheating, even if you may not usually cheat. These functions will be marked by <span class="cheat-deterrent">*</span> in this document.</p>
+<h2><a>Entity Filters</a></h2>
+  <p>Some of SaitoHUD's commands support <em>entity filters</em>, which allow you to specify a criteria by which to match entities. You list a set of conditions separated by spaces, with each condition being in the format of <code>property=value</code>. For an entity to match a filter, all conditions must be satisfied. For example, if you wanted to only select entities with &quot;wire&quot; in their class name and &quot;gate&quot; in the model paths, the following filter would be used:</p>
   <pre>class=wire model=gate</pre>
   <p>Note how they match <em>substrings</em>. By default, it is assumed that you mean class, so the following filter would have sufficed:</p>
   <pre>wire model=gate</pre>
-  <p>If you want to a condition that the entity must <em>not</em> match, place a hyphen (-) in front of the value. For example, if you wanted to match conditions mentioned above, but you did not want to match entities with &quot;sand&quot; in their material paths, you would use:</p>
+  <p>If you want to a condition that the entity must <em>not</em> match, place a hyphen (-) in front of the value. For example, if you wanted to match the conditions mentioned above, but you did not want to match entities with &quot;sand&quot; in their material paths, you would use:</p>
   <pre>class=wire model=gate material=-sand</pre>
   <p>An alternative syntax of the above filter using the syntax <code>@type pattern</code> is:</p>
 <pre>wire @model gate @material sand</pre>
@@ -87,12 +118,23 @@ pre, code {
   </ul>
   <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you.</p>
   <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>*</code> or <code>@mdl *</code> or even <code>@mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
-  <p>If you want at least one condition to match, but you do need all conditions to match, you can use OR. ORs have operator precedence over ANDs. So far, you have not seen AND explicitly written because it is assumed, but you are free to write it. See the filters below, which all do the same thing:</p>
+  <p>If you want at least one condition to match, but you do not need all conditions to match, you can can seperate the conditions with &quot;or&quot;. ORs have operator precedence over ANDs. So far, you have not seen AND explicitly written because it is assumed, but you may write it if it clarifies the filter string. See the filters below, which all do the same thing:</p>
   <pre>wire and (expr or gate mdl=cpu) or mdl=barrel<br>wire and (expr or gate @mdl cpu) or @mdl barrel<br>wire ( expr or gate @mdl cpu ) or @mdl barrel</pre>
-  <h2>List Gestures</h2>
-  <p>SaitoHUD provides a quick list menu that can be accessed with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
-<h2>Overlays</h2>
-<p>The overlays module has functions to display the locations of other players and highlight entities using filters. </p>
+  <h2><a id="gesture-menu">Gesture Menu</a></h2>
+  <p>SaitoHUD provides a quick context-sensitive menu that can be opened with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
+  <p>As long as the bound button is held down, the menu will appear in the top right. Scroll through the menu by moving your mouse, and lift your finger off the bound button to once you have selected an item. Note that you may have to move the mouse slightly after you have lifted your finger for a selection to take effect.</p>
+<h2><a id="hud-overlays">HUD Overlays</a></h2>
+<p>There are the following functions:</p>
+<ul>
+  <li>The entity information overlay displays a large amount of useful entity-related information on your HUD on the right side. It can be configured to show additional player-specific properties as well.</li>
+  <li>Name tags display the names of all players on the server on your HUD. The distance that the player is away from you is also visible.<span class="cheat-deterrent">*</span></li>
+  <li>Player bounding boxes show the bounding boxes of players on your HUD.<span class="cheat-deterrent">*</span></li>
+  <li>Player markers display a small arrow beneath the feet of players on your HUD, indicating orientation.<span class="cheat-deterrent">*</span></li>
+  <li>Triads, or 3D coordinate origin markers, can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  <li>The class names of entities can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  <li>Bounding boxes of entities can be displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  </ul>
+<p>The results of the filtering operations for the relevant functions are cached for very brief amounts of time to significantly increase performance.</p>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
   <col width="1%" />
@@ -117,26 +159,25 @@ pre, code {
     <td>In addition to entity information, additional player information can also be displayed.</td>
   </tr>
   <tr>
-    <td>name_tags</td>
+    <td>name_tags<span class="cheat-deterrent">*</span></td>
     <td>bool</td>
     <td>0</td>
     <td>Draws the names of players.</td>
   </tr>
   <tr>
-    <td>player_boxes</td>
+    <td>player_boxes<span class="cheat-deterrent">*</span></td>
     <td>bool</td>
     <td>0</td>
     <td>Draws the bounding boxes and direction lines of players.</td>
   </tr>
   <tr>
-    <td>player_markers</td>
+    <td>player_markers<span class="cheat-deterrent">*</span></td>
     <td>bool</td>
     <td>0</td>
     <td>Draws an arrow under the feet of players indicating the way they face.</td>
   </tr>
 </table>
 <h3>Commands</h3>
-<p>These commands are very useful for finding &quot;lost&quot; entities. The results of the filtering operations are cached for very brief amounts of time to significantly increase performance.</p>
 <table border="0" cellpadding="0" cellspacing="0">
   <col width="1%" />
   <col width="1%" />
@@ -146,22 +187,22 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td>triads_filter</td>
+    <td>triads_filter<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws 3D coordinate triads at the location of matched entities.</td>
   </tr>
   <tr>
-    <td>overlay_filter</td>
+    <td>overlay_filter<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws class names at the location of matched entities.</td>
   </tr>
   <tr>
-    <td>bbox_filter</td>
+    <td>bbox_filter<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws bounding boxes at the location of matched entities..</td>
   </tr>
   <tr>
-    <td>toggle_triads</td>
+    <td>toggle_triads<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">void</td>
     <td>Legacy function to toggle triads on all entities on and off.</td>
   </tr>
@@ -171,7 +212,7 @@ pre, code {
     <td>Dumps the contents of entity information HUD overlay to console for easy copy and paste.</td>
   </tr>
 </table>
-<h2>Sampling</h2>
+<h2><a id="sampling">Sampling</a></h2>
 <p>Sampling allows you to trace the path of an entity or player. The path that the entity or player travels is drawn on the screen. By default, you can only sample one entity at a time, but a cvar adjusts this behavior.</p>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
@@ -185,7 +226,7 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td>sample_draw</td>
+    <td>sample_draw<span class="cheat-deterrent">*</span></td>
     <td>bool</td>
     <td>1</td>
     <td>Draws the lines tracing the paths of sampled entities.</td>
@@ -293,11 +334,11 @@ pre, code {
     <td>Prints a list of all sampled entities to console.</td>
   </tr>
 </table>
-<h2>Stranded Game Mode</h2>
-<p>SaitoHUD has the following features for the <em>Stranded</em> game mode:</p>
+<h2><a id="stranded">Stranded Game Mode</a></h2>
+<p>SaitoHUD has the following functions for the <em>Stranded</em> game mode:</p>
 <ul>
-  <li>Replaces the resource drawing code with a routine that also colors the name of resources appropriate colors (stone is a grey-ish color).</li>
-  <li>Adds a very useful context-sensitive list gesture menu.</li>
+  <li>Replacement of the resource drawing code with a routine that also colors the name of resources appropriate colors (i.e. stone is a grey-ish color).</li>
+  <li>A very useful context-sensitive gesture menu.</li>
   </ul>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
@@ -323,8 +364,10 @@ pre, code {
     <td>The maximum distance away a resource can be for its resource name will be displayed.</td>
   </tr>
 </table>
-<h2>Sandbox Game Mode</h2>
-<p>For sandbox game modes (and all game modes that not stranded), there is a default sandbox list gesture menu that contains some common tools. To customize this list, create a CSV file at <strong>data/saitohud/sandbox/menu.csv</strong> (in your data/ folder) and make a list of the tools that you wish to have on the menu. The first column is the text that will be shown, while the second column is the console command to run.</p>
+<h2><a id="sandbox">Sandbox Game Mode</a></h2>
+<p>For sandbox games, there is a customizable gesture menu.</p>
+<h3><a id="sandbox-customize-menu">Customizing the Gesture Menu</a></h3>
+<p>There is a default sandbox list gesture menu that contains some common tools, but if you wish to customize this, create a CSV file at <strong>data/saitohud/sandbox/menu.csv</strong> (in your data/ folder) and make a list of the tools that you wish to have on the menu. The first column is the text that will be shown, while the second column is the console command to run.</p>
 <p>The following is a sample from the default menu.csv file:</p>
 <pre>Title,Command
 Easy Precision Tool,tool_easy_precision
@@ -335,7 +378,7 @@ Adv. Duplicator Tool,tool_adv_duplicator
 Expression 2 Tool,tool_wire_expression2
 Wire Debugger Tool,tool_wire_debugger
 Improved Wire Tool,tool_wire_improved</pre>
-<h2>Miscellaneous</h2>
+<h2><a id="miscellaneous">Miscellaneous</a></h2>
 <h3>Cvars</h3>
   <table border="0" cellspacing="0" cellpadding="0">
     <col width="1%" />
@@ -348,7 +391,7 @@ Improved Wire Tool,tool_wire_improved</pre>
       <th scope="col">Description</th>
     </tr>
     <tr>
-      <td>trace_aims</td>
+      <td>trace_aims<span class="cheat-deterrent">*</span></td>
 
       <td>bool</td>
       <td>0</td>
@@ -382,7 +425,7 @@ Improved Wire Tool,tool_wire_improved</pre>
       <td>Toggles the display of the HUD.</td>
     </tr>
     <tr>
-      <td>super_flashlight</td>
+      <td>super_flashlight<span class="cheat-deterrent">*</span></td>
       <td>void</td>
       <td>Toggles a powerful flashlight that illuminates the area immediately around you and the area that you are looking at. This works by creating two dynamic lights, one at your location, and another at the location that your aim vector collides at.</td>
     </tr>
