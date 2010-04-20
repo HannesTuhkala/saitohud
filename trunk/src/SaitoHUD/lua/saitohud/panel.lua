@@ -45,10 +45,15 @@ local function SamplingPanel(panel)
     panel:ClearControls()
     panel:AddHeader()
     
-    panel:AddControl("CheckBox", {
+    if SaitoHUD.AntiUnfairTriggered() then
+        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
+    end
+    
+    local c = panel:AddControl("CheckBox", {
         Label = "Draw Sampled Data",
         Command = "sample_draw"
     })
+    c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("CheckBox", {
         Label = "Draw Nodes",
@@ -60,7 +65,6 @@ local function SamplingPanel(panel)
         Command = "sample_thick"
     })
     
-    
     panel:AddControl("CheckBox", {
         Label = "Fade Samples",
         Command = "sample_fade"
@@ -70,7 +74,6 @@ local function SamplingPanel(panel)
         Label = "Use Random Colors",
         Command = "sample_random_color"
     })
-    
     
     panel:AddControl("CheckBox", {
         Label = "Allow Multiple",
@@ -101,6 +104,7 @@ local function SamplingPanel(panel)
     sampleEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample " .. sampleEntry:GetValue())
     end
+    sampleEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Remove Player by Name:"})
     local removeEntry = panel:AddControl("DTextEntry",{})
@@ -110,6 +114,7 @@ local function SamplingPanel(panel)
     removeEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_remove " .. removeEntry:GetValue())
     end
+    removeEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Sample by Filter:"})
     local sampleFilterEntry = panel:AddControl("DTextEntry",{})
@@ -119,6 +124,7 @@ local function SamplingPanel(panel)
     sampleFilterEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_filter " .. sampleFilterEntry:GetValue())
     end
+    sampleFilterEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Remove by Filter:"})
     local removeFilterEntry = panel:AddControl("DTextEntry",{})
@@ -128,11 +134,13 @@ local function SamplingPanel(panel)
     removeFilterEntry.OnEnter = function()
         LocalPlayer():ConCommand("sample_remove_filter " .. removeFilterEntry:GetValue())
     end
+    removeFilterEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     local button = panel:AddControl("Button", {
         Label = "Remove All Samplers",
         Command = "sample_clear",
     })
+     button:SetDisabled(SaitoHUD.AntiUnfairTriggered())
 end
 
 local function OverlayPanel(panel)
@@ -150,7 +158,7 @@ local function OverlayPanel(panel)
     })
     
     if SaitoHUD.AntiUnfairTriggered() then
-        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and some of the following options do not take effect."})
+        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
     end
     
     local c = panel:AddControl("CheckBox", {
@@ -185,6 +193,7 @@ local function OverlayPanel(panel)
     triadsEntry.OnEnter = function()
         LocalPlayer():ConCommand("triads_filter " .. triadsEntry:GetValue())
     end
+    triadsEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Overlay Filter:"})
     local overlayEntry = panel:AddControl("DTextEntry",{})
@@ -194,6 +203,7 @@ local function OverlayPanel(panel)
     overlayEntry.OnEnter = function()
         LocalPlayer():ConCommand("overlay_filter " .. overlayEntry:GetValue())
     end
+    overlayEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
     panel:AddControl("Label", {Text = "Bounding Box Filter:"})
     local bboxEntry = panel:AddControl("DTextEntry",{})
@@ -203,6 +213,7 @@ local function OverlayPanel(panel)
     bboxEntry.OnEnter = function()
         LocalPlayer():ConCommand("bbox_filter " .. bboxEntry:GetValue())
     end
+    bboxEntry:SetDisabled(SaitoHUD.AntiUnfairTriggered())
 end
 
 --- PopulateToolMenu hook.

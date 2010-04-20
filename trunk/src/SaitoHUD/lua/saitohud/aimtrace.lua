@@ -72,7 +72,7 @@ end
 -- error, the game will be put in an undefined state that only a restart of the
 -- game can fix.
 local function DrawTraceAims()
-    if traceAims:GetBool() then
+    if traceAims:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
         cam.Start3D(EyePos(), EyeAngles())
         -- Wrap the call in pcall() because an error here causes mayhem, so it
         -- is best if any errors are caught

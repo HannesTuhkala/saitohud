@@ -55,7 +55,7 @@ local function ToggleFlashLight()
     
     surface.PlaySound("items/flashlight1.wav")
     
-    if lightEnabled then
+    if lightEnabled and SaitoHUD.AntiUnfairTriggered() then
         hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
     else
         hook.Remove("Think", "SaitoHUD.Super.Flashlight")
