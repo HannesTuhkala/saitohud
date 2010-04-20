@@ -16,16 +16,27 @@
 -- 
 -- $Id$
 
+--- This file is responsible for a lot of the HUD overlays.
+
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
 local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
 local playerMarkers = CreateClientConVar("player_markers", "0", true, false)
 
-SaitoHUD.triadsFilter = nil
-SaitoHUD.overlayFilter = nil
-SaitoHUD.bboxFilter = nil
+local lastTriadsFilter = nil -- Legacy support
+local lastOverlayMatch = 0
+local triadsFilter = nil
+local overlayFilter = nil
+local bboxFilter = nil
+-- These are used to cache the filter results for short periods of time
+local triadsMatches = {}
+local overlayMatches = {}
+local bboxMatches = {}
 
+--- Draw a triad.
+-- @param p1 Point
+-- @param ang Angle
 local function DrawTriad(p1, ang)
     local p2 = p1 + ang:Forward() * 16
     local p3 = p1 - ang:Right() * 16
@@ -41,76 +52,16 @@ local function DrawTriad(p1, ang)
     surface.DrawLine(p1.x, p1.y, p4.x, p4.y)
 end
 
-function SaitoHUD.DrawEntityInfo()
-    if SaitoHUD.Gesturing then
-        return
-    end
-    
-    local lines = SaitoHUD.GetEntityInfoLines(showPlayerInfo:GetBool(),drawEntityInfo:GetBool())
-    
-    if table.Count(lines) > 0 then
-        local color = Color(255, 255, 255, 255)
-        
-        local yOffset = ScrH() * 0.3
-        for _, s in pairs(lines) do
-            draw.SimpleText(s, "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
-            yOffset = yOffset + 14
-        end
-    end
-end
-
-local lastOverlayMatch = 0
-local triadsMatches = {}
-local overlayMatches = {}
-local bboxMatches = {}
-
-local function UpdateOverlayMatches()
-    if not SaitoHUD.triadsFilter and not SaitoHUD.overlayFilter and
-       not SaitoHUD.bboxFilter then
-        return
-    end
-    
-    triadsMatches = {}
-    overlayMatches = {}
-    bboxMatches = {}
-    
-    local refPos = SaitoHUD.GetRefPos()
-    
-    for _, ent in pairs(ents.GetAll()) do
-        if ValidEntity(ent) then
-            local cls = ent:GetClass()
-            if cls == "" or not cls then
-                cls = "<?>"
-            end
-            local pos = ent:GetPos()
-            
-            if cls != "viewmodel" and -- cls:sub(1, 7) != "weapon_" and cls != "player" and 
-               cls != "physgun_beam" and cls != "gmod_tool" and
-               cls != "gmod_camera" and cls != "worldspawn" then
-                if SaitoHUD.triadsFilter and SaitoHUD.triadsFilter.f(ent, refPos) then
-                    table.insert(triadsMatches, ent)
-                end
-                
-                if SaitoHUD.overlayFilter and SaitoHUD.overlayFilter.f(ent, refPos) then
-                    table.insert(overlayMatches, ent)
-                end
-                
-                if SaitoHUD.bboxFilter and SaitoHUD.bboxFilter.f(ent, refPos) then
-                    table.insert(bboxMatches, ent)
-                end
-            end
-        end
-    end
-end
-
-function SaitoHUD.DrawOverlays()
-    if not SaitoHUD.triadsFilter and not SaitoHUD.overlayFilter and
-       not SaitoHUD.bboxFilter then
+--- Draw the overlays.
+function OverlaysPaint()
+    -- Check to make sure that we even have a filter to draw
+    if not triadsFilter and not overlayFilter and
+       not bboxFilter then
         return
     end
     
     if CurTime() - lastOverlayMatch > 1 then
-        UpdateOverlayMatches()
+        EvaluateFilters()
         lastOverlayMatch = CurTime()
     end
     
@@ -192,7 +143,70 @@ function SaitoHUD.DrawOverlays()
     end
 end
 
-function SaitoHUD.DrawNameTags()
+--- Draws the entity information on screen.
+local function EntityInfoPaint()
+    if SaitoHUD.Gesturing then return end
+    
+    local lines = SaitoHUD.GetEntityInfoLines(showPlayerInfo:GetBool(), 
+                                               drawEntityInfo:GetBool())
+    
+    if table.Count(lines) > 0 then
+        local color = Color(255, 255, 255, 255)
+        
+        local yOffset = ScrH() * 0.3
+        for _, s in pairs(lines) do
+            draw.SimpleText(s, "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
+            yOffset = yOffset + 14
+        end
+    end
+end
+
+--- Builds the cache of matched of entities. This is to significantly increase
+-- performance, as evaluating the filter is a fairly resource intensive task.
+local function EvaluateFilters()
+    -- Check to make sure that we even have a filter to update
+    if not triadsFilter and not overlayFilter and
+       not bboxFilter then
+        return
+    end
+    
+    triadsMatches = {}
+    overlayMatches = {}
+    bboxMatches = {}
+    
+    local refPos = SaitoHUD.GetRefPos()
+    
+    for _, ent in pairs(ents.GetAll()) do
+        if ValidEntity(ent) then
+            local cls = ent:GetClass()
+            local pos = ent:GetPos()
+            
+            --- Class may be empty
+            if cls == "" or not cls then
+                cls = "<?>"
+            end
+            
+            if cls != "viewmodel" and -- cls:sub(1, 7) != "weapon_" and cls != "player" and 
+               cls != "physgun_beam" and cls != "gmod_tool" and
+               cls != "gmod_camera" and cls != "worldspawn" then
+                if triadsFilter and triadsFilter.f(ent, refPos) then
+                    table.insert(triadsMatches, ent)
+                end
+                
+                if overlayFilter and overlayFilter.f(ent, refPos) then
+                    table.insert(overlayMatches, ent)
+                end
+                
+                if bboxFilter and bboxFilter.f(ent, refPos) then
+                    table.insert(bboxMatches, ent)
+                end
+            end
+        end
+    end
+end
+
+--- Draw the name tags.
+function NameTagsPaint()
     local refPos = SaitoHUD.GetRefPos()
     
     for _, ply in pairs(player.GetAll()) do
@@ -235,7 +249,8 @@ function SaitoHUD.DrawNameTags()
     end
 end
 
-function SaitoHUD.DrawPlayerBoxes()
+--- Draw player bounding boxes.
+function PlayerBBoxesPaint()
     local refPos = SaitoHUD.GetRefPos()
     
     for _, ply in pairs(player.GetAll()) do
@@ -311,7 +326,8 @@ function SaitoHUD.DrawPlayerBoxes()
     end
 end
 
-function SaitoHUD.DrawPlayerMarkers()
+--- Draw player orientation markers.
+function PlayerMarkersPaint()
     for _, ply in pairs(player.GetAll()) do
         local doDraw = true
         
@@ -362,55 +378,106 @@ function SaitoHUD.DrawPlayerMarkers()
     end
 end
 
-local lastTriadsFilter = nil
-
-concommand.Add("triads_filter", function(ply, cmd, args)
-    if SaitoHUD.AntiUnfairTriggered() then return end
-    SaitoHUD.triadsFilter = SaitoHUD.entityFilter.Build(args, true)
-end)
-
-concommand.Add("overlay_filter", function(ply, cmd, args)
-    if SaitoHUD.AntiUnfairTriggered() then return end
-    SaitoHUD.overlayFilter = SaitoHUD.entityFilter.Build(args, true)
-end)
-
-concommand.Add("bbox_filter", function(ply, cmd, args)
-    if SaitoHUD.AntiUnfairTriggered() then return end
-    SaitoHUD.bboxFilter = SaitoHUD.entityFilter.Build(args, true)
-end)
-
-concommand.Add("toggle_triads", function(ply, cmd, args)
-    if SaitoHUD.AntiUnfairTriggered() then return end
+--- Console command to change the triads filter.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function SetTriadsFilter(ply, cmd, args)
+    triadsFilter = SaitoHUD.entityFilter.Build(args, true)
     
-    if SaitoHUD.triadsFilter then
-        lastTriadsFilter = SaitoHUD.triadsFilter
-        SaitoHUD.triadsFilter = nil
+    Rehook()
+end
+
+--- Console command to set the overlay filter.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function SetOverlayFilter(ply, cmd, args)
+    overlayFilter = SaitoHUD.entityFilter.Build(args, true)
+    
+    Rehook()
+end
+
+--- Console command to set the bounding box filter.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function SetBBoxFilter(ply, cmd, args)
+    bboxFilter = SaitoHUD.entityFilter.Build(args, true)
+    
+    Rehook()
+end
+
+--- Legacy console command to "toggle" the triads filter.
+local function ToggleTriads(ply, cmd, args)
+    if triadsFilter then
+        lastTriadsFilter = triadsFilter
+        triadsFilter = nil
     else
         if lastTriadsFilter then
-            SaitoHUD.triadsFilter = lastTriadsFilter
+            triadsFilter = lastTriadsFilter
         else
-            SaitoHUD.triadsFilter = SaitoHUD.entityFilter.Build({"*"}, true)
+            triadsFilter = SaitoHUD.entityFilter.Build({"*"}, true)
         end
     end
-end)
-
-concommand.Add("dump_info", function(ply, cmd, args)
-    SaitoHUD.DumpEntityInfo()
-end)
-
-hook.Add("HUDPaint", "SaitoHUDOverlays", function()
-    SaitoHUD.DrawEntityInfo()
     
-    if not SaitoHUD.AntiUnfairTriggered() then
-        SaitoHUD.DrawOverlays()
-        if drawNameTags:GetBool() then
-            SaitoHUD.DrawNameTags()
-        end
-        if playerBoxes:GetBool() then
-            SaitoHUD.DrawPlayerBoxes()
-        end
-        if playerMarkers:GetBool() then
-            SaitoHUD.DrawPlayerMarkers()
+    Rehook()
+end
+
+--- Adjusts hooks as necessary.
+local function Rehook()
+    -- Entity info
+    if showPlayerInfo:GetBool() or drawEntityInfo:GetBool() then
+        hook.Add("HUDPaint", "SaitoHUD.EntityInfo", EntityInfoPaint)
+    else
+        hook.Remove("HUDPaint", "SaitoHUD.EntityInfo")
+    end
+    
+    -- Filters
+    if not SaitoHUD.AntiUnfairTriggered() and 
+        (triadsFilter or overlayFilter or bboxFilter) then
+            hook.Add("HUDPaint", "SaitoHUD.Overlays", OverlaysPaint)
+        else
+            hook.Remove("HUDPaint", "SaitoHUD.Overlays")
         end
     end
-end)
+    
+    -- Name tags
+    if not SaitoHUD.AntiUnfairTriggered() and drawNameTags:GetBool() then
+            hook.Add("HUDPaint", "SaitoHUD.NameTags", NameTagsPaint)
+        else
+            hook.Remove("HUDPaint", "SaitoHUD.NameTags")
+        end
+    end
+    
+    -- Player bounding boxes
+    if not SaitoHUD.AntiUnfairTriggered() and playerBoxes:GetBool() then
+            hook.Add("HUDPaint", "SaitoHUD.PlayerBBoxes", PlayerBBoxesPaint)
+        else
+            hook.Remove("HUDPaint", "SaitoHUD.PlayerBBoxes")
+        end
+    end
+    
+    -- Player orientation markers
+    if not SaitoHUD.AntiUnfairTriggered() and playerMarkers:GetBool() then
+            hook.Add("HUDPaint", "SaitoHUD.PlayerMarkers", PlayerMarkersPaint)
+        else
+            hook.Remove("HUDPaint", "SaitoHUD.PlayerMarkers")
+        end
+    end
+end
+
+concommand.Add("triads_filter", SetTriadsFilter)
+concommand.Add("overlay_filter", SetOverlayFilter)
+concommand.Add("bbox_filter", SetBBoxFilter)
+concommand.Add("toggle_triads", ToggleTriads)
+concommand.Add("dump_info", function() SaitoHUD.DumpEntityInfo() end)
+
+-- Need to rehook
+cvars.AddChangeCallback("entity_info", Rehook)
+cvars.AddChangeCallback("entity_info_player", Rehook)
+cvars.AddChangeCallback("name_tags", Rehook)
+cvars.AddChangeCallback("player_boxes", Rehook)
+cvars.AddChangeCallback("player_markers", Rehook)
+
+Rehook()
