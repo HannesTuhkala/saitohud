@@ -20,6 +20,7 @@
 
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
 local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
+local drawFriendTags = CreateClientConVar("friend_tags", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local simpleNameTags = CreateClientConVar("name_tags_simple", "0", true, false)
 local rainbowFriends = CreateClientConVar("name_tags_rainbow_friends", "0", true, false)
@@ -259,47 +260,49 @@ function NameTagsPaint()
             local shadowColor = Color(0, 0, 0, 255)
             local bold = false
             
-            if SaitoHUD.NameTagsColorHook and not SaitoHUD.ShouldIgnoreHook() then
-                color, shadowColor = SaitoHUD.NameTagsColorHook(ply)
-            else
-                if friendIDs[steamID] then
-                    bold = boldFriends:GetBool()
-                    
-                    if rainbowFriends:GetBool() then
-                        color = HSVToColor(math.sin(CurTime() * 360 / 500) * 360, 1, 1)
-                    else
-                        color = friendIDs[steamID].color
+            if drawNameTags:GetBool() or (drawFriendTags:GetBool() and friendIDs[steamID]) then       
+                if SaitoHUD.NameTagsColorHook and not SaitoHUD.ShouldIgnoreHook() then
+                    color, shadowColor = SaitoHUD.NameTagsColorHook(ply)
+                else
+                    if friendIDs[steamID] then
+                        bold = boldFriends:GetBool()
+                        
+                        if rainbowFriends:GetBool() then
+                            color = HSVToColor(math.sin(CurTime() * 360 / 500) * 360, 1, 1)
+                        else
+                            color = friendIDs[steamID].color
+                        end
                     end
                 end
-            end
-            
-            local text = name
-            if playerDistances:GetBool() then
-                text = text .. "[" .. tostring(distance) .. "]"
-            end
-            
-            if simpleNameTags:GetBool() then
-                if bold then
-                    draw.SimpleText(text,
-                                    "DefaultBold", screenPos.x + 1, screenPos.y + 1,
-                                    shadowColor, 1, ALIGN_TOP)
-                    draw.SimpleText(text,
-                                    "DefaultBold", screenPos.x, screenPos.y,
-                                    color, 1, ALIGN_TOP)
-                else
-                    draw.SimpleText(text,
-                                    "DefaultSmallDropShadow", screenPos.x + 1, screenPos.y + 1,
-                                    color, 1, ALIGN_TOP)
+                
+                local text = name
+                if playerDistances:GetBool() then
+                    text = text .. "[" .. tostring(distance) .. "]"
                 end
-            else
-                if bold then
-                    draw.SimpleTextOutlined(text,
-                                            "DefaultBold", screenPos.x, screenPos.y,
-                                            color, 1, ALIGN_TOP, 1, shadowColor)
+                
+                if simpleNameTags:GetBool() then
+                    if bold then
+                        draw.SimpleText(text,
+                                        "DefaultBold", screenPos.x + 1, screenPos.y + 1,
+                                        shadowColor, 1, ALIGN_TOP)
+                        draw.SimpleText(text,
+                                        "DefaultBold", screenPos.x, screenPos.y,
+                                        color, 1, ALIGN_TOP)
+                    else
+                        draw.SimpleText(text,
+                                        "DefaultSmallDropShadow", screenPos.x + 1, screenPos.y + 1,
+                                        color, 1, ALIGN_TOP)
+                    end
                 else
-                    draw.SimpleTextOutlined(text,
-                                            "DefaultSmall", screenPos.x, screenPos.y,
-                                            color, 1, ALIGN_TOP, 1, shadowColor)
+                    if bold then
+                        draw.SimpleTextOutlined(text,
+                                                "DefaultBold", screenPos.x, screenPos.y,
+                                                color, 1, ALIGN_TOP, 1, shadowColor)
+                    else
+                        draw.SimpleTextOutlined(text,
+                                                "DefaultSmall", screenPos.x, screenPos.y,
+                                                color, 1, ALIGN_TOP, 1, shadowColor)
+                    end
                 end
             end
         end
@@ -499,7 +502,7 @@ Rehook = function()
     end
     
     -- Name tags
-    if drawNameTags:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
+    if (drawNameTags:GetBool() or drawFriendTags:GetBool()) and not SaitoHUD.AntiUnfairTriggered() then
         hook.Add("HUDPaint", "SaitoHUD.NameTags", NameTagsPaint)
     else
         SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.NameTags")
@@ -530,6 +533,7 @@ concommand.Add("dump_info", function() SaitoHUD.DumpEntityInfo() end)
 cvars.AddChangeCallback("entity_info", Rehook)
 cvars.AddChangeCallback("entity_info_player", Rehook)
 cvars.AddChangeCallback("name_tags", Rehook)
+cvars.AddChangeCallback("friend_tags", Rehook)
 cvars.AddChangeCallback("player_boxes", Rehook)
 cvars.AddChangeCallback("player_markers", Rehook)
 
