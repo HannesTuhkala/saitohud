@@ -532,8 +532,8 @@ concommand.Add("dump_info", function() SaitoHUD.DumpEntityInfo() end)
 -- Need to rehook
 cvars.AddChangeCallback("entity_info", Rehook)
 cvars.AddChangeCallback("entity_info_player", Rehook)
-cvars.AddChangeCallback("name_tags_always", Rehook)
-cvars.AddChangeCallback("friend_tags", Rehook)
+cvars.AddChangeCallback("name_tags", Rehook)
+cvars.AddChangeCallback("friend_tags_always", Rehook)
 cvars.AddChangeCallback("player_boxes", Rehook)
 cvars.AddChangeCallback("player_markers", Rehook)
 
