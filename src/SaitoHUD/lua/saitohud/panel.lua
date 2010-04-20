@@ -24,6 +24,7 @@ local function AddInput(panel, text, unfair)
     
     if unfair==1 then
         entry:SetEditable(not SaitoHUD.AntiUnfairTriggered())
+        entry:SetDrawBackground(not SaitoHUD.AntiUnfairTriggered())
     end
     
     return entry
