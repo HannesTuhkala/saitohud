@@ -167,19 +167,19 @@ local function OverlayPanel(panel)
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    panel:AddControl("CheckBox", {
+    c = panel:AddControl("CheckBox", {
         Label = "Show Player Bounding Boxes",
         Command = "player_boxes"
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    panel:AddControl("CheckBox", {
+    c = panel:AddControl("CheckBox", {
         Label = "Show Player Orientation Markers",
         Command = "player_markers"
     })
     c:SetDisabled(SaitoHUD.AntiUnfairTriggered())
     
-    panel:AddControl("CheckBox", {
+    c = panel:AddControl("CheckBox", {
         Label = "Show Player Line of Sights",
         Command = "trace_aims"
     })
