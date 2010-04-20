@@ -150,11 +150,11 @@ local function Rehook()
         if sampleDraw:GetBool() then
             hook.Add("HUDPaint", "SaitoHUD.Sampling", DrawSamples)
         else
-            hook.Remove("HUDPaint", "SaitoHUD.Sampling")
+            SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.Sampling")
         end
     else
-        hook.Remove("Think", "SaitoHUD.Sampling")
-        hook.Remove("HUDPaint", "SaitoHUD.Sampling")
+        SaitoHUD.RemoveHook("Think", "SaitoHUD.Sampling")
+        SaitoHUD.RemoveHook("HUDPaint", "SaitoHUD.Sampling")
     end
 end
 

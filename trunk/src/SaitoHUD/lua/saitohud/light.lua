@@ -58,11 +58,11 @@ local function ToggleFlashLight()
     if lightEnabled and SaitoHUD.AntiUnfairTriggered() then
         hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
     else
-        hook.Remove("Think", "SaitoHUD.Super.Flashlight")
+        SaitoHUD.RemoveHook("Think", "SaitoHUD.Super.Flashlight")
     end
 end
 
 concommand.Add("super_flashlight", ToggleFlashLight)
 
 -- Remove the hook, in case of a reload
-hook.Remove("Think", "SaitoHUD.Super.Flashlight")
+SaitoHUD.RemoveHook("Think", "SaitoHUD.Super.Flashlight")
