@@ -9,21 +9,21 @@ body {
   padding: 20px;
   background: #ffffff;
   color: #000000;
+  line-height: 130%;
 }
 body, table, td {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10pt;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 9pt;
 }
 h1 {
-  font-family: Verdana, Arial, Lucida Grande, Trebuchet MS;
-  font-weight: normal;
-  font-size: 200%;
-  color: #8e0d0d;
-  margin-top: 0;
-}
-h2 {
+  margin: 0 0 20px 0;
+  font-family: Arial, Helvetica, Helvetica;
+  font-weight: bold;
+  font-size: 160%;
+  color: #260083;
+}h2 {
   font-family: Arial, Lucida Grande, Trebuchet MS;
-  font-size: 150%;
+  font-size: 130%;
   color: #000000
 }
 h3 {
@@ -45,7 +45,7 @@ table th, table td {
   vertical-align: top;
 }
 table th {
-  background: #efefef;
+  background: #e4fffd;
   text-align: left;
 }
 pre, code {
@@ -53,8 +53,13 @@ pre, code {
   font-size: 110%;
 }
 #footer {
-  margin: 20px 0 0 0;
+  margin: 40px 0 0 0;
+  padding: 5px 0 0 0;
   color: #444444;
+  border-top: 1px solid #999999;
+}
+#footer-id {
+	float: right;
 }
 </style>
 </head>
@@ -100,31 +105,31 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td><code>entity_info</code></td>
+    <td>entity_info</td>
     <td>bool</td>
     <td>1</td>
     <td>Draws information about the entity that you are looking on.</td>
   </tr>
   <tr>
-    <td><code>entity_info_player</code></td>
+    <td>entity_info_player</td>
     <td>bool</td>
     <td>0</td>
     <td>In addition to entity information, additional player information can also be displayed.</td>
   </tr>
   <tr>
-    <td><code>name_tags</code></td>
+    <td>name_tags</td>
     <td>bool</td>
     <td>0</td>
     <td>Draws the names of players.</td>
   </tr>
   <tr>
-    <td><code>player_boxes</code></td>
+    <td>player_boxes</td>
     <td>bool</td>
     <td>0</td>
     <td>Draws the bounding boxes and direction lines of players.</td>
   </tr>
   <tr>
-    <td><code>player_markers</code></td>
+    <td>player_markers</td>
     <td>bool</td>
     <td>0</td>
     <td>Draws an arrow under the feet of players indicating the way they face.</td>
@@ -141,28 +146,28 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td><code>triads_filter</code></td>
-    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>triads_filter</td>
+    <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws 3D coordinate triads at the location of matched entities.</td>
   </tr>
   <tr>
-    <td><code>overlay_filter</code></td>
-    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>overlay_filter</td>
+    <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws class names at the location of matched entities.</td>
   </tr>
   <tr>
-    <td><code>bbox_filter</code></td>
-    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>bbox_filter</td>
+    <td nowrap="nowrap">filter filter(...)</td>
     <td>Draws bounding boxes at the location of matched entities..</td>
   </tr>
   <tr>
-    <td><code>toggle_triads</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>toggle_triads</td>
+    <td nowrap="nowrap">void</td>
     <td>Legacy function to toggle triads on all entities on and off.</td>
   </tr>
   <tr>
-    <td><code>dump_info</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>dump_info</td>
+    <td nowrap="nowrap">void</td>
     <td>Dumps the contents of entity information HUD overlay to console for easy copy and paste.</td>
   </tr>
 </table>
@@ -180,49 +185,49 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td><code>sample_draw</code></td>
+    <td>sample_draw</td>
     <td>bool</td>
     <td>1</td>
     <td>Draws the lines tracing the paths of sampled entities.</td>
   </tr>
   <tr>
-    <td><code>sample_resolution</code></td>
+    <td>sample_resolution</td>
     <td>float</td>
     <td>20</td>
     <td>The interval, in milliseconds, at which the sampler will take data points.</td>
   </tr>
   <tr>
-    <td><code>sample_size</code></td>
+    <td>sample_size</td>
     <td>int</td>
     <td>100</td>
     <td>The maximum number of data points to store for a single sampled entity. Older data points will be removed.</td>
   </tr>
   <tr>
-    <td><code>sample_nodes</code></td>
+    <td>sample_nodes</td>
     <td>bool</td>
     <td>1</td>
     <td>Draws squares at the data points.</td>
   </tr>
   <tr>
-    <td><code>sample_multiple</code></td>
+    <td>sample_multiple</td>
     <td>bool</td>
     <td>0</td>
     <td>Allows for sampling of more than one entity or player at a time.</td>
   </tr>
   <tr>
-    <td><code>sample_random_color</code></td>
+    <td>sample_random_color</td>
     <td>bool</td>
     <td>0</td>
     <td>Use a random color.</td>
   </tr>
   <tr>
-    <td><code>sample_fade</code></td>
+    <td>sample_fade</td>
     <td>bool</td>
     <td>0</td>
     <td>Fade out old data points when drawing.</td>
   </tr>
   <tr>
-    <td><code>sample_thick</code></td>
+    <td>sample_thick</td>
     <td>bool</td>
     <td>0</td>
     <td>Draw thicker lines.</td>
@@ -238,53 +243,53 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td><code>sample</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>sample</td>
+    <td nowrap="nowrap">void</td>
     <td>Samples the entity that you are looking at.</td>
   </tr>
   <tr>
-    <td><code>sample</code></td>
-    <td nowrap="nowrap"><code>string name</code></td>
+    <td>sample</td>
+    <td nowrap="nowrap">string name</td>
     <td>Samples a player, found by their name.</td>
   </tr>
   <tr>
-    <td><code>sample_id</code></td>
-    <td nowrap="nowrap"><code>int id</code></td>
+    <td>sample_id</td>
+    <td nowrap="nowrap">int id</td>
     <td>Samples an entity, found by entity index.</td>
   </tr>
   <tr>
-    <td><code>sample_filter</code></td>
-    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>sample_filter</td>
+    <td nowrap="nowrap">filter filter(...)</td>
     <td>Samples entities, based on an entity filter.</td>
   </tr>
   <tr>
-    <td><code>sample_remove</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>sample_remove</td>
+    <td nowrap="nowrap">void</td>
     <td>Stops sampling the entity that you are looking at.</td>
   </tr>
   <tr>
-    <td><code>sample_remove</code></td>
-    <td nowrap="nowrap"><code>string name</code></td>
+    <td>sample_remove</td>
+    <td nowrap="nowrap">string name</td>
     <td>Stops sampling a player, found by their name.</td>
   </tr>
   <tr>
-    <td><code>sample_remove_id</code></td>
-    <td nowrap="nowrap"><code>int id</code></td>
+    <td>sample_remove_id</td>
+    <td nowrap="nowrap">int id</td>
     <td>Stops sampling an entity, found by entity index.</td>
   </tr>
   <tr>
-    <td><code>sample_remove_filter</code></td>
-    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>sample_remove_filter</td>
+    <td nowrap="nowrap">filter filter(...)</td>
     <td>Stops sampling entities, based on an entity filter.</td>
   </tr>
   <tr>
-    <td><code>sample_clear</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>sample_clear</td>
+    <td nowrap="nowrap">void</td>
     <td>Stops sampling all entities.</td>
   </tr>
   <tr>
-    <td><code>sample_list</code></td>
-    <td nowrap="nowrap"><code>void</code></td>
+    <td>sample_list</td>
+    <td nowrap="nowrap">void</td>
     <td>Prints a list of all sampled entities to console.</td>
   </tr>
 </table>
@@ -306,13 +311,13 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td><code>stranded_res_seeable</code></td>
+    <td>stranded_res_seeable</td>
     <td>bool</td>
     <td>1</td>
     <td>Only draw the names of resources if a trace originating from your eye and ending at the resource does not collide with any other entity. This is how the Stranded game mode handles resource display.</td>
   </tr>
   <tr>
-    <td><code>stranded_res_distance</code></td>
+    <td>stranded_res_distance</td>
     <td>float</td>
     <td>500</td>
     <td>The maximum distance away a resource can be for its resource name will be displayed.</td>
@@ -343,19 +348,20 @@ Improved Wire Tool,tool_wire_improved</pre>
       <th scope="col">Description</th>
     </tr>
     <tr>
-      <td><code>trace_aims</code></td>
+      <td>trace_aims</td>
+
       <td>bool</td>
       <td>0</td>
       <td>Enable the drawing of lines that trace the aims of players. The lines begin near the eyes of players and end at the surface that the line collides with. If a player is targetted, the color of the line will change.</td>
     </tr>
     <tr>
-      <td><code>saitohud_ignore_hooks</code></td>
+      <td>saitohud_ignore_hooks</td>
       <td>bool</td>
       <td>0</td>
       <td>Disables all hooks. Hooks are used to override handling of some SaitoHUD features. For example, there is a hook that allows a plugin to modify the color of the player bounding boxes.</td>
     </tr>
     <tr>
-      <td><code>saitohud_modules</code></td>
+      <td>saitohud_modules</td>
       <td>string</td>
       <td>""</td>
       <td>List of additional modules to load, separated by commas.</td>
@@ -371,39 +377,40 @@ Improved Wire Tool,tool_wire_improved</pre>
       <th scope="col">Description</th>
     </tr>
     <tr>
-      <td><code>toggle_hud</code></td>
-      <td><code>void</code></td>
+      <td>toggle_hud</td>
+      <td>void</td>
       <td>Toggles the display of the HUD.</td>
     </tr>
     <tr>
-      <td><code>super_flashlight</code></td>
-      <td><code>void</code></td>
+      <td>super_flashlight</td>
+      <td>void</td>
       <td>Toggles a powerful flashlight that illuminates the area immediately around you and the area that you are looking at. This works by creating two dynamic lights, one at your location, and another at the location that your aim vector collides at.</td>
     </tr>
     <tr>
-      <td><code>run_string</code></td>
-      <td nowrap="nowrap"><code>string lua(...)</code></td>
+      <td>run_string</td>
+      <td nowrap="nowrap">string lua(...)</td>
       <td>Runs Lua code. This command does not work well.</td>
     </tr>
     <tr>
-      <td><code>run_file</code></td>
-      <td nowrap="nowrap"><code>string path</code></td>
+      <td>run_file</td>
+      <td nowrap="nowrap">string path</td>
       <td>Executes a file as Lua code.</td>
     </tr>
     <tr>
-      <td><code>saitohud_help</code></td>
-      <td nowrap="nowrap"><code>void</code></td>
+      <td>saitohud_help</td>
+      <td nowrap="nowrap">void</td>
       <td>Shows the SaitoHUD help window.</td>
     </tr>
     <tr>
-      <td><code>saitohud_reload</code></td>
-      <td nowrap="nowrap"><code>void</code></td>
+      <td>saitohud_reload</td>
+      <td nowrap="nowrap">void</td>
       <td>Reloads SaitoHUD.</td>
     </tr>
   </table>
   
   <div id="footer">
-    &copy; Copyright 2009-2010 sk89q, BoJaN. $Id$
+  	<span id="footer-id">$Id$</span>
+    &copy; sk89q, BoJaN.
   </div>
 </div>
 </body>
