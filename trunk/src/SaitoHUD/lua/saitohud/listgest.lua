@@ -27,8 +27,8 @@ local lastIndex = 0
 --- Builds the list gesture menu.
 local function GetMenu()
     local menu = {}
-    local numHooks = SaitoHUD.CountHooks("SaitoHUDListGestures")
-    local registered = SaitoHUD.CallHookAggregate("SaitoHUDListGestures", numHooks)
+    local numHooks = SaitoHUD.CountHooks("SaitoHUDProvideMenu")
+    local registered = SaitoHUD.CallHookAggregate("SaitoHUDProvideMenu", numHooks)
     
     for _, items in pairs(registered) do
         table.Merge(menu, items)

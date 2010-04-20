@@ -62,7 +62,7 @@ local function SandboxMenu(numItems)
     return menu
 end
 
-hook.Add("SaitoHUDListGestures", "SaitoHUD.Sandbox", SandboxMenu)
+hook.Add("SaitoHUDProvideMenu", "SaitoHUD.Sandbox", SandboxMenu)
 
 -- Load the menu!
 SaitoHUD.LoadSandboxMenu()
