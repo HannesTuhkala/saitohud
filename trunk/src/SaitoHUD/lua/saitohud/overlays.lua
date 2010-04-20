@@ -47,7 +47,7 @@ local function LoadFriends()
     
     local data = file.Read("saitohud/friends.csv")
     
-    if data ~= "" then
+    if data ~= nil and data ~= "" then
         data = SaitoHUD.ParseCSV(data)
         
         if #data > 0 then
