@@ -291,7 +291,7 @@ local function SetUp()
             end
         end
 
-        hook.Add("SaitoHUDListGestures", "SaitoHUD.Stranded", StrandedMenu)
+        hook.Add("SaitoHUDProvideMenu", "SaitoHUD.Stranded", StrandedMenu)
         hook.Add("HUDPaint", "SaitoHUDStrandedHUDPaint", HUDPaint)
         hook.Remove("HUDPaint", "GMS_ResourceDropsHUD")
         hook.Add("KeyRelease", "SaitoHUDStrandedKeyRelease", HandleKey)
