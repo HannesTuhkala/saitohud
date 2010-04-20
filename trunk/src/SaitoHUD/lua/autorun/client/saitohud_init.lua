@@ -20,7 +20,6 @@
 concommand.Add("saitohud_reload", function()
     LocalPlayer():PrintMessage(HUD_PRINTTALK, "Reloading SaitoHUD...")
     include("saitohud/init.lua")
-    SaitoHUD.UpdatePanels()
 end)
 
 include("saitohud/init.lua")
