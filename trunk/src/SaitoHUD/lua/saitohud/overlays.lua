@@ -34,6 +34,8 @@ local triadsMatches = {}
 local overlayMatches = {}
 local bboxMatches = {}
 
+local Rehook = function() end
+
 --- Draw a triad.
 -- @param p1 Point
 -- @param ang Angle
@@ -50,6 +52,50 @@ local function DrawTriad(p1, ang)
     surface.DrawLine(p1.x, p1.y, p3.x, p3.y)
     surface.SetDrawColor(0, 0, 255, 255)
     surface.DrawLine(p1.x, p1.y, p4.x, p4.y)
+end
+
+--- Builds the cache of matched of entities. This is to significantly increase
+-- performance, as evaluating the filter is a fairly resource intensive task.
+local function EvaluateFilters()
+    -- Check to make sure that we even have a filter to update
+    if not triadsFilter and not overlayFilter and
+       not bboxFilter then
+        return
+    end
+    
+    triadsMatches = {}
+    overlayMatches = {}
+    bboxMatches = {}
+    
+    local refPos = SaitoHUD.GetRefPos()
+    
+    for _, ent in pairs(ents.GetAll()) do
+        if ValidEntity(ent) then
+            local cls = ent:GetClass()
+            local pos = ent:GetPos()
+            
+            --- Class may be empty
+            if cls == "" or not cls then
+                cls = "<?>"
+            end
+            
+            if cls != "viewmodel" and -- cls:sub(1, 7) != "weapon_" and cls != "player" and 
+               cls != "physgun_beam" and cls != "gmod_tool" and
+               cls != "gmod_camera" and cls != "worldspawn" then
+                if triadsFilter and triadsFilter.f(ent, refPos) then
+                    table.insert(triadsMatches, ent)
+                end
+                
+                if overlayFilter and overlayFilter.f(ent, refPos) then
+                    table.insert(overlayMatches, ent)
+                end
+                
+                if bboxFilter and bboxFilter.f(ent, refPos) then
+                    table.insert(bboxMatches, ent)
+                end
+            end
+        end
+    end
 end
 
 --- Draw the overlays.
@@ -157,50 +203,6 @@ local function EntityInfoPaint()
         for _, s in pairs(lines) do
             draw.SimpleText(s, "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
             yOffset = yOffset + 14
-        end
-    end
-end
-
---- Builds the cache of matched of entities. This is to significantly increase
--- performance, as evaluating the filter is a fairly resource intensive task.
-local function EvaluateFilters()
-    -- Check to make sure that we even have a filter to update
-    if not triadsFilter and not overlayFilter and
-       not bboxFilter then
-        return
-    end
-    
-    triadsMatches = {}
-    overlayMatches = {}
-    bboxMatches = {}
-    
-    local refPos = SaitoHUD.GetRefPos()
-    
-    for _, ent in pairs(ents.GetAll()) do
-        if ValidEntity(ent) then
-            local cls = ent:GetClass()
-            local pos = ent:GetPos()
-            
-            --- Class may be empty
-            if cls == "" or not cls then
-                cls = "<?>"
-            end
-            
-            if cls != "viewmodel" and -- cls:sub(1, 7) != "weapon_" and cls != "player" and 
-               cls != "physgun_beam" and cls != "gmod_tool" and
-               cls != "gmod_camera" and cls != "worldspawn" then
-                if triadsFilter and triadsFilter.f(ent, refPos) then
-                    table.insert(triadsMatches, ent)
-                end
-                
-                if overlayFilter and overlayFilter.f(ent, refPos) then
-                    table.insert(overlayMatches, ent)
-                end
-                
-                if bboxFilter and bboxFilter.f(ent, refPos) then
-                    table.insert(bboxMatches, ent)
-                end
-            end
         end
     end
 end
@@ -425,7 +427,7 @@ local function ToggleTriads(ply, cmd, args)
 end
 
 --- Adjusts hooks as necessary.
-local function Rehook()
+Rehook = function()
     -- Entity info
     if showPlayerInfo:GetBool() or drawEntityInfo:GetBool() then
         hook.Add("HUDPaint", "SaitoHUD.EntityInfo", EntityInfoPaint)
