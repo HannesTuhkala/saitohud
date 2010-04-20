@@ -221,3 +221,5 @@ function SaitoHUD.UpdatePanels()
 end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
+
+SaitoHUD.UpdatePanels()
