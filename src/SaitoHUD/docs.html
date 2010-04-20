@@ -66,9 +66,9 @@ pre, code {
   <h2>Filters</h2>
   <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. You list a set of conditions separated by spaces, with each condition being in the format of <code>property=value</code>. For an entity to match a filter, all conditions must be satisfied. For example, if you wanted to only select entities with &quot;wire&quot; in their class name and &quot;gate&quot; in the model paths, the following filter would be used:</p>
   <pre>class=wire model=gate</pre>
-  <p>Note how they match <em>substrings</em>. By default, it is assumed that you mean class, so the following filter would have sufficied:</p>
+  <p>Note how they match <em>substrings</em>. By default, it is assumed that you mean class, so the following filter would have sufficed:</p>
   <pre>wire model=gate</pre>
-  <p>If you want to a condition to not match, place a hyphen (-) in front of the value. For example, if you wanted to match conditions mentioned above, but you did not want to match entities with &quot;sand&quot; in their material paths, you would use:</p>
+  <p>If you want to a condition that the entity must <em>not</em> match, place a hyphen (-) in front of the value. For example, if you wanted to match conditions mentioned above, but you did not want to match entities with &quot;sand&quot; in their material paths, you would use:</p>
   <pre>class=wire model=gate material=-sand</pre>
   <p>An alternative syntax of the above filter using the syntax <code>@type pattern</code> is:</p>
 <pre>wire @model gate @material sand</pre>
@@ -253,6 +253,11 @@ pre, code {
     <td>Samples an entity, found by entity index.</td>
   </tr>
   <tr>
+    <td><code>sample_filter</code></td>
+    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>Samples entities, based on an entity filter.</td>
+  </tr>
+  <tr>
     <td><code>sample_remove</code></td>
     <td nowrap="nowrap"><code>void</code></td>
     <td>Stops sampling the entity that you are looking at.</td>
@@ -266,6 +271,11 @@ pre, code {
     <td><code>sample_remove_id</code></td>
     <td nowrap="nowrap"><code>int id</code></td>
     <td>Stops sampling an entity, found by entity index.</td>
+  </tr>
+  <tr>
+    <td><code>sample_remove_filter</code></td>
+    <td nowrap="nowrap"><code>filter filter(...)</code></td>
+    <td>Stops sampling entities, based on an entity filter.</td>
   </tr>
   <tr>
     <td><code>sample_clear</code></td>
@@ -393,7 +403,7 @@ Improved Wire Tool,tool_wire_improved</pre>
   </table>
   
   <div id="footer">
-    &copy; Copyright 2009-2010 sk89q.
+    &copy; Copyright 2009-2010 sk89q, BoJaN. $Id$
   </div>
 </div>
 </body>
