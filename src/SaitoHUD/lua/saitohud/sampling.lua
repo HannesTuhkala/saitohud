@@ -425,7 +425,7 @@ end
 
 --- Hook to log and draw samples.
 function DrawSamples()
-    if sampleDraw:GetBool() then
+    if sampleDraw:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
         SaitoHUD.DrawSamples(true)
     end
 end

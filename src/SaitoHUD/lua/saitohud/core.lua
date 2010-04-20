@@ -103,17 +103,18 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
             })
         end
         
-        if showPlayerInfo and tr.Entity:IsPlayer() then
+        if not SaitoHUD.AntiUnfairTriggered() and 
+            showPlayerInfo and tr.Entity:IsPlayer() then
             table.Add(lines, {
-            "",
-            "Name: " .. tostring(tr.Entity:Name()),
-            "SteamID: " .. tostring(tr.Entity:SteamID()),
-            "Ping: " .. tostring(tr.Entity:Ping()),
-            "Health: " .. tostring(tr.Entity:Health()),
-            "Armor: " .. tostring(tr.Entity:Armor()),
-            "Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
-            "Kills: " .. tostring(tr.Entity:Frags()),
-            "Deaths: " .. tostring(tr.Entity:Deaths()),
+                "",
+                "Name: " .. tostring(tr.Entity:Name()),
+                "SteamID: " .. tostring(tr.Entity:SteamID()),
+                "Ping: " .. tostring(tr.Entity:Ping()),
+                "Health: " .. tostring(tr.Entity:Health()),
+                "Armor: " .. tostring(tr.Entity:Armor()),
+                "Weapon: " .. tostring(tr.Entity:GetActiveWeapon()),
+                "Kills: " .. tostring(tr.Entity:Frags()),
+                "Deaths: " .. tostring(tr.Entity:Deaths()),
             })
         end
     else

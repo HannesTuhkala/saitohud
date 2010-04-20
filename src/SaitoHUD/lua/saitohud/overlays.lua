@@ -365,18 +365,23 @@ end
 local lastTriadsFilter = nil
 
 concommand.Add("triads_filter", function(ply, cmd, args)
+    if SaitoHUD.AntiUnfairTriggered() then return end
     SaitoHUD.triadsFilter = SaitoHUD.entityFilter.Build(args, true)
 end)
 
 concommand.Add("overlay_filter", function(ply, cmd, args)
+    if SaitoHUD.AntiUnfairTriggered() then return end
     SaitoHUD.overlayFilter = SaitoHUD.entityFilter.Build(args, true)
 end)
 
 concommand.Add("bbox_filter", function(ply, cmd, args)
+    if SaitoHUD.AntiUnfairTriggered() then return end
     SaitoHUD.bboxFilter = SaitoHUD.entityFilter.Build(args, true)
 end)
 
 concommand.Add("toggle_triads", function(ply, cmd, args)
+    if SaitoHUD.AntiUnfairTriggered() then return end
+    
     if SaitoHUD.triadsFilter then
         lastTriadsFilter = SaitoHUD.triadsFilter
         SaitoHUD.triadsFilter = nil
