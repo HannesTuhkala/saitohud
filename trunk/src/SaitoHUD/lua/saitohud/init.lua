@@ -39,7 +39,6 @@ load("sampling") -- Entity path tracking
 load("aimtrace")
 load("stranded")
 load("sandbox")
-load("lua")
 load("cinematography")
 load("panel")
 
