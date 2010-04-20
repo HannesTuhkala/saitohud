@@ -64,13 +64,14 @@ pre, code {
   <h1>SaitoHUD Reference  </h1>
   <p>SaitoHUD is a utility HUD with a wide variety of functions. Note that it does not attempt to protect itself from tampered global functions.</p>
   <h2>Filters</h2>
-  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. For example, you could match all entities that have class names that contain  &quot;prop_&quot; and model paths that contain fire by using the filter <code>prop_ @mdl fire</code>. To match entity class names, list the class name substrings to match after the command. For example, if the command was <code>highlight_ents</code>, the corresponding command that would match class substrings of &quot;wire_&quot; and &quot;expr&quot; would be:</p>
-  <pre>highlight_ents wire expr</pre>
-  <p>If you want to prevent the matching of something, prepend a hyphen (&quot;-&quot;), like so:</p>
-  <pre>highlight_ents wire -light</pre>
-  <p>To match other properties, such as model path or material, use the syntax of <code>@type pattern</code>, like so:</p>
-<pre>highlight_ents wire -light @model gate @model -ram</pre>
-  <p>That would match all entities that have class names containing &quot;wire&quot; but do not have class names containing &quot;light&quot;, and have &quot;gate&quot; in their model path, but not &quot;ram&quot; in their model path.</p>
+  <p>Some of SaitoHUD's commands support <em>filters</em>, which allow you to specify a criteria by which to match entities. You list a set of conditions separated by spaces, with each condition being in the format of <code>property=value</code>. For an entity to match a filter, all conditions must be satisfied. For example, if you wanted to only select entities with &quot;wire&quot; in their class name and &quot;gate&quot; in the model paths, the following filter would be used:</p>
+  <pre>class=wire model=gate</pre>
+  <p>Note how they match <em>substrings</em>. By default, it is assumed that you mean class, so the following filter would have sufficied:</p>
+  <pre>wire model=gate</pre>
+  <p>If you want to a condition to not match, place a hyphen (-) in front of the value. For example, if you wanted to match conditions mentioned above, but you did not want to match entities with &quot;sand&quot; in their material paths, you would use:</p>
+  <pre>class=wire model=gate material=-sand</pre>
+  <p>An alternative syntax of the above filter using the syntax <code>@type pattern</code> is:</p>
+<pre>wire @model gate @material sand</pre>
   <p>SaitoHUD supports the following  properties to filter by:</p>
   <ul>
     <li>@id</li>
@@ -80,16 +81,13 @@ pre, code {
     <li>@material (alias @mat)</li>
   </ul>
   <p>The @mindist and @maxdist properties take numbers as arguments and allow you to filter entities by their distance away from you.</p>
-  <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>highlight_ents *</code> or <code>highlight_ents @mdl *</code> or even <code>highlight_ents @mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
-  <p>To do &quot;OR&quot;, merely use write or/OR. You may also use parentheses. An explicit AND/and can also be written. OR has a higher precedence than AND. See the following example, which also uses explicit ANDs:</p>
-  <pre>highlight_ents wire and (expr or gate @mdl cpu) or @mdl barrel</pre>
-  <p>There is also an alternative syntax for the  properties:</p>
-  <pre>highlight_ents wire and (expr or gate mdl=cpu) or mdl=barrel</pre>
-  <p>The results of the filtering operation are cached for very brief amounts of time to significantly increase performance.</p>
+  <p>Use an asterisk (*) if you wish to match all class names, models, or materials (ex. <code>*</code> or <code>@mdl *</code> or even <code>@mdl -*</code>). Note that it cannot be used as a wildcard character; if you use it, it must stand alone. To disable a filter, execute the command without any arguments.</p>
+  <p>If you want at least one condition to match, but you do need all conditions to match, you can use OR. ORs have operator precedence over ANDs. So far, you have not seen AND explicitly written because it is assumed, but you are free to write it. See the filters below, which all do the same thing:</p>
+  <pre>wire and (expr or gate mdl=cpu) or mdl=barrel<br>wire and (expr or gate @mdl cpu) or @mdl barrel<br>wire ( expr or gate @mdl cpu ) or @mdl barrel</pre>
   <h2>List Gestures</h2>
   <p>SaitoHUD provides a quick list menu that can be accessed with a key and quickly scrolled with the mouse. By default, SaitoHUD does not have anything in this menu, but plugins may populate the list. To enable list gestures, bind <code>+listgest</code> to a key or mouse button, preferrably a mouse button.</p>
 <h2>Overlays</h2>
-<p>The overlays module has functions to displaying the locations of other players, and it is especially useful for server administrators.</p>
+<p>The overlays module has functions to display the locations of other players and highlight entities using filters. </p>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
   <col width="1%" />
@@ -133,7 +131,7 @@ pre, code {
   </tr>
 </table>
 <h3>Commands</h3>
-<p>These commands are very useful for finding &quot;lost&quot; entities.</p>
+<p>These commands are very useful for finding &quot;lost&quot; entities. The results of the filtering operations are cached for very brief amounts of time to significantly increase performance.</p>
 <table border="0" cellpadding="0" cellspacing="0">
   <col width="1%" />
   <col width="1%" />
