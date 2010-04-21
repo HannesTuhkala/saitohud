@@ -23,7 +23,7 @@ local ignoreHooks = CreateClientConVar("saitohud_ignore_hooks", "0", false, fals
 
 --- Checks whether the anti-unfair mode is triggered.
 function SaitoHUD.AntiUnfairTriggered()
-    if type(GAMEMODE) == nil then return false end
+    if GAMEMODE == nil or type(GAMEMODE) ~= 'table' then return false end
     if (LocalPlayer().IsAdmin and LocalPlayer():IsAdmin()) or 
        (LocalPlayer().IsSuperAdmin and LocalPlayer():IsSuperAdmin()) then
        return false
