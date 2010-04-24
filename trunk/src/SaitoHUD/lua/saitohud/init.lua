@@ -40,6 +40,7 @@ load("aimtrace")
 load("stranded")
 load("sandbox")
 load("cinematography")
+load("survey")
 load("panel")
 
 Msg("Loading additional modules...\n")

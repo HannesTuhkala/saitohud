@@ -72,3 +72,14 @@ function SaitoHUD.DrawBBox(ent, color)
         --surface.DrawLine(p[1].x, p[1].y, p[3].x, p[3].y)
     end
 end
+
+--- Draws a 2D line in 3D-space. This must be called within a cam.Start3D
+-- section.
+-- @param p1 Start
+-- @param p2 End
+function SaitoHUD.Draw3D2DLine(p1, p2)
+    -- Draw the line
+    cam.Start3D2D(p1, (p2 - p1):Angle(), 1)
+    surface.DrawLine(0, 0, p1:Distance(p2), 0)
+    cam.End3D2D()
+end
