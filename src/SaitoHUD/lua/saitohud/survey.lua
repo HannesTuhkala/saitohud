@@ -72,9 +72,9 @@ local function ReflectAnalysis(ply, cmd, args)
     end
     
     if not reflectTraceMultiple:GetBool() then
-        if #reflectionLines > 0 then
-            LocalPlayer():ChatPrint("Note: Multiple reflection analyses is disabled")
-        end
+        -- if #reflectionLines > 0 then
+            -- LocalPlayer():ChatPrint("Note: Multiple reflection analyses is disabled")
+        -- end
         reflectionLines = {}
     end
     
