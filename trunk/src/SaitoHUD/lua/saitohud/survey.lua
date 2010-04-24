@@ -37,7 +37,7 @@ local function OrthoTrace(ply, cmd, args)
     
     local data = {}
     data.start = start.HitPos
-    data.endpos = start.HitNormal * 10000 + start.HitPos
+    data.endpos = start.HitNormal * 100000 + start.HitPos
     data.filter = LocalPlayer()
     local final = util.TraceLine(data)
     
@@ -87,7 +87,7 @@ local function ReflectAnalysis(ply, cmd, args)
     for i = 1, numReflects do
         local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
         local lastPoint = tr.HitPos
-        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 10000, LocalPlayer())
+        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 100000, LocalPlayer())
         vec = tr.HitPos - tr.StartPos
         table.insert(lines, {lastPoint, tr.HitPos})
     end
