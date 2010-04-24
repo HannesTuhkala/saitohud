@@ -432,6 +432,7 @@ pre, code {
 <p>SaitoHUD can:</p>
 <ul>
   <li>Draw an orthogonal line extending away from a point that you were looking at.</li>
+  <li>Draw a line from your point of view and reflect it multiple times.</li>
   </ul>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
@@ -449,6 +450,12 @@ pre, code {
     <td>bool</td>
     <td>1</td>
     <td>Draws coordinates for end points of orthogonal traces.</td>
+  </tr>
+  <tr>
+    <td>reflect_trace_nodes<span class="cheat-deterrent"></span></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Draw reflection trace nodes.</td>
   </tr>
 </table>
 <h3>Commands</h3>
@@ -469,6 +476,16 @@ pre, code {
     <td>ortho_trace_clear</td>
     <td nowrap="nowrap">void</td>
     <td>Clears the list of orthogonal traces.</td>
+  </tr>
+  <tr>
+    <td>reflect_trace</td>
+    <td nowrap="nowrap">int numReflections</td>
+    <td>Starts a reflection analysis trace from your point of view.</td>
+  </tr>
+  <tr>
+    <td>reflect_trace_clear</td>
+    <td nowrap="nowrap">void</td>
+    <td>Clear the list of reflection traces.</td>
   </tr>
 </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>
