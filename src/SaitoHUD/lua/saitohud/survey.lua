@@ -62,8 +62,12 @@ end
 local function ReflectAnalysis(ply, cmd, args)
     local numReflects = tonumber(args[1])
     
-    if numReflects < 2 then
-        Error("Mininum 1 reflection")
+    if #args ~= 1 then
+        Msg("Invalid number of arguments\n")
+        return
+    elseif numReflects < 2 then
+        Msg("Minimum number of reflections: 1\n")
+        return
     end
     
     local lines = {}
