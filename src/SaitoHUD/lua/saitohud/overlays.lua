@@ -28,6 +28,7 @@ local boldFriends = CreateClientConVar("name_tags_bold_friends", "1", true, fals
 local playerDistances = CreateClientConVar("name_tags_distances", "1", true, false)
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
 local playerMarkers = CreateClientConVar("player_markers", "0", true, false)
+local overlayFilterText = CreateClientConVar("overlay_filter_text", "class", true, false)
 
 local friendIDs = {}
 local lastTriadsFilter = nil -- Legacy support
@@ -150,13 +151,25 @@ function OverlaysPaint()
         end
     end
     
+    local ot = overlayFilterText:GetString()
+    
     for _, ent in pairs(overlayMatches) do
         if ValidEntity(ent) then
-            local cls = ent:GetClass()
+            local text = "<INVALID>"
             local pos = ent:GetPos()
             local screenPos = pos:ToScreen()
             
-            draw.SimpleText(cls, "TabLarge", screenPos.x, screenPos.y,
+            if ot == "class" then
+                text = ent:GetClass()
+            elseif ot == "model" then
+                text = ent:GetModel()
+            elseif ot == "material" then
+                text = ent:GetMaterial()
+            end
+            
+            if text == nil then text = "" end
+            
+            draw.SimpleText(text, "TabLarge", screenPos.x, screenPos.y,
                             Color(255, 255, 255, 255), 1, ALIGN_TOP) 
         end
     end
