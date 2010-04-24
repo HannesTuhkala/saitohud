@@ -19,6 +19,8 @@
 
 -- This module implements surveying tools.
 
+local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
+
 local orthogonalTraces = {}
 
 local Rehook = nil
@@ -59,6 +61,21 @@ local function DrawOrthoTraces()
     end
 end
 
+--- Draw orthogonal trace text.
+local function DrawOrthoTraceText()
+    for _, v in pairs(orthogonalTraces) do
+        local screenPos = v[1]:ToScreen()
+        draw.SimpleText(tostring(v[1]),
+                        "DefaultSmallDropShadow", screenPos.x, screenPos.y,
+                        Color(255, 255, 255, 255), 1, ALIGN_TOP)
+        
+        local screenPos = v[2]:ToScreen()
+        draw.SimpleText(tostring(v[2]),
+                        "DefaultSmallDropShadow", screenPos.x, screenPos.y,
+                        Color(255, 255, 255, 255), 1, ALIGN_TOP)
+    end
+end
+
 --- Hook to draw survey stuff in RenderScreenspaceEffects.
 local function DrawSurveyScreenspace()
     cam.Start3D(EyePos(), EyeAngles())
@@ -68,11 +85,20 @@ local function DrawSurveyScreenspace()
     cam.End3D()
 end
 
+--- Draw survey HUDPaint stuff.
+local function DrawSurvey()
+    if orthoTraceText:GetBool() then
+        DrawOrthoTraceText()
+    end
+end
+
 Rehook = function()
     if #orthogonalTraces > 0 then
         hook.Add("RenderScreenspaceEffects", "SaitoHUD.Survey", DrawSurveyScreenspace)
+        hook.Add("HUDPaint", "SaitoHUD.Survey", DrawSurvey)
     else
         hook.Remove("RenderScreenspaceEffects", "SaitoHUD.Survey")
+        hook.Remove("HUDPaint", "SaitoHUD.Survey")
     end
 end
 
