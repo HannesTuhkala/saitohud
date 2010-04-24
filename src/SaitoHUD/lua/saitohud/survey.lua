@@ -22,6 +22,7 @@
 local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
 local reflectTraceNodes = CreateClientConVar("reflect_trace_nodes", "1", true, false)
 local reflectTraceMultiple = CreateClientConVar("reflect_trace_multiple", "0", true, false)
+local reflectTraceColorProgression = CreateClientConVar("reflect_trace_color_progression", "0", true, false)
 
 local orthogonalTraces = {}
 local reflectionLines = {}
@@ -109,14 +110,18 @@ end
 
 --- Draw RenderScreenspaceEffects.
 local function DoDrawSurveyScreenspace()
+    surface.SetDrawColor(255, 255, 0, 255)
     for _, v in pairs(orthogonalTraces) do
-        surface.SetDrawColor(255, 255, 0, 255)
         SaitoHUD.Draw3D2DLine(v[1], v[2])
     end
     
+    surface.SetDrawColor(255, 255, 0, 255)
     for _, lines in pairs(reflectionLines) do
-        for _, v in pairs(lines) do
-            surface.SetDrawColor(255, 255, 0, 255)
+        for k, v in pairs(lines) do
+            if reflectTraceColorProgression:GetBool() then
+                surface.SetDrawColor(255 * k / #lines, 255 * (1 - k / #lines),
+                                     255 * (1 - k / #lines), 255)
+            end
             SaitoHUD.Draw3D2DLine(v[1], v[2])
         end
     end
@@ -144,11 +149,16 @@ local function DrawReflectAnalysisText()
     surface.SetDrawColor(255, 255, 0, 255)
     
     for _, lines in pairs(reflectionLines) do
-        for _, v in pairs(lines) do
+        for k, v in pairs(lines) do
+            if reflectTraceColorProgression:GetBool() then
+                surface.SetDrawColor(255 * k / #lines, 255 * (1 - k / #lines),
+                                     255 * (1 - k / #lines), 255)
+            end
+            
             local screenPos = v[1]:ToScreen()
             surface.DrawOutlinedRect(screenPos.x - dim / 2, screenPos.y - dim / 2, dim, dim)
             
-            if _ == #lines then
+            if k == #lines then
                 local screenPos = v[2]:ToScreen()
                 surface.DrawOutlinedRect(screenPos.x - dim / 2, screenPos.y - dim / 2, dim, dim)
             end
