@@ -20,8 +20,10 @@
 -- This module implements surveying tools.
 
 local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
+local reflectTraceNodes = CreateClientConVar("reflect_trace_nodes", "1", true, false)
 
 local orthogonalTraces = {}
+local reflectionLines = {}
 
 local Rehook = nil
 
@@ -53,11 +55,58 @@ local function OrthoTraceClear(ply, cmd, args)
     Rehook()
 end
 
---- Draw orthogonal traces.
-local function DrawOrthoTraces()
+--- Console commands to do reflection analysis.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ReflectAnalysis(ply, cmd, args)
+    local numReflects = tonumber(args[1])
+    
+    if numReflects < 2 then
+        Error("Mininum 1 reflection")
+    end
+    
+    local lines = {}
+    
+    local tr = SaitoHUD.GetRefTrace()
+    local vec = tr.HitPos - tr.StartPos
+    table.insert(lines, {tr.StartPos, tr.HitPos})
+    
+    for i = 1, numReflects do
+        local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
+        local lastPoint = tr.HitPos
+        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 10000, LocalPlayer())
+        vec = tr.HitPos - tr.StartPos
+        table.insert(lines, {lastPoint, tr.HitPos})
+    end
+    
+    table.insert(reflectionLines, lines)
+    
+    Rehook()
+end
+
+--- Console commands clear the list of reflection traces.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ReflectAnalysisClear(ply, cmd, args)
+    reflectionLines = {}
+    
+    Rehook()
+end
+
+--- Draw RenderScreenspaceEffects.
+local function DoDrawSurveyScreenspace()
     for _, v in pairs(orthogonalTraces) do
-        surface.SetDrawColor(255, 0, 0, 255)
+        surface.SetDrawColor(255, 255, 0, 255)
         SaitoHUD.Draw3D2DLine(v[1], v[2])
+    end
+    
+    for _, lines in pairs(reflectionLines) do
+        for _, v in pairs(lines) do
+            surface.SetDrawColor(255, 255, 0, 255)
+            SaitoHUD.Draw3D2DLine(v[1], v[2])
+        end
     end
 end
 
@@ -76,12 +125,31 @@ local function DrawOrthoTraceText()
     end
 end
 
+--- Draw reflection analysis text.
+local function DrawReflectAnalysisText()
+    local dim = 5
+    
+    surface.SetDrawColor(255, 255, 0, 255)
+    
+    for _, lines in pairs(reflectionLines) do
+        for _, v in pairs(lines) do
+            local screenPos = v[1]:ToScreen()
+            surface.DrawOutlinedRect(screenPos.x - dim / 2, screenPos.y - dim / 2, dim, dim)
+            
+            if _ == #lines then
+                local screenPos = v[2]:ToScreen()
+                surface.DrawOutlinedRect(screenPos.x - dim / 2, screenPos.y - dim / 2, dim, dim)
+            end
+        end
+    end
+end
+
 --- Hook to draw survey stuff in RenderScreenspaceEffects.
 local function DrawSurveyScreenspace()
     cam.Start3D(EyePos(), EyeAngles())
     -- Wrap the call in pcall() because an error here causes mayhem, so it
     -- is best if any errors are caught
-    err, x = pcall(DrawOrthoTraces)
+    err, x = pcall(DoDrawSurveyScreenspace)
     cam.End3D()
 end
 
@@ -90,10 +158,14 @@ local function DrawSurvey()
     if orthoTraceText:GetBool() then
         DrawOrthoTraceText()
     end
+    
+    if reflectTraceNodes:GetBool() then
+        DrawReflectAnalysisText()
+    end
 end
 
 Rehook = function()
-    if #orthogonalTraces > 0 then
+    if #orthogonalTraces > 0 or #reflectionLines > 0 then
         hook.Add("RenderScreenspaceEffects", "SaitoHUD.Survey", DrawSurveyScreenspace)
         hook.Add("HUDPaint", "SaitoHUD.Survey", DrawSurvey)
     else
@@ -106,3 +178,5 @@ Rehook()
 
 concommand.Add("ortho_trace", OrthoTrace)
 concommand.Add("ortho_trace_clear", OrthoTraceClear)
+concommand.Add("reflect_trace", ReflectAnalysis)
+concommand.Add("reflect_trace_clear", ReflectAnalysisClear)
