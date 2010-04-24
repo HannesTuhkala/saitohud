@@ -21,6 +21,7 @@
 
 local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
 local reflectTraceNodes = CreateClientConVar("reflect_trace_nodes", "1", true, false)
+local reflectTraceMultiple = CreateClientConVar("reflect_trace_multiple", "0", true, false)
 
 local orthogonalTraces = {}
 local reflectionLines = {}
@@ -68,6 +69,13 @@ local function ReflectAnalysis(ply, cmd, args)
     elseif numReflects < 2 then
         Msg("Minimum number of reflections: 1\n")
         return
+    end
+    
+    if not reflectTraceMultiple:GetBool() then
+        if #reflectionLines > 0 then
+            LocalPlayer():ChatPrint("Note: Multiple reflection analyses is disabled")
+        end
+        reflectionLines = {}
     end
     
     local lines = {}
