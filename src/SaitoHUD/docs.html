@@ -433,6 +433,7 @@ pre, code {
 <ul>
   <li>Draw an orthogonal line extending away from a point that you were looking at.</li>
   <li>Draw a line from your point of view and reflect it multiple times.</li>
+  <li>Measure the distance of a path.</li>
   </ul>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
@@ -498,6 +499,66 @@ pre, code {
     <td>reflect_trace_clear</td>
     <td nowrap="nowrap">void</td>
     <td>Clear the list of reflection traces.</td>
+  </tr>
+  <tr>
+    <td>measure_add</td>
+    <td nowrap="nowrap">void</td>
+    <td>Adds the point that you are looking at to the measured path.</td>
+  </tr>
+  <tr>
+    <td>measure_add</td>
+    <td nowrap="nowrap">float x, float y, float z</td>
+    <td>Adds a coordinate to the measured path.</td>
+  </tr>
+  <tr>
+    <td>measure_insert</td>
+    <td nowrap="nowrap">int index</td>
+    <td>Adds the point that you are looking at to the measured path at a certain index.</td>
+  </tr>
+  <tr>
+    <td>measure_insert</td>
+    <td>int index, float x, float y, float z</td>
+    <td>Adds a coordinate to the measuerd path at a certain index.</td>
+  </tr>
+  <tr>
+    <td>measure_list</td>
+    <td nowrap="nowrap">void</td>
+    <td>Lists the points of the measured path.</td>
+  </tr>
+  <tr>
+    <td>measure_clear</td>
+    <td nowrap="nowrap">void</td>
+    <td>Clears the list of points in the measured path.</td>
+  </tr>
+  <tr>
+    <td>measure_sum</td>
+    <td nowrap="nowrap">int index1, int index2</td>
+    <td>Adds the distances between the points between the points at index1 and at index2.</td>
+  </tr>
+  <tr>
+    <td>measure_between</td>
+    <td nowrap="nowrap">int index1, int index2</td>
+    <td>Adds the  distance of the direct vector between points at index1 and at index2.</td>
+  </tr>
+  <tr>
+    <td>measure_remove</td>
+    <td nowrap="nowrap">int index</td>
+    <td>Remove a point.</td>
+  </tr>
+  <tr>
+    <td>measure_remove_last</td>
+    <td nowrap="nowrap">void</td>
+    <td>Remove the last point.</td>
+  </tr>
+  <tr>
+    <td>measure_replace</td>
+    <td nowrap="nowrap">int index</td>
+    <td>Replaces a point on the measured path with the point that you are looking at.</td>
+  </tr>
+  <tr>
+    <td>measure_replace</td>
+    <td>int index, float x, float y, float z</td>
+    <td>Replaces a point on the measured path with a coordinate.</td>
   </tr>
 </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>
