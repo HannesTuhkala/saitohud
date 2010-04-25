@@ -168,7 +168,7 @@ local function OverlayPanel(panel)
 	options["Class"] = {overlay_filter_text = "class"}
 	options["Model"] = {overlay_filter_text = "model"}
 	options["Material"] = {overlay_filter_text = "material"}
-	panel:AddControl("ListBox",{Label="Overlay Filter Text",MenuButton = false,Height = 66,Options = options})
+	panel:AddControl("ListBox",{Label="Overlay Filter Text",MenuButton = false,Height = 67,Options = options})
     
     entry = AddInput(panel,"Triads Filter:","triads_filter",false,true)
     entry = AddInput(panel,"Overlay Filter:","overlay_filter",false,true)
@@ -203,17 +203,17 @@ local function CommandsPanel(panel)
 	options["Expression2"] = {bbox_filter = "wire_expr"}
 	options["Pods/Seats"] = {bbox_filter = "pod"}
 	options["Vehicles"] = {bbox_filter = "vehicle"}
-	panel:AddControl("ListBox",{Label="BBox Filter",MenuButton = false,Height = 66,Options = options})
+	panel:AddControl("ListBox",{Label="BBox Filter",MenuButton = false,Height = 67,Options = options})
     local options = {}
 	options["Expression2"] = {overlay_filter = "wire_expr"}
 	options["Pods/Seats"] = {overlay_filter = "pod"}
 	options["Vehicles"] = {overlay_filter = "vehicle"}
-	panel:AddControl("ListBox",{Label="Overlay Filter",MenuButton = false,Height = 66,Options = options})
+	panel:AddControl("ListBox",{Label="Overlay Filter",MenuButton = false,Height = 67,Options = options})
     local options = {}
 	options["Expression2"] = {triads_filter = "wire_expr"}
 	options["Pods/Seats"] = {triads_filter = "pod"}
 	options["Vehicles"] = {triads_filter = "vehicle"}
-	panel:AddControl("ListBox",{Label="Triads Filter",MenuButton = false,Height = 66,Options = options})
+	panel:AddControl("ListBox",{Label="Triads Filter",MenuButton = false,Height = 67,Options = options})
     
     AddLabel(panel,"Ortho Trace")
     AddButton(panel,"Trace","ortho_trace",false)
@@ -229,7 +229,7 @@ local function CommandsPanel(panel)
 	options["500"] = {reflect_trace = 500}
 	options["750"] = {reflect_trace = 750}
 	options["1000"] = {reflect_trace = 1000}
-	panel:AddControl("ListBox",{Label="Reflect Trace",MenuButton = false,Height = 66,Options = options})
+	panel:AddControl("ListBox",{Label="Reflect Trace",MenuButton = false,Height = 67,Options = options})
     AddButton(panel,"Clear","reflect_trace_clear",false)
     
 	AddLabel(panel,"Measuring")
