@@ -1,6 +1,8 @@
 #summary Screenshots of SaitoHUD.
 #labels Featured
 
+<wiki:toc max_depth="3" />
+
 = Entity Information =
 
 http://saitohud.googlecode.com/svn/wiki/images/entity_info.jpg
