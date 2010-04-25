@@ -33,6 +33,10 @@ http://saitohud.googlecode.com/svn/wiki/images/ortho_trace.jpg
 
 http://saitohud.googlecode.com/svn/wiki/images/reflection_analysis.jpg
 
+== Path Measurement ==
+
+http://saitohud.googlecode.com/svn/wiki/images/measuring.jpg
+
 = Sandbox Gamemode =
 
 == Gesture Menu ==
