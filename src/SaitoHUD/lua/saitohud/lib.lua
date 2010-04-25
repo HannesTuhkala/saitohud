@@ -185,3 +185,34 @@ function SaitoHUD.ConsoleAutocompletePlayer(cmd, args)
     
     return names
 end
+
+--- Tries to parse a vector from console command arguments.
+-- @param args Arguments
+-- @param skip Number of initial arguments to ignore
+function SaitoHUD.ParseConcmdVector(args, skip)
+    if skip == nil then skip = 0 end
+    local x, y, z
+    
+    if #args - skip == 1 then
+        local r = string.Explode(",", args[1 + skip])
+        if r[3] == nil then return nil end
+        x = tonumber(r[1])
+        y = tonumber(r[2])
+        z = tonumber(r[3])
+    elseif #args - skip == 3 then
+        x = args[1 + skip]:gsub(",", "")
+        y = args[2 + skip]:gsub(",", "")
+        z = args[3 + skip]:gsub(",", "")
+        x = tonumber(x)
+        y = tonumber(y)
+        z = tonumber(z)
+    else
+        return nil
+    end
+    
+    if x ~= nil and y ~= nil and z ~= nil then
+        return Vector(x, y, z)
+    else
+        return nil
+    end
+end
