@@ -19,6 +19,9 @@
 
 -- This module implements surveying tools.
 
+SaitoHUD.MeasurePoints = {}
+SaitoHUD.MeasureLength = 0
+
 local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
 local reflectTraceNodes = CreateClientConVar("reflect_trace_nodes", "1", true, false)
 local reflectTraceMultiple = CreateClientConVar("reflect_trace_multiple", "0", true, false)
@@ -26,8 +29,6 @@ local reflectTraceColorProgression = CreateClientConVar("reflect_trace_color_pro
 
 local orthogonalTraces = {}
 local reflectionLines = {}
-local measurePoints = {}
-local measureTotalLength = 0
 
 local Rehook = nil
 
@@ -102,14 +103,14 @@ end
 
 --- Recalculate the measured total.
 local function RecalcMeasuredTotal()
-    measureTotalLength = 0
+    SaitoHUD.MeasureLength = 0
     
-    if #measurePoints > 1 then
-        local last = measurePoints[1]
+    if #SaitoHUD.MeasurePoints > 1 then
+        local last = SaitoHUD.MeasurePoints[1]
         
-        for i = 2, #measurePoints do
-            local pt = measurePoints[i]
-            measureTotalLength = measureTotalLength + pt:Distance(last)
+        for i = 2, #SaitoHUD.MeasurePoints do
+            local pt = SaitoHUD.MeasurePoints[i]
+            SaitoHUD.MeasureLength = SaitoHUD.MeasureLength + pt:Distance(last)
             last = pt
         end
     end
@@ -137,18 +138,20 @@ local function AddMeasuredPoint(ply, cmd, args)
         return
     end
     
-    if #measurePoints > 0 then
-        local last = measurePoints[#measurePoints]
-        measureTotalLength = measureTotalLength + vec:Distance(last)
-        
-        print("Added point #" .. #measurePoints + 1)
+    local last = SaitoHUD.MeasurePoints[#SaitoHUD.MeasurePoints]
+    
+    table.insert(SaitoHUD.MeasurePoints, vec)
+    RecalcMeasuredTotal()
+    
+    if #SaitoHUD.MeasurePoints > 1 then
+        print("Added point #" .. #SaitoHUD.MeasurePoints + 1)
         print(string.format("Incremental distance: %f",
                             last:Distance(vec)))
-        print(string.format("Total distance: %f", measureTotalLength))
+        print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
     end
     
-    table.insert(measurePoints, vec)
     
+    SaitoHUD.UpdateMeasuringPanel()
     Rehook()
 end
 
@@ -182,15 +185,16 @@ local function InsertMeasuredPoint(ply, cmd, args)
     
     index = math.floor(index)
     
-    if index < 1 or index > #measurePoints + 1 then
+    if index < 1 or index > #SaitoHUD.MeasurePoints + 1 then
         Msg("Invalid index\n")
         return
     end
     
-    table.insert(measurePoints, index, vec)
+    table.insert(SaitoHUD.MeasurePoints, index, vec)
     print("Inserted point at #" .. index)
     
     RecalcMeasuredTotal()
+    SaitoHUD.UpdateMeasuringPanel()
     Rehook()
 end
 
@@ -218,15 +222,16 @@ local function ReplaceMeasuredPoint(ply, cmd, args)
     
     local index = tonumber(args[1])
     
-    if not measurePoints[index] then
+    if not SaitoHUD.MeasurePoints[index] then
         Msg("No such index\n")
         return
     end
     
-    measurePoints[index] = vec
+    SaitoHUD.MeasurePoints[index] = vec
     print("Replaced point #" .. index)
     
     RecalcMeasuredTotal()
+    SaitoHUD.UpdateMeasuringPanel()
     Rehook()
 end
 
@@ -254,15 +259,16 @@ local function RemoveMeasuredPoint(ply, cmd, args)
     
     local index = tonumber(args[1])
     
-    if not measurePoints[index] then
+    if not SaitoHUD.MeasurePoints[index] then
         Msg("No such index\n")
         return
     end
     
-    table.remove(measurePoints, index)
+    table.remove(SaitoHUD.MeasurePoints, index)
     print("Removed point #" .. index)
     
     RecalcMeasuredTotal()
+    SaitoHUD.UpdateMeasuringPanel()
     Rehook()
 end
 
@@ -271,7 +277,7 @@ end
 -- @param cmd Command
 -- @param args Arguments
 local function RemoveLastMeasuredPoint(ply, cmd, args)
-    RemoveMeasuredPoint(ply, cmd, {#measurePoints})
+    RemoveMeasuredPoint(ply, cmd, {#SaitoHUD.MeasurePoints})
 end
 
 --- Console command to list points added in the measurement tool.
@@ -284,17 +290,17 @@ local function ListMeasuredPoints(ply, cmd, args)
         return
     end
     
-    if #measurePoints > 0 then
-        for k, pt in pairs(measurePoints) do
+    if #SaitoHUD.MeasurePoints > 0 then
+        for k, pt in pairs(SaitoHUD.MeasurePoints) do
             if k == 1 then
                 print(string.format("#%d (%s)",k, tostring(pt)))
             else
                 print(string.format("#%d (%s) incr. dist.: %f",
-                                    k, tostring(pt), pt:Distance(measurePoints[k - 1])))
+                                    k, tostring(pt), pt:Distance(SaitoHUD.MeasurePoints[k - 1])))
             end
         end
         
-        print(string.format("Total distance: %f", measureTotalLength))
+        print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
     else
         print("No points!")
     end
@@ -321,16 +327,16 @@ local function SumMeasuredPoints(ply, cmd, args)
     index1 = math.floor(index1)
     index2 = math.floor(index2)
     
-    if index1 < 1 or index2 > #measurePoints then
+    if index1 < 1 or index2 > #SaitoHUD.MeasurePoints then
         Msg("Indexes out of range\n")
         return
     end
     
-    local last = measurePoints[index1]
+    local last = SaitoHUD.MeasurePoints[index1]
     local total = 0
     
     for i = index1 + 1, index2 do
-        local pt = measurePoints[i]
+        local pt = SaitoHUD.MeasurePoints[i]
         total = total + pt:Distance(last)
         last = pt
     end
@@ -364,7 +370,7 @@ local function BetweenMeasuredPoints(ply, cmd, args)
         return
     end
     
-    local distance = measurePoints[index1]:Distance(measurePoints[index2])
+    local distance = SaitoHUD.MeasurePoints[index1]:Distance(SaitoHUD.MeasurePoints[index2])
     
     print(string.format("Direct distance between #%d and #%d: %f", index1, index2, distance))
 end
@@ -379,8 +385,12 @@ local function ClearMeasuredPoints(ply, cmd, args)
         return
     end
     
-    measurePoints = {}
+    SaitoHUD.MeasurePoints = {}
+    
     print("Cleared")
+    
+    SaitoHUD.UpdateMeasuringPanel()
+    Rehook()
 end
 
 --- Console commands clear the list of reflection traces.
@@ -414,11 +424,11 @@ local function DoDrawSurveyScreenspace()
     -- Since the lines are long, we cannot draw on the HUD because lines with
     -- end points that are off screen may not appear right
     surface.SetDrawColor(255, 0, 255, 255)
-    if #measurePoints > 1 then
-        local last = measurePoints[1]
+    if #SaitoHUD.MeasurePoints > 1 then
+        local last = SaitoHUD.MeasurePoints[1]
         
-        for i = 2, #measurePoints do
-            local pt = measurePoints[i]
+        for i = 2, #SaitoHUD.MeasurePoints do
+            local pt = SaitoHUD.MeasurePoints[i]
             
             SaitoHUD.Draw3D2DLine(last, pt)
             
@@ -480,8 +490,8 @@ local function DrawMeasuringLines()
     local dim = 5
     surface.SetDrawColor(255, 0, 255, 255)
     
-    if #measurePoints > 1 then
-        local last = measurePoints[1]
+    if #SaitoHUD.MeasurePoints > 1 then
+        local last = SaitoHUD.MeasurePoints[1]
         local lastScreen = last:ToScreen()
         
         if lastScreen.visible then
@@ -490,8 +500,8 @@ local function DrawMeasuringLines()
                             Color(255, 255, 255, 255), 1, ALIGN_TOP)
         end
         
-        for i = 2, #measurePoints do
-            local pt = measurePoints[i]
+        for i = 2, #SaitoHUD.MeasurePoints do
+            local pt = SaitoHUD.MeasurePoints[i]
             local midPt = (pt - last) / 2 + last
             local ptScreen = pt:ToScreen()
             local midPtScreen = midPt:ToScreen()
@@ -519,11 +529,11 @@ local function DrawMeasuringLines()
 
         local yOffset = ScrH() * 0.3 - 50
         local color = Color(255, 200, 255, 255)
-        draw.SimpleText("Measured Total: " .. measureTotalLength,
+        draw.SimpleText("Measured Total: " .. SaitoHUD.MeasureLength,
                         "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
-    elseif #measurePoints == 1 then
+    elseif #SaitoHUD.MeasurePoints == 1 then
         local dim = 5
-        local last = measurePoints[1]
+        local last = SaitoHUD.MeasurePoints[1]
         local lastScreen = last:ToScreen()
         surface.DrawOutlinedRect(lastScreen.x - dim / 2,
                                  lastScreen.y - dim / 2,
@@ -557,7 +567,7 @@ local function DrawSurvey()
 end
 
 Rehook = function()
-    if #orthogonalTraces > 0 or #reflectionLines > 0 or #measurePoints > 0 then
+    if #orthogonalTraces > 0 or #reflectionLines > 0 or #SaitoHUD.MeasurePoints > 0 then
         hook.Add("RenderScreenspaceEffects", "SaitoHUD.Survey", DrawSurveyScreenspace)
         hook.Add("HUDPaint", "SaitoHUD.Survey", DrawSurvey)
     else
