@@ -430,14 +430,23 @@ end
 --- Draw orthogonal trace text.
 local function DrawOrthoTraceText()
     for _, v in pairs(orthogonalTraces) do
+		local dist = math.Round(v[1]:Distance(v[2]))
         local screenPos = v[1]:ToScreen()
         draw.SimpleText(tostring(v[1]),
                         "DefaultSmallDropShadow", screenPos.x, screenPos.y,
+                        Color(255, 255, 255, 255), 1, ALIGN_TOP)
+                        
+        draw.SimpleText(tostring(dist),
+                        "DefaultSmallDropShadow", screenPos.x, screenPos.y+10,
                         Color(255, 255, 255, 255), 1, ALIGN_TOP)
         
         local screenPos = v[2]:ToScreen()
         draw.SimpleText(tostring(v[2]),
                         "DefaultSmallDropShadow", screenPos.x, screenPos.y,
+                        Color(255, 255, 255, 255), 1, ALIGN_TOP)
+                        
+        draw.SimpleText(tostring(dist),
+                        "DefaultSmallDropShadow", screenPos.x, screenPos.y+10,
                         Color(255, 255, 255, 255), 1, ALIGN_TOP)
     end
 end
