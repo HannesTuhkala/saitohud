@@ -155,6 +155,36 @@ local function AddMeasuredPoint(ply, cmd, args)
     Rehook()
 end
 
+--- Console command to close the path of the measurement tool.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function CloseMeasurementLoop(ply, cmd, args)
+    local vec = nil
+    
+    if #SaitoHUD.MeasurePoints < 2 then
+        LocalPlayer():ChatPrint("Not enough points.")
+    end
+    
+    local vec = SaitoHUD.MeasurePoints[1]
+    
+    local last = SaitoHUD.MeasurePoints[#SaitoHUD.MeasurePoints]
+    
+    table.insert(SaitoHUD.MeasurePoints, vec)
+    RecalcMeasuredTotal()
+    
+    if #SaitoHUD.MeasurePoints > 1 then
+        print("Added point #" .. #SaitoHUD.MeasurePoints)
+        print(string.format("Incremental distance: %f",
+                            last:Distance(vec)))
+        print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
+    end
+    
+    
+    SaitoHUD.UpdateMeasuringPanel()
+    Rehook()
+end
+
 --- Console command to add an orthogonal line to the path measurement tool.
 -- @param ply Player
 -- @param cmd Command
@@ -656,6 +686,7 @@ concommand.Add("reflect_trace", ReflectAnalysis)
 concommand.Add("reflect_trace_clear", ReflectAnalysisClear)
 concommand.Add("measure_add", AddMeasuredPoint)
 concommand.Add("measure_add_ortho", AddOrthoMeasuredPoint)
+concommand.Add("measure_close", CloseMeasurementLoop)
 concommand.Add("measure_insert", InsertMeasuredPoint)
 concommand.Add("measure_insert_ortho", InsertOrthoMeasuredPoint)
 concommand.Add("measure_replace", ReplaceMeasuredPoint)
