@@ -25,8 +25,8 @@ end
 SaitoHUD = {}
 SaitoHUD.Reloading = reloading
 
-local additionalModules = CreateClientConVar("saitohud_modules", "", false, false)
-local earlyAdditionalModules = CreateClientConVar("saitohud_modules_pre", "", false, false)
+local additionalModules = CreateClientConVar("saitohud_modules", "", true, false)
+local earlyAdditionalModules = CreateClientConVar("saitohud_modules_pre", "", true, false)
 
 local function Load(module)
     path = "saitohud/" .. module .. ".lua"
