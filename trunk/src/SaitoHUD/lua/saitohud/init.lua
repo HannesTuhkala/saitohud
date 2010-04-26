@@ -26,11 +26,22 @@ SaitoHUD = {}
 SaitoHUD.Reloading = reloading
 
 local additionalModules = CreateClientConVar("saitohud_modules", "", false, false)
+local earlyAdditionalModules = CreateClientConVar("saitohud_modules_pre", "", false, false)
 
-local function load(module)
+local function Load(module)
     path = "saitohud/" .. module .. ".lua"
     Msg("Loading: " .. path .. "...\n")
     include(path)
+end
+
+local function LoadList(str)
+    local modules = string.Explode(",", str)
+    for _, module in pairs(modules) do
+        local module = string.Trim(module)
+        if module ~= "" then
+            Load(module)
+        end
+    end
 end
 
 Msg("====== Loading SaitoHUD ======\n")
@@ -39,29 +50,26 @@ if reloading then
     Msg("Reloading detected!\n")
 end
 
-load("filters") -- Entity filtering engine
-load("lib")
-load("core")
-load("drawing")
-load("light")
-load("listgest")
-load("overlays") -- Entity overlay information
-load("sampling") -- Entity path tracking
-load("aimtrace")
-load("stranded")
-load("sandbox")
-load("cinematography")
-load("survey")
-load("panel")
+Msg("Loading early modules...\n")
+LoadList(earlyAdditionalModules:GetString())
+
+Msg("Loading built-in modules...\n")
+Load("filters") -- Entity filtering engine
+Load("lib")
+Load("core")
+Load("drawing")
+Load("light")
+Load("listgest")
+Load("overlays") -- Entity overlay information
+Load("sampling") -- Entity path tracking
+Load("aimtrace")
+Load("stranded")
+Load("sandbox")
+Load("cinematography")
+Load("survey")
+Load("panel")
 
 Msg("Loading additional modules...\n")
-
-local modules = string.Explode(",", additionalModules:GetString())
-for _, module in pairs(modules) do
-    local module = string.Trim(module)
-    if module ~= "" then
-        load(module)
-    end
-end
+LoadList(additionalModules:GetString())
 
 Msg("==============================\n")
