@@ -16,7 +16,14 @@
 -- 
 -- $Id$
 
+local reloading = false
+
+if SaitoHUD ~= nil then
+    reloading = true 
+end
+
 SaitoHUD = {}
+SaitoHUD.Reloading = reloading
 
 local additionalModules = CreateClientConVar("saitohud_modules", "", false, false)
 
@@ -27,6 +34,10 @@ local function load(module)
 end
 
 Msg("====== Loading SaitoHUD ======\n")
+
+if reloading then
+    Msg("Reloading detected!\n")
+end
 
 load("filters") -- Entity filtering engine
 load("lib")
