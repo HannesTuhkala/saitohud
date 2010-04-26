@@ -399,4 +399,6 @@ end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
 
-SaitoHUD.UpdatePanels()
+if SaitoHUD.Reloading then
+    SaitoHUD.UpdatePanels()
+end
