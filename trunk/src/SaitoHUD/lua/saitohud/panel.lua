@@ -185,7 +185,7 @@ local function OverlayPanel(panel)
     
 	AddLabel(panel, "Name Tags:")
     AddToggle(panel, "Show Name Tags", "name_tags", true)
-    AddToggle(panel, "Always Show Name Tags of Friends", "friend_tags_always", true)
+    AddToggle(panel, "Always Show Friends", "friend_tags_always", true)
     AddToggle(panel, "Simple Text Style", "name_tags_simple", true)
     AddToggle(panel, "Show Distance", "name_tags_distances", true)
     AddToggle(panel, "Rainbow Friends' Names", "name_tags_rainbow_friends", true)
