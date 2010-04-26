@@ -19,13 +19,15 @@
 
 -- Module for handling lights
 
+local selfLight = CreateClientConVar("super_flashlight_self", "0", true, false)
+
 local lightEnabled = false
 
 --- Renders the dynamic light for the super flashlight.
 local function RenderFlashlight()
     local light = DynamicLight(123120000)
     
-    if light then 
+    if light and not selfLight:GetBool() then 
         light.Pos = LocalPlayer():GetEyeTrace().HitPos
         light.r = 255
         light.g = 255 
@@ -34,7 +36,8 @@ local function RenderFlashlight()
         light.Size = 2000
         light.Decay = 0 
         light.DieTime = CurTime() + 0.3
-    end 
+    end
+    
     local light = DynamicLight(123120001) 
     
     if light then 
@@ -42,8 +45,8 @@ local function RenderFlashlight()
         light.r = 255
         light.g = 255 
         light.b = 255
-        light.Brightness = 1
-        light.Size = 2000
+        light.Brightness = 0.01
+        light.Size = 5000
         light.Decay = 0 
         light.DieTime = CurTime() + 0.3
     end 
