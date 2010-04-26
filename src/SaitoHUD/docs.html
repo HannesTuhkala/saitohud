@@ -511,6 +511,11 @@ pre, code {
     <td>Adds a coordinate to the measured path.</td>
   </tr>
   <tr>
+    <td>measure_add_ortho</td>
+    <td nowrap="nowrap">void</td>
+    <td>Adds two points to the list of measured path points, one at the point that you are looking at, and the second point  on the line normal to the hit surface that hits the first object.</td>
+  </tr>
+  <tr>
     <td>measure_insert</td>
     <td nowrap="nowrap">int index</td>
     <td>Adds the point that you are looking at to the measured path at a certain index.</td>
@@ -519,6 +524,26 @@ pre, code {
     <td>measure_insert</td>
     <td>int index, float x, float y, float z</td>
     <td>Adds a coordinate to the measured path at a certain index.</td>
+  </tr>
+  <tr>
+    <td>measure_insert_ortho</td>
+    <td>int index</td>
+    <td>See measure_add_ortho. Inserts the two points at index.</td>
+  </tr>
+  <tr>
+    <td>measure_replace</td>
+    <td nowrap="nowrap">int index</td>
+    <td>Replaces a point on the measured path with the point that you are looking at.</td>
+  </tr>
+  <tr>
+    <td>measure_replace</td>
+    <td>int index, float x, float y, float z</td>
+    <td>Replaces a point on the measured path with a coordinate.</td>
+  </tr>
+  <tr>
+    <td>measure_close</td>
+    <td>void</td>
+    <td>Closes the path.</td>
   </tr>
   <tr>
     <td>measure_list</td>
@@ -549,16 +574,6 @@ pre, code {
     <td>measure_remove_last</td>
     <td nowrap="nowrap">void</td>
     <td>Remove the last point.</td>
-  </tr>
-  <tr>
-    <td>measure_replace</td>
-    <td nowrap="nowrap">int index</td>
-    <td>Replaces a point on the measured path with the point that you are looking at.</td>
-  </tr>
-  <tr>
-    <td>measure_replace</td>
-    <td>int index, float x, float y, float z</td>
-    <td>Replaces a point on the measured path with a coordinate.</td>
   </tr>
 </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>
@@ -635,6 +650,12 @@ Improved Wire Tool,tool_wire_improved</pre>
       <td>string</td>
       <td>""</td>
       <td>List of additional modules to load, separated by commas.</td>
+    </tr>
+    <tr>
+      <td>saitohud_modules_pre</td>
+      <td>string</td>
+      <td>&quot;</td>
+      <td>List of additional modules to load before all other modules, separated by commas.</td>
     </tr>
   </table>
   <h3>Commands</h3>
