@@ -312,6 +312,7 @@ local function MeasuringPanel(panel)
                                 end
                             end)
     end, false)
+    AddButton(panel, "Add Orthogonal Line", "measure_add_ortho", false)
     AddButton(panel, "Undo Point", "measure_remove_last", false)
     AddButton(panel, "Clear", "measure_clear", false)
     
@@ -341,6 +342,9 @@ local function MeasuringPanel(panel)
                                         RunConsoleCommand("measure_insert", line:GetValue(1), unpack(args))
                                     end
                                 end)
+        end)
+        menu:AddOption("Add Orthogonal Line Before", function()
+            RunConsoleCommand("measure_insert_ortho", line:GetValue(1))
         end)
         menu:AddOption("Replace Point", function()
             RunConsoleCommand("measure_replace", line:GetValue(1))

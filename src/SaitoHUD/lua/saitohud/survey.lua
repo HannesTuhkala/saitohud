@@ -116,7 +116,7 @@ local function RecalcMeasuredTotal()
     end
 end
 
---- Console commands to add a point to the path measurement tool.
+--- Console command to add a point to the path measurement tool.
 -- @param ply Player
 -- @param cmd Command
 -- @param args Arguments
@@ -144,12 +144,43 @@ local function AddMeasuredPoint(ply, cmd, args)
     RecalcMeasuredTotal()
     
     if #SaitoHUD.MeasurePoints > 1 then
-        print("Added point #" .. #SaitoHUD.MeasurePoints + 1)
+        print("Added point #" .. #SaitoHUD.MeasurePoints)
         print(string.format("Incremental distance: %f",
                             last:Distance(vec)))
         print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
     end
     
+    
+    SaitoHUD.UpdateMeasuringPanel()
+    Rehook()
+end
+
+--- Console command to add an orthogonal line to the path measurement tool.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function AddOrthoMeasuredPoint(ply, cmd, args)
+    if #args ~= 0 then
+        Msg("Invalid number of arguments\n")
+        return
+    end
+    
+    local start = SaitoHUD.GetRefTrace()
+    
+    local data = {}
+    data.start = start.HitPos
+    data.endpos = start.HitNormal * 100000 + start.HitPos
+    data.filter = LocalPlayer()
+    local final = util.TraceLine(data)
+    
+    table.insert(SaitoHUD.MeasurePoints, start.HitPos)
+    table.insert(SaitoHUD.MeasurePoints, final.HitPos)
+    
+    RecalcMeasuredTotal()
+    
+    print("Added points #" .. (#SaitoHUD.MeasurePoints - 1) ..
+          " #" .. #SaitoHUD.MeasurePoints)
+    print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
     
     SaitoHUD.UpdateMeasuringPanel()
     Rehook()
@@ -192,6 +223,47 @@ local function InsertMeasuredPoint(ply, cmd, args)
     
     table.insert(SaitoHUD.MeasurePoints, index, vec)
     print("Inserted point at #" .. index)
+    
+    RecalcMeasuredTotal()
+    SaitoHUD.UpdateMeasuringPanel()
+    Rehook()
+end
+
+--- Console command to insert an orthogonal line in the path measurement tool.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function InsertOrthoMeasuredPoint(ply, cmd, args)
+    if #args ~= 1 then
+        Msg("Invalid number of arguments\n")
+        return
+    end
+    
+    local index = tonumber(args[1])
+    
+    if not index then
+        Msg("Invalid index\n")
+    end
+    
+    index = math.floor(index)
+    
+    if index < 1 or index > #SaitoHUD.MeasurePoints + 1 then
+        Msg("Invalid index\n")
+        return
+    end
+    
+    local start = SaitoHUD.GetRefTrace()
+    
+    local data = {}
+    data.start = start.HitPos
+    data.endpos = start.HitNormal * 100000 + start.HitPos
+    data.filter = LocalPlayer()
+    local final = util.TraceLine(data)
+    
+    table.insert(SaitoHUD.MeasurePoints, index, start.HitPos)
+    table.insert(SaitoHUD.MeasurePoints, index + 1, final.HitPos)
+    
+    print("Inserted 2 points at #" .. index)
     
     RecalcMeasuredTotal()
     SaitoHUD.UpdateMeasuringPanel()
@@ -583,11 +655,13 @@ concommand.Add("ortho_trace_clear", OrthoTraceClear)
 concommand.Add("reflect_trace", ReflectAnalysis)
 concommand.Add("reflect_trace_clear", ReflectAnalysisClear)
 concommand.Add("measure_add", AddMeasuredPoint)
+concommand.Add("measure_add_ortho", AddOrthoMeasuredPoint)
 concommand.Add("measure_insert", InsertMeasuredPoint)
+concommand.Add("measure_insert_ortho", InsertOrthoMeasuredPoint)
+concommand.Add("measure_replace", ReplaceMeasuredPoint)
 concommand.Add("measure_list", ListMeasuredPoints)
 concommand.Add("measure_clear", ClearMeasuredPoints)
 concommand.Add("measure_sum", SumMeasuredPoints)
 concommand.Add("measure_between", BetweenMeasuredPoints)
 concommand.Add("measure_remove", RemoveMeasuredPoint)
 concommand.Add("measure_remove_last", RemoveLastMeasuredPoint)
-concommand.Add("measure_replace", ReplaceMeasuredPoint)
