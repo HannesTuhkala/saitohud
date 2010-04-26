@@ -360,8 +360,15 @@ local function MeasuringPanel(panel)
         menu:AddOption("Delete Point", function()
             RunConsoleCommand("measure_remove", line:GetValue(1))
         end)
+        menu:AddOption("Copy Coordinates", function()
+            SetClipboardText(line:GetValue(2))
+        end)
         menu:Open()
     end
+    
+    AddButton(panel, "Copy Total Distance", function()
+        SetClipboardText(SaitoHUD.MeasureLength)
+    end)
 end
 
 local panels = {
