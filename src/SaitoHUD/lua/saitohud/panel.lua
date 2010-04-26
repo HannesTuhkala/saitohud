@@ -410,9 +410,3 @@ function SaitoHUD.UpdatePanels()
 end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
-
-if SaitoHUD.Reloading then
-    pcall(function()
-        SaitoHUD.UpdatePanels()
-    end)
-end
