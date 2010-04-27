@@ -203,6 +203,8 @@ local function EntityHighlightingPanel(panel)
     panel:ClearControls()
     panel:AddHeader()
     
+    AddToggle(panel, "Continuous Filter Evaluation", "overlays_continuous_eval", false)
+    
     local quickFilters = {
         "",
         "wire_expr",
@@ -228,21 +230,29 @@ local function EntityHighlightingPanel(panel)
     AddInput(panel, "Overlay Filter:", "overlay_filter", false, true)
     
 	panel:AddControl("ListBox", {
-        Label = "Overlay Filter Text",
-        MenuButton = false,
-        Options = {
-            Class = {overlay_filter_text = "class"},
-            Model = {overlay_filter_text = "model"},
-            Material = {overlay_filter_text = "material"},
-        }
-    })
-    
-	panel:AddControl("ListBox", {
         Label = "Quick Overlay Filter",
         MenuButton = false,
         Height = 99,
         Options = BuildQuickFilterList("overlay_filter", quickFilters)
     })
+    
+	panel:AddControl("ListBox", {
+        Label = "Overlay Filter Text",
+        MenuButton = false,
+        Height = 52,
+        Options = {
+            Class = {overlay_filter_text = "class"},
+            Model = {overlay_filter_text = "model"},
+            Material = {overlay_filter_text = "material"},
+            Speed = {overlay_filter_text = "speed"},
+            ["Peak Speed"] = {overlay_filter_text = "peakspeed"},
+        }
+    })
+	
+	AddLabel(panel, "Peak speed evaluation benefits from continuous filter evaluation if accuracy is desired.")
+    
+    AddToggle(panel, "Print Cached Data on Entity Removal", "overlay_filter_print_removed", false)
+    AddButton(panel, "Clear Cache", "overlay_filter_clear_cache", false)
     
     -- Bounding box filter
     
