@@ -164,9 +164,13 @@ local function SamplingPanel(panel)
     })
     
     AddInput(panel, "Sample Player by Name:", "sample", true, true)
+        :SetToolTip("Partial names accepted")
     AddInput(panel, "Remove Player by Name:", "sample_remove", true, true)
+        :SetToolTip("Partial names accepted")
     AddInput(panel, "Sample by Filter:", "sample_filter", true, true)
+        :SetToolTip("Enter a filter and then press ENTER")
     AddInput(panel, "Remove by Filter:", "sample_remove_filter", true, true)
+        :SetToolTip("Enter a filter and then press ENTER")
 end
 
 --- Creates the overlay panel.
@@ -186,6 +190,7 @@ local function OverlayPanel(panel)
 	AddLabel(panel, "Name Tags:")
     AddToggle(panel, "Show Name Tags", "name_tags", true)
     AddToggle(panel, "Always Show Friends", "friend_tags_always", true)
+        :SetToolTip("See the help to find out how to define a friends list")
     AddToggle(panel, "Simple Text Style", "name_tags_simple", true)
     AddToggle(panel, "Show Distance", "name_tags_distances", true)
     AddToggle(panel, "Rainbow Friends' Names", "name_tags_rainbow_friends", true)
@@ -217,6 +222,7 @@ local function EntityHighlightingPanel(panel)
     -- Triads filter
     
     AddInput(panel, "Triads Filter:", "triads_filter", false, true)
+        :SetToolTip("Enter a filter and then press ENTER")
     
 	panel:AddControl("ListBox", {
         Label = "Quick Triads Filter",
@@ -228,6 +234,7 @@ local function EntityHighlightingPanel(panel)
     -- Overlay filter
     
     AddInput(panel, "Overlay Filter:", "overlay_filter", false, true)
+        :SetToolTip("Enter a filter and then press ENTER")
     
 	panel:AddControl("ListBox", {
         Label = "Quick Overlay Filter",
@@ -257,6 +264,7 @@ local function EntityHighlightingPanel(panel)
     -- Bounding box filter
     
     AddInput(panel, "Bounding Box Filter:", "bbox_filter", false, true)
+        :SetToolTip("Enter a filter and then press ENTER")
     
 	panel:AddControl("ListBox", {
         Label = "Quick Bounding Box Filter",
