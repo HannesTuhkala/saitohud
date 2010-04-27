@@ -397,6 +397,8 @@ local panels = {
 
 --- PopulateToolMenu hook.
 local function PopulateToolMenu()
+    _SaitoHUDToolMenuPopulated = true
+    
     for k, v in pairs(panels) do
         spawnmenu.AddToolMenuOption("Options", "SaitoHUD", "SaitoHUD" .. k,
                                     v[1], "", "", v[2], v[3])
@@ -420,3 +422,8 @@ function SaitoHUD.UpdatePanels()
 end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
+
+if _SaitoHUDToolMenuPopulated and SaitoHUD.Reloading then
+    Msg("Updating panels...\n")
+    SaitoHUD.UpdatePanels()
+end
