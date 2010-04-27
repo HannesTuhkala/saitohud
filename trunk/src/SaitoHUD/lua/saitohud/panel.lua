@@ -20,6 +20,37 @@
 -- Panel GUI.
 
 local pointsList
+local quickFilters = {}
+
+--- Loads the quick filters from file.
+local function LoadQuickFilters()
+    local data = SaitoHUD.ParseCSV(file.Read("saitohud/quick_filters.csv"))
+    
+    if #data > 0 then
+        -- Remove the header
+        if data[1][1] == "Filter" then
+            table.remove(data, 1)
+        end
+        
+        quickFilters = {""}
+        
+        for _, v in pairs(data) do
+            if v[1] and v[1] ~= "" then
+                table.insert(quickFilters, v[1])
+            end
+        end
+    else
+        quickFilters = {
+            "",
+            "pod",
+            "npc",
+            "vehicle",
+            "sent_ball",
+            "maxdist=1000 and prop",
+            "wire_expr",
+        }
+    end
+end
 
 --- Adds an input to a panel.
 -- @param panel
@@ -102,16 +133,36 @@ local function AddButton(panel, label, command)
 	return button
 end
 
---- Builds the quick filter list for the filtering panel.
+--- Adds the quick filter list for the filtering panel.
+-- @param panel
 -- @param cmd
--- @param filters
+-- @param text
+-- @param input
 -- @return
-local function BuildQuickFilterList(cmd, filters)
-	local options = {}
-    for _, filter in pairs(filters) do
-        options[filter] = {[cmd] = filter}
+local function AddQuickFilterList(panel, cmd, text, field)
+	local ctrl = panel:AddControl("DListView", {})
+    ctrl:AddColumn("Quick " .. text .. " Filter")
+    ctrl:SetTall(101)
+    
+    ctrl.OnRowSelected = function(panel, line) 
+        local args = SaitoHUD.ParseCommand(panel:GetLine(line):GetValue(1))
+        RunConsoleCommand(cmd, unpack(args))
     end
-    return options
+    
+    ctrl.OnRowRightClick = function(lst, index, line)
+        local menu = DermaMenu()
+        menu:AddOption("Set Input to Value", function()
+            field:SetValue(line:GetValue(1))
+        end)
+        menu:AddOption("Copy", function()
+            SetClipboardText(line:GetValue(1))
+        end)
+        menu:Open()
+    end
+    
+    for _, filter in pairs(quickFilters) do
+        ctrl:AddLine(filter) 
+    end
 end
 
 --- Creates the help panel.
@@ -210,38 +261,19 @@ local function EntityHighlightingPanel(panel)
     
     AddToggle(panel, "Continuous Filter Evaluation", "overlays_continuous_eval", false)
     
-    local quickFilters = {
-        "",
-        "wire_expr",
-        "pod",
-        "npc",
-        "vehicle",
-        "maxdist=1000",
-    }
-    
     -- Triads filter
     
-    AddInput(panel, "Triads Filter:", "triads_filter", false, true)
-        :SetToolTip("Enter a filter and then press ENTER")
+    local ctrl = AddInput(panel, "Triads Filter:", "triads_filter", false, true)
+    ctrl:SetToolTip("Enter a filter and then press ENTER")
     
-	panel:AddControl("ListBox", {
-        Label = "Quick Triads Filter",
-        MenuButton = false,
-        Height = 99,
-        Options = BuildQuickFilterList("triads_filter", quickFilters)
-    })
+	AddQuickFilterList(panel, "triads_filter", "Triads", ctrl)
     
     -- Overlay filter
     
-    AddInput(panel, "Overlay Filter:", "overlay_filter", false, true)
-        :SetToolTip("Enter a filter and then press ENTER")
+    local ctrl = AddInput(panel, "Overlay Filter:", "overlay_filter", false, true)
+    ctrl:SetToolTip("Enter a filter and then press ENTER")
     
-	panel:AddControl("ListBox", {
-        Label = "Quick Overlay Filter",
-        MenuButton = false,
-        Height = 99,
-        Options = BuildQuickFilterList("overlay_filter", quickFilters)
-    })
+	AddQuickFilterList(panel, "overlay_filter", "Overlay", ctrl)
     
 	panel:AddControl("ListBox", {
         Label = "Overlay Filter Text",
@@ -263,15 +295,10 @@ local function EntityHighlightingPanel(panel)
     
     -- Bounding box filter
     
-    AddInput(panel, "Bounding Box Filter:", "bbox_filter", false, true)
-        :SetToolTip("Enter a filter and then press ENTER")
+    local ctrl = AddInput(panel, "Bounding Box Filter:", "bbox_filter", false, true)
+    ctrl:SetToolTip("Enter a filter and then press ENTER")
     
-	panel:AddControl("ListBox", {
-        Label = "Quick Bounding Box Filter",
-        MenuButton = false,
-        Height = 99,
-        Options = BuildQuickFilterList("bbox_filter", quickFilters)
-    })
+	AddQuickFilterList(panel, "bbox_filter", "Bounding Box", ctrl)
 end
 
 --- Creates the surveying panel.
@@ -430,6 +457,8 @@ function SaitoHUD.UpdatePanels()
 end
 
 hook.Add("PopulateToolMenu", "SaitoHUD.PopulateToolMenu", PopulateToolMenu)
+
+LoadQuickFilters()
 
 if _SaitoHUDToolMenuPopulated and SaitoHUD.Reloading then
     Msg("Updating panels...\n")

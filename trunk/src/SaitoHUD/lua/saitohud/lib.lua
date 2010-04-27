@@ -118,6 +118,9 @@ end
 -- @param data Data to parse
 -- @return Table of rows
 function SaitoHUD.ParseCSV(data)
+    if data == nil then return {} end
+    if data:Trim() == "" then return {} end
+    
     local lines = string.Explode("\n", data:gsub("\r", ""))
     local result = {}
     
@@ -215,4 +218,38 @@ function SaitoHUD.ParseConcmdVector(args, skip)
     else
         return nil
     end
+end
+
+--- Parses a string into a table, as if it were a console command.
+-- @params str
+-- @return The table
+function SaitoHUD.ParseCommand(str)
+    local quoted = false
+    local escaped = false
+    local result = {}
+    local buf = ""
+    for c = 1, #str do
+        local char = str:sub(c, c)
+        if escaped then
+            buf = buf .. char
+            escaped = false
+        elseif char == "\"" and quoted then
+            quoted = false
+            table.insert(result, buf)
+            buf = ""
+        elseif char == "\"" and buf == "" then
+            quoted = true
+        elseif char == " " and not quoted then
+            if buf ~= "" then
+                table.insert(result, buf)
+                buf = ""
+            end
+        else
+            buf = buf .. char
+        end
+    end
+    if buf ~= "" then
+        table.insert(result, buf)
+    end
+    return result
 end
