@@ -267,10 +267,44 @@ pre, code {
 <p>Entities can be highlighted based on an <a href="#entity-filters">entity filter</a> with:</p>
 <ul>
   <li>Triads, or 3D coordinate origin markers, that are displayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
-  <li>HUD displays of entity class names at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
+  <li>HUD displays of entity properties at the locations of selected entities.<span class="cheat-deterrent">*</span>
+    <ul>
+      <li>Peak speed can be shown for entities. The data is cached but that data can be cleared with the appropriate console command below.</li>
+    </ul>
+  </li>
   <li>Bounding boxes of entities that aredisplayed at the locations of selected entities.<span class="cheat-deterrent">*</span></li>
 </ul>
 <p>The results of the filtering operations for the following functions are cached for very brief amounts of time to significantly increase performance.</p>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>overlays_continuous_eval</td>
+    <td>bool</td>
+    <td>0</td>
+    <td>Continually evaluate the filters every time the the HUD is drawn. This may result in a very large FPS drop, depending on your setup and the number of entities.</td>
+  </tr>
+  <tr>
+    <td>overlay_filter_text</td>
+    <td>text</td>
+    <td>&quot;class&quot;</td>
+    <td>Text to show for overlay filters. Options: class, model, material, speed, peakspeed</td>
+  </tr>
+  <tr>
+    <td>overlay_filter_print_removed</td>
+    <td>bool</td>
+    <td>0</td>
+    <td>When an entity is removed from an overlay filter cache, then print the result.</td>
+  </tr>
+</table>
 <h3>Commands</h3>
 <table border="0" cellpadding="0" cellspacing="0">
   <col width="1%" />
@@ -291,9 +325,9 @@ pre, code {
     <td>Draws class names at the location of matched entities.</td>
   </tr>
   <tr>
-    <td>overlay_filter_text</td>
-    <td nowrap="nowrap">string type</td>
-    <td>Text to show for overlay filters. Options: class, model, material</td>
+    <td>overlay_filter_clear_cache</td>
+    <td nowrap="nowrap">void</td>
+    <td>Clears the data point cache used by the overlay filte.r</td>
   </tr>
   <tr>
     <td>bbox_filter<span class="cheat-deterrent">*</span></td>
