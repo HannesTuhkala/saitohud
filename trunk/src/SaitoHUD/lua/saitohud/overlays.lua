@@ -29,6 +29,8 @@ local playerDistances = CreateClientConVar("name_tags_distances", "1", true, fal
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
 local playerMarkers = CreateClientConVar("player_markers", "0", true, false)
 local overlayFilterText = CreateClientConVar("overlay_filter_text", "class", true, false)
+local overlayFilterPrint = CreateClientConVar("overlay_filter_print_removed", "0", true, false)
+local evaluateOnEveryDraw = CreateClientConVar("overlays_continuous_eval", "0", true, false)
 
 local friendIDs = {}
 local lastTriadsFilter = nil -- Legacy support
@@ -40,6 +42,9 @@ local bboxFilter = nil
 local triadsMatches = {}
 local overlayMatches = {}
 local bboxMatches = {}
+-- Used for temporary storage
+local peakSpeeds = {}
+local peakEntityInfo = {}
 
 local Rehook = function() end
 
@@ -127,17 +132,40 @@ local function EvaluateFilters()
             end
         end
     end
+    
+    -- Clear dead entities from caches
+    for k, _ in pairs(peakSpeeds) do
+        local ent = ents.GetByIndex(k)
+        if not ValidEntity(ent) then
+            if overlayFilterPrint:GetBool() then
+                print(string.format("%s removed, peak speed was %f",
+                                    peakEntityInfo[k],
+                                    peakSpeeds[k]))
+            end
+            
+            peakSpeeds[k] = nil
+        end
+    end
+end
+
+--- Console command to clear overlay caches.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ClearOverlayCaches(ply, cmd, args)
+    peakSpeeds = {}
+    peakEntityInfo = {}
 end
 
 --- Draw the overlays.
-function OverlaysPaint()
+local function OverlaysPaint()
     -- Check to make sure that we even have a filter to draw
     if not triadsFilter and not overlayFilter and
        not bboxFilter then
         return
     end
     
-    if CurTime() - lastOverlayMatch > 1 then
+    if CurTime() - lastOverlayMatch > 1 or evaluateOnEveryDraw:GetBool() then
         EvaluateFilters()
         lastOverlayMatch = CurTime()
     end
@@ -165,6 +193,31 @@ function OverlaysPaint()
                 text = ent:GetModel()
             elseif ot == "material" then
                 text = ent:GetMaterial()
+            elseif ot == "speed" then
+                local speed = ent:GetVelocity():Length()
+                if speed == 0 then
+                    text = "Z"
+                else
+                    text = string.format("%0.1f", speed)
+                end
+            elseif ot == "peakspeed" then
+                local index = ent:EntIndex()
+                local speed = ent:GetVelocity():Length()
+                if not peakSpeeds[index] then
+                    peakSpeeds[index] = speed
+                    peakEntityInfo[index] = string.format("%s [%s]",
+                                            ent:GetClass(),
+                                            ent:GetModel())
+                else
+                    if speed > peakSpeeds[index] then
+                        peakSpeeds[index] = speed
+                    end
+                end
+                if peakSpeeds[index] == 0 then
+                    text = "Z"
+                else
+                    text = string.format("%0.1f", peakSpeeds[index])
+                end
             end
             
             if text == nil then text = "" end
@@ -251,7 +304,7 @@ local function EntityInfoPaint()
 end
 
 --- Draw the name tags.
-function NameTagsPaint()
+local function NameTagsPaint()
     local refPos = SaitoHUD.GetRefPos()
     
     for _, ply in pairs(player.GetAll()) do
@@ -323,7 +376,7 @@ function NameTagsPaint()
 end
 
 --- Draw player bounding boxes.
-function PlayerBBoxesPaint()
+local function PlayerBBoxesPaint()
     local refPos = SaitoHUD.GetRefPos()
     
     for _, ply in pairs(player.GetAll()) do
@@ -400,7 +453,7 @@ function PlayerBBoxesPaint()
 end
 
 --- Draw player orientation markers.
-function PlayerMarkersPaint()
+local function PlayerMarkersPaint()
     for _, ply in pairs(player.GetAll()) do
         local doDraw = true
         
@@ -538,6 +591,7 @@ end
 
 concommand.Add("triads_filter", SetTriadsFilter)
 concommand.Add("overlay_filter", SetOverlayFilter)
+concommand.Add("overlay_filter_clear_cache", ClearOverlayCaches)
 concommand.Add("bbox_filter", SetBBoxFilter)
 concommand.Add("toggle_triads", ToggleTriads)
 concommand.Add("dump_info", function() SaitoHUD.DumpEntityInfo() end)
@@ -549,6 +603,7 @@ cvars.AddChangeCallback("name_tags", Rehook)
 cvars.AddChangeCallback("friend_tags_always", Rehook)
 cvars.AddChangeCallback("player_boxes", Rehook)
 cvars.AddChangeCallback("player_markers", Rehook)
+cvars.AddChangeCallback("overlay_filter_text", ClearOverlayCaches)
 
 LoadFriends()
 Rehook()
