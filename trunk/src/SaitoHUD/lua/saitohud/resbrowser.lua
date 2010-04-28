@@ -87,7 +87,7 @@ local function UpdateSoundList(panel, entries, path)
         if string.sub(testPath, 1, len) == path then
             local rest = string.sub(testPath, len + 1)
             if not rest:find("/") then
-                panel:AddLine(rest, string.format("%.2f", SoundDuration(testPath)), path, testPath)
+                panel:AddLine(rest, "", path, testPath)
             end
         end
     end
@@ -126,6 +126,7 @@ function SaitoHUD.OpenSoundBrowser()
         timer.Simple(0.1, function()
             surface.PlaySound(path)
         end)
+        line:SetValue(2, string.format("%.2f", SoundDuration(path)))
     end
     
     sounds.OnRowRightClick = function(lst, index, line)
