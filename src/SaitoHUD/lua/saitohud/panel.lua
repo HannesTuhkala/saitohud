@@ -178,6 +178,19 @@ local function HelpPanel(panel)
     end
 end
 
+--- Creates the tools panel.
+-- @param panel
+local function ToolPanel(panel)
+    panel:ClearControls()
+    panel:AddHeader()
+    
+    local button = panel:AddControl("DButton", {})
+    button:SetText("Sound Browser")
+    button.DoClick = function(button)
+        SaitoHUD.OpenSoundBrowser()
+    end
+end
+
 --- Creates the sampling panel.
 -- @param panel
 local function SamplingPanel(panel)
@@ -423,6 +436,7 @@ end
 
 local panels = {
     Help = {"Help", HelpPanel},
+    Tools = {"Tools", ToolPanel},
     Sampling = {"Sampling", SamplingPanel, {SwitchConVar = "sample_draw"}},
     Overlay = {"Overlay", OverlayPanel},
     Filtering = {"Filtering", EntityHighlightingPanel},
