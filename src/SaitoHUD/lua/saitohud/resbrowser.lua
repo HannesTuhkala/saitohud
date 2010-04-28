@@ -95,17 +95,17 @@ end
 
 --- Opens the sound browser.
 function SaitoHUD.OpenSoundBrowser()
-    -- if soundBrowserWindow then
-        -- soundBrowserWindow:Center()
-        -- soundBrowserWindow:MakePopup()
-        -- soundBrowserWindow:InvalidateLayout(true, true)
-        -- return
-    -- end
+    if soundBrowserWindow then
+        soundBrowserWindow:SetVisible(true)
+        soundBrowserWindow:MakePopup()
+        soundBrowserWindow:InvalidateLayout(true, true)
+        return
+    end
     
     local frame = vgui.Create("DFrame")
     soundBrowserWindow = frame
     frame:SetTitle("Sound Browser")
-    frame:SetDeleteOnClose(true)
+    frame:SetDeleteOnClose(false)
     frame:SetScreenLock(true)
     frame:SetSize(math.min(600, ScrW() - 20), ScrH() * 4/5)
     frame:SetSizable(true)
@@ -181,7 +181,7 @@ function SaitoHUD.OpenSoundBrowser()
     
     -- Load list button
     local loadListButton = vgui.Create("DButton", frame)
-    loadListButton:SetText("Load List")
+    loadListButton:SetText("Load List..")
     loadListButton:SetWide(80)
     loadListButton.DoClick = function()
         local files = file.Find("saitohud/resource_browser/sounds/*.csv")
