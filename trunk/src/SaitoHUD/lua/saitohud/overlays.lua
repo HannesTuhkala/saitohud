@@ -462,7 +462,7 @@ end
 --- Draw player orientation markers.
 local function PlayerMarkersPaint()
     for _, ply in pairs(player.GetAll()) do
-        local doDraw = true
+        local doDraw = ply ~= LocalPlayer()
         
         if SaitoHUD.ShouldDrawPlayerOverlayHook and not SaitoHUD.ShouldIgnoreHook() then
             if not SaitoHUD.ShouldDrawPlayerOverlayHook(ply) then
