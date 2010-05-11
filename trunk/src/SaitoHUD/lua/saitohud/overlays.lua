@@ -380,7 +380,7 @@ local function PlayerBBoxesPaint()
     local refPos = SaitoHUD.GetRefPos()
     
     for _, ply in pairs(player.GetAll()) do
-        local doDraw = true
+        local doDraw = ply ~= LocalPlayer()
         
         if SaitoHUD.ShouldDrawPlayerOverlayHook and not SaitoHUD.ShouldIgnoreHook() then
             if not SaitoHUD.ShouldDrawPlayerOverlayHook(ply) then
@@ -395,21 +395,28 @@ local function PlayerBBoxesPaint()
             local obbMax = ply:OBBMaxs()
             
             local p = {
-                ply:LocalToWorld(Vector(obbMin.x, obbMin.y, obbMin.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMin.x, obbMax.y, obbMin.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMax.x, obbMax.y, obbMin.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMax.x, obbMin.y, obbMin.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMin.x, obbMin.y, obbMax.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMin.x, obbMax.y, obbMax.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMax.x, obbMax.y, obbMax.z)):ToScreen(),
-                ply:LocalToWorld(Vector(obbMax.x, obbMin.y, obbMax.z)):ToScreen(),
+                Vector(obbMin.x, obbMin.y, obbMin.z),
+                Vector(obbMin.x, obbMax.y, obbMin.z),
+                Vector(obbMax.x, obbMax.y, obbMin.z),
+                Vector(obbMax.x, obbMin.y, obbMin.z),
+                Vector(obbMin.x, obbMin.y, obbMax.z),
+                Vector(obbMin.x, obbMax.y, obbMax.z),
+                Vector(obbMax.x, obbMax.y, obbMax.z),
+                Vector(obbMax.x, obbMin.y, obbMax.z),
             }
             
-            local front = ply:LocalToWorld(Vector(0, 0, 40)):ToScreen()
-            local front2 = ply:LocalToWorld(Vector(50, 0, 40)):ToScreen()
+            local front = Vector(0, 0, 40)
+            front:Rotate(Angle(0, ply:EyeAngles().y, 0))
+            front = ply:LocalToWorld(front):ToScreen()
+            local front2 = Vector(50, 0, 40)
+            front2:Rotate(Angle(0, ply:EyeAngles().y, 0))
+            front2 = ply:LocalToWorld(front2):ToScreen()
             
             local visible = true
             for i = 1, 8 do
+                p[i]:Rotate(Angle(0, ply:EyeAngles().y, 0))
+                p[i] = ply:LocalToWorld(p[i])
+                p[i] = p[i]:ToScreen()
                 if not p[i].visible then
                     visible = false
                     break
@@ -470,13 +477,16 @@ local function PlayerMarkersPaint()
             local obbMax = ply:OBBMaxs()
             
             local p = {
-                ply:LocalToWorld(Vector(0, 10, 0)):ToScreen(),
-                ply:LocalToWorld(Vector(0, -10, 0)):ToScreen(),
-                ply:LocalToWorld(Vector(10, 0, 0)):ToScreen(),
+                Vector(0, 10, 0),
+                Vector(0, -10, 0),
+                Vector(10, 0, 0),
             }
             
             local visible = true
             for i = 1, 3 do
+                p[i]:Rotate(Angle(0, ply:EyeAngles().y, 0))
+                p[i] = ply:LocalToWorld(p[i])
+                p[i] = p[i]:ToScreen()
                 if not p[i].visible then
                     visible = false
                     break
