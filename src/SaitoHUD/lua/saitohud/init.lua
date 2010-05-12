@@ -68,6 +68,7 @@ Load("sandbox")
 Load("cinematography")
 Load("survey")
 Load("resbrowser")
+Load("concmd")
 Load("panel")
 
 Msg("Loading additional modules...\n")
