@@ -140,7 +140,7 @@ end
 
 --- Dumps the entity information printout to console.
 function SaitoHUD.DumpEntityInfo()
-    local lines = SaitoHUD.GetEntityInfoLines()
+    local lines = SaitoHUD.GetEntityInfoLines(true, true)
     
     if table.Count(lines) > 0 then
         for _, s in pairs(lines) do
