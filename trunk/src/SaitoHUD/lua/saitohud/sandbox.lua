@@ -24,7 +24,7 @@ local menu = {}
 --- Loads the sandbox menu from file.
 -- A default one will be used if the file does not exist.
 function SaitoHUD.LoadSandboxMenu()
-    local data = file.Read("saitohud/sandbox/menu.csv")
+    local data = file.Read("saitohud/sandbox/menu.txt")
     
     if data ~= nil and data ~= "" then
         data = SaitoHUD.ParseCSV(data)
