@@ -51,7 +51,7 @@ local Rehook = function() end
 local function LoadFriends()
     friendIDs = {}
     
-    local data = file.Read("saitohud/friends.csv")
+    local data = file.Read("saitohud/friends.txt")
     
     if data ~= nil and data ~= "" then
         data = SaitoHUD.ParseCSV(data)

@@ -184,7 +184,7 @@ function SaitoHUD.OpenSoundBrowser()
     loadListButton:SetText("Load List..")
     loadListButton:SetWide(80)
     loadListButton.DoClick = function()
-        local files = file.Find("saitohud/resource_browser/sounds/*.csv")
+        local files = file.Find("saitohud/resource_browser/sounds/*.txt")
         
         local menu = DermaMenu()
         
@@ -231,4 +231,4 @@ end
 
 concommand.Add("sound_browser", function() SaitoHUD.OpenSoundBrowser() end)
 
-LoadSounds("source.csv")
+LoadSounds("source.txt")

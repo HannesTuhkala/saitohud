@@ -24,7 +24,7 @@ local quickFilters = {}
 
 --- Loads the quick filters from file.
 local function LoadQuickFilters()
-    local data = SaitoHUD.ParseCSV(file.Read("saitohud/quick_filters.csv"))
+    local data = SaitoHUD.ParseCSV(file.Read("saitohud/quick_filters.txt"))
     
     if #data > 0 then
         -- Remove the header
