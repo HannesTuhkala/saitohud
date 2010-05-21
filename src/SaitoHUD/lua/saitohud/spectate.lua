@@ -97,9 +97,15 @@ end
 --- HUDPaint function.
 local function HUDPaint()
     if spectateNotice:GetBool() then
-        draw.SimpleText("Free Spectating", "Trebuchet22", ScrW() / 2 + 1, ScrH() * .8 + 1,
+        local text = "Free Spectating"
+        
+        if not spectateLock:GetBool() then
+            text = "(UNLOCKED) Free Spectating"
+        end
+        
+        draw.SimpleText(text, "Trebuchet22", ScrW() / 2 + 1, ScrH() * .8 + 1,
                         Color(0, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-        draw.SimpleText("Free Spectating", "Trebuchet22", ScrW() / 2, ScrH() * .8,
+        draw.SimpleText(text, "Trebuchet22", ScrW() / 2, ScrH() * .8,
                         Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 end
