@@ -22,6 +22,7 @@
 local soundFolders = {}
 local soundList = {}
 local soundBrowserWindow
+local loaded = false
 
 --- Loads the sounds from file.
 local function LoadSounds(f)
@@ -100,6 +101,11 @@ function SaitoHUD.OpenSoundBrowser()
         soundBrowserWindow:MakePopup()
         soundBrowserWindow:InvalidateLayout(true, true)
         return
+    end
+    
+    if not loaded then
+        LoadSounds("source.txt")
+        loaded = true
     end
     
     local frame = vgui.Create("DFrame")
@@ -230,5 +236,3 @@ function SaitoHUD.OpenSoundBrowser()
 end
 
 concommand.Add("sound_browser", function() SaitoHUD.OpenSoundBrowser() end)
-
-LoadSounds("source.txt")
