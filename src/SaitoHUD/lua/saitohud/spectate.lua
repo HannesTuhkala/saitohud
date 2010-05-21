@@ -191,10 +191,4 @@ local function OverrideTraceFunctions()
 end
 
 concommand.Add("toggle_spectate", ToggleSpectate)
-hook.Remove("PlayerBindPress", "SaitoHUD.Spectate")
-hook.Remove("CreateMove", "SaitoHUD.Spectate")
-hook.Remove("CalcView", "SaitoHUD.Spectate")
-hook.Remove("Think", "SaitoHUD.Spectate")
-hook.Remove("ShouldDrawLocalPlayer", "SaitoHUD.Spectate")
-hook.Remove("HUDPaint", "SaitoHUD.Spectate")
 OverrideTraceFunctions()

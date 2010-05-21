@@ -44,10 +44,21 @@ local function LoadList(str)
     end
 end
 
+local function RemoveExistingHooks()
+    for name, list in pairs(hook.GetTable()) do
+        for k, f in pairs(list) do
+            if k:match("^SaitoHUD") then
+                list[k] = nil
+            end
+        end
+    end
+end
+
 Msg("====== Loading SaitoHUD ======\n")
 
 if reloading then
     Msg("Reloading detected!\n")
+    RemoveExistingHooks()
 end
 
 Msg("Loading early modules...\n")
