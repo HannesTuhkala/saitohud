@@ -78,18 +78,14 @@ Msg("Loading built-in modules...\n")
 Load("filters") -- Entity filtering engine
 Load("lib")
 Load("core")
-Load("drawing")
-Load("light")
+Load("util")
 Load("listgest")
 Load("overlays") -- Entity overlay information
 Load("sampling") -- Entity path tracking
-Load("aimtrace")
 Load("stranded")
 Load("sandbox")
-Load("cinematography")
 Load("survey")
 Load("resbrowser")
-Load("concmd")
 Load("spectate")
 Load("panel")
 
