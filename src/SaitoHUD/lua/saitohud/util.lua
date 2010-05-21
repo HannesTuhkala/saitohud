@@ -15,11 +15,93 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: cinematography.lua 63 2010-04-20 20:24:37Z the.sk89q $
 
--- This module handles the drawing of the aim traces.
+-- This module has some minor features.
 
 local traceAims = CreateClientConVar("trace_aims", "0", true, false)
+local selfLight = CreateClientConVar("super_flashlight_self", "0", true, false)
+
+local lightEnabled = false
+local hideHUD = false
+local toggledCommands = {}
+
+--- Renders the dynamic light for the super flashlight.
+local function RenderFlashlight()
+    local light = DynamicLight(123120000)
+    
+    if light and not selfLight:GetBool() then 
+        light.Pos = LocalPlayer():GetEyeTrace().HitPos
+        light.r = 255
+        light.g = 255 
+        light.b = 255
+        light.Brightness = 1
+        light.Size = 2000
+        light.Decay = 0 
+        light.DieTime = CurTime() + 0.3
+    end
+    
+    local light = DynamicLight(123120001) 
+    
+    if light then 
+        light.Pos = LocalPlayer():GetPos()
+        light.r = 255
+        light.g = 255 
+        light.b = 255
+        light.Brightness = 0.01
+        light.Size = 5000
+        light.Decay = 0 
+        light.DieTime = CurTime() + 0.3
+    end 
+end  
+
+--- Toggles the flash light.
+local function ToggleFlashLight()
+    lightEnabled = not lightEnabled
+    
+    surface.PlaySound("items/flashlight1.wav")
+    
+    if lightEnabled and not SaitoHUD.AntiUnfairTriggered() then
+        LocalPlayer():ChatPrint("Light Enabled")
+        hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
+    else
+        SaitoHUD.RemoveHook("Think", "SaitoHUD.Super.Flashlight")
+    end
+end
+
+--- Toggles the HUD hiding hook.
+local function ToggleHideHUD(ply, cmd, args)
+    hideHUD = not hideHUD
+    
+    if hideHUD then
+        hook.Add("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD", function() return false end)
+    else
+        SaitoHUD.RemoveHook("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
+    end
+end
+
+--- Console command toggle a concommand.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ToggleConCmd(ply, cmd, args)
+    if #args ~= 1 then
+        Msg("Invalid number of arguments\n")
+        return
+    end
+    
+    local cmd = args[1]
+    
+    if toggledCommands[cmd] then
+        RunConsoleCommand("-" .. cmd)
+        toggledCommands[cmd] = nil
+        chat.AddText(Color(255, 0, 0), "-" .. cmd)
+    else
+        RunConsoleCommand("+" .. cmd)
+        toggledCommands[cmd] = true
+        chat.AddText(Color(0, 255, 0), "+" .. cmd)
+    end
+end
 
 --- Actually draws the trace aim lines and endpoint boxes.
 local function DrawTraceAimsHelper()
@@ -80,5 +162,9 @@ local function DrawTraceAims()
         cam.End3D()
     end
 end
+
+concommand.Add("super_flashlight", ToggleFlashLight)
+concommand.Add("toggle_concmd", ToggleConCmd)
+concommand.Add("toggle_hud", ToggleHideHUD)
 
 hook.Add("RenderScreenspaceEffects", "SaitoHUD.AimTrace", DrawTraceAims)
