@@ -69,6 +69,7 @@ Load("cinematography")
 Load("survey")
 Load("resbrowser")
 Load("concmd")
+Load("spectate")
 Load("panel")
 
 Msg("Loading additional modules...\n")

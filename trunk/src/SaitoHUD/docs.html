@@ -102,6 +102,7 @@ pre, code {
     </li>
     <li><a href="#sampling">Sampling</a></li>
     <li><a href="#surveying">Surveying</a></li>
+    <li><a href="#spectating">Spectating</a></li>
     <li><a href="#stranded">Stranded Game Mode</a></li>
     <li><a href="#sandbox">Sandbox Game Mode</a>
       <ol>
@@ -614,6 +615,53 @@ pre, code {
     <td>measure_remove_last</td>
     <td nowrap="nowrap">void</td>
     <td>Remove the last point.</td>
+  </tr>
+</table>
+<h2><a id="spectating">Spectating</a></h2>
+<p>You can free spectate around the map.</p>
+<h3>Cvars</h3>
+<table border="0" cellspacing="0" cellpadding="0">
+  <col width="1%" />
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Type</th>
+    <th scope="col">Default</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>free_spectate_lock<span class="cheat-deterrent"></span></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Locks player movement and turning while free spectating. Turn this off if you want your player to face the point that you are looking at from free spectate mode.</td>
+  </tr>
+  <tr>
+    <td>free_spectate_rate<span class="cheat-deterrent"></span></td>
+    <td>float</td>
+    <td>1000</td>
+    <td>Rate at which camera moves.</td>
+  </tr>
+  <tr>
+    <td>free_spectate_notice<span class="cheat-deterrent"></span></td>
+    <td>bool</td>
+    <td>1</td>
+    <td>Show a notice when you are free spectating.</td>
+  </tr>
+</table>
+<h3>Commands</h3>
+<table border="0" cellpadding="0" cellspacing="0">
+  <col width="1%" />
+  <col width="1%" />
+  <tr>
+    <th scope="col">Cvar</th>
+    <th scope="col">Arguments</th>
+    <th scope="col">Description</th>
+  </tr>
+  <tr>
+    <td>toggle_spectate</td>
+    <td nowrap="nowrap">void</td>
+    <td>Toggle free spectate.</td>
   </tr>
 </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>

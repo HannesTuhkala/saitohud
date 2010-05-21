@@ -434,6 +434,30 @@ local function MeasuringPanel(panel)
     end)
 end
 
+--- Creates the sampling panel.
+-- @param panel
+local function SpectatingPanel(panel)
+    panel:ClearControls()
+    panel:AddHeader()
+    
+    if SaitoHUD.AntiUnfairTriggered() then
+        panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
+    end
+    
+    AddButton(panel, "Toggle Free Spectate", "toggle_spectate", true)
+    
+    AddToggle(panel, "Show Spectating Notice", "free_spectate_notice", true)
+    AddToggle(panel, "Lock Player", "free_spectate_lock", false)
+    
+    panel:AddControl("Slider", {
+        Label = "Movement Rate:",
+        Command = "free_spectate_rate",
+        Type = "integer",
+        min = "1",
+        max = "10000"
+    })
+end
+
 local panels = {
     Help = {"Help", HelpPanel},
     Tools = {"Tools", ToolPanel},
@@ -442,6 +466,7 @@ local panels = {
     Filtering = {"Filtering", EntityHighlightingPanel},
     Surveying = {"Surveying", SurveyPanel},
     Measuring = {"Measuring", MeasuringPanel},
+    Spectating = {"Spectating", SpectatingPanel},
 }
 
 --- PopulateToolMenu hook.
