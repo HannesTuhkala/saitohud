@@ -456,6 +456,13 @@ local function SpectatingPanel(panel)
         min = "1",
         max = "10000"
     })
+    panel:AddControl("Slider", {
+        Label = "Slow Factor:",
+        Command = "free_spectate_slow_factor",
+        Type = "float",
+        min = "1",
+        max = "100"
+    })
 end
 
 local panels = {

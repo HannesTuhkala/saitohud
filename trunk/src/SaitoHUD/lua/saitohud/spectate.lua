@@ -21,6 +21,7 @@
 
 local spectateLock = CreateClientConVar("free_spectate_lock", "1", true, false)
 local spectateRate = CreateClientConVar("free_spectate_rate", "1000", true, false)
+local spectateSlowFactor = CreateClientConVar("free_spectate_slow_factor", "4", true, false)
 local spectateNotice = CreateClientConVar("free_spectate_notice", "1", true, false)
 
 local viewPos = Vector()
@@ -83,7 +84,7 @@ end
 --- Spectate think function.
 local function Think()
     local rate = keyPressed["+speed"] and spectateRate:GetFloat() * 2 or spectateRate:GetFloat()
-    if keyPressed["+walk"] then rate = rate / 4 end
+    if keyPressed["+walk"] then rate = rate / spectateSlowFactor:GetFloat() end
     
     if keyPressed["+forward"] then viewPos = viewPos + viewAng:Forward() * rate * RealFrameTime() end
     if keyPressed["+back"] then viewPos = viewPos - viewAng:Forward() * rate * RealFrameTime() end
