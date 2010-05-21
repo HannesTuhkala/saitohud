@@ -618,7 +618,7 @@ pre, code {
   </tr>
 </table>
 <h2><a id="spectating">Spectating</a></h2>
-<p>You can free spectate around the map.</p>
+<p>Free spectate mode allows you to move a free floating camera around the map to be able to see outside your player. Be aware that only entities within your vincinity will be visible because the server will only send entities that you should be able to see (in your potentially-visible set).</p>
 <h3>Cvars</h3>
 <table border="0" cellspacing="0" cellpadding="0">
   <col width="1%" />
@@ -648,6 +648,12 @@ pre, code {
     <td>1</td>
     <td>Show a notice when you are free spectating.</td>
   </tr>
+  <tr>
+    <td>free_spectate_slow_factor<span class="cheat-deterrent"></span></td>
+    <td>float</td>
+    <td>4</td>
+    <td>Factor by which to reduce the camera movement rate when the walk key is pressed.</td>
+  </tr>
 </table>
 <h3>Commands</h3>
 <table border="0" cellpadding="0" cellspacing="0">
@@ -659,9 +665,14 @@ pre, code {
     <th scope="col">Description</th>
   </tr>
   <tr>
-    <td>toggle_spectate</td>
+    <td>toggle_spectate<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">void</td>
     <td>Toggle free spectate.</td>
+  </tr>
+  <tr>
+    <td>free_spectate<span class="cheat-deterrent">*</span></td>
+    <td nowrap="nowrap">void</td>
+    <td>Alias of toggle_spectate.</td>
   </tr>
 </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>
@@ -748,8 +759,14 @@ Improved Wire Tool,tool_wire_improved</pre>
     <tr>
       <td>saitohud_modules_pre</td>
       <td>string</td>
-      <td>&quot;</td>
+      <td>&quot;&quot;</td>
       <td>List of additional modules to load before all other modules, separated by commas.</td>
+    </tr>
+    <tr>
+      <td>saitohud_profile</td>
+      <td>bool</td>
+      <td>0</td>
+      <td>Display how long it takes each module to load.</td>
     </tr>
   </table>
   <h3>Commands</h3>
@@ -765,6 +782,11 @@ Improved Wire Tool,tool_wire_improved</pre>
       <td>toggle_hud</td>
       <td>void</td>
       <td>Toggles the display of the HUD.</td>
+    </tr>
+    <tr>
+      <td>toggle_concmd</td>
+      <td>string cmd</td>
+      <td>Ttoggle a command on and off (i.e. attack). Don't put + or - when giving the command name.</td>
     </tr>
     <tr>
       <td>super_flashlight<span class="cheat-deterrent">*</span></td>

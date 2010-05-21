@@ -444,7 +444,7 @@ local function SpectatingPanel(panel)
         panel:AddControl("Label", {Text = "WARNING: A non-sandbox game mode has been detected and the following options do not take effect."})
     end
     
-    AddButton(panel, "Toggle Free Spectate", "toggle_spectate", true)
+    AddButton(panel, "Toggle Free Spectate", "free_spectate", true)
     
     AddToggle(panel, "Show Spectating Notice", "free_spectate_notice", true)
     AddToggle(panel, "Lock Player", "free_spectate_lock", false)

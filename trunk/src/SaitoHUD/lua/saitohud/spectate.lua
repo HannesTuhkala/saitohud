@@ -196,5 +196,6 @@ local function OverrideTraceFunctions()
     end
 end
 
+concommand.Add("free_spectate", ToggleSpectate)
 concommand.Add("toggle_spectate", ToggleSpectate)
 OverrideTraceFunctions()
