@@ -25,13 +25,19 @@ end
 SaitoHUD = {}
 SaitoHUD.Reloading = reloading
 
-local additionalModules = CreateClientConVar("saitohud_modules", "", true, false)
-local earlyAdditionalModules = CreateClientConVar("saitohud_modules_pre", "", true, false)
+local postModules = CreateClientConVar("saitohud_modules", "", true, false):GetString()
+local preModules = CreateClientConVar("saitohud_modules_pre", "", true, false):GetString()
+local profile = CreateClientConVar("saitohud_profile", "0", true, false):GetBool()
 
 local function Load(module)
     path = "saitohud/" .. module .. ".lua"
-    Msg("Loading: " .. path .. "...\n")
+    MsgN("Loading: " .. path .. "...")
+    local start = SysTime()
     include(path)
+    if profile then
+        local t = SysTime() - start
+        print(string.format(" >>> %.3fms", t * 1000))
+    end
 end
 
 local function LoadList(str)
@@ -61,8 +67,12 @@ if reloading then
     RemoveExistingHooks()
 end
 
-Msg("Loading early modules...\n")
-LoadList(earlyAdditionalModules:GetString())
+local start = SysTime()
+
+if preModules ~= "" then
+    Msg("Loading early modules...\n")
+    LoadList(preModules)
+end
 
 Msg("Loading built-in modules...\n")
 Load("filters") -- Entity filtering engine
@@ -83,7 +93,14 @@ Load("concmd")
 Load("spectate")
 Load("panel")
 
-Msg("Loading additional modules...\n")
-LoadList(additionalModules:GetString())
+if postModules ~= "" then
+    MsgN("Loading additional modules...\n")
+    LoadList(postModules)
+end
+
+if profile then
+    local t = SysTime() - start
+    print(string.format("TOTAL: %.3fms", t * 1000))
+end
 
 Msg("==============================\n")
