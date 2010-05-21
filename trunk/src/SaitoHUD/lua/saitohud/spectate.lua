@@ -27,7 +27,7 @@ local viewPos = Vector()
 local viewAng = Angle()
 local spectating = false
 local origViewAngle = Angle()
-local listenPresses = {"+forward", "+back", "+moveleft", "+moveright", "+jump", "+speed", "+duck"}
+local listenPresses = {"+forward", "+back", "+moveleft", "+moveright", "+jump", "+speed", "+duck", "+walk"}
 local keyPressed = {}
 local lastTrace = nil
 local lastTraceTime = 0
@@ -83,6 +83,7 @@ end
 --- Spectate think function.
 local function Think()
     local rate = keyPressed["+speed"] and spectateRate:GetFloat() * 2 or spectateRate:GetFloat()
+    if keyPressed["+walk"] then rate = rate / 4 end
     
     if keyPressed["+forward"] then viewPos = viewPos + viewAng:Forward() * rate * RealFrameTime() end
     if keyPressed["+back"] then viewPos = viewPos - viewAng:Forward() * rate * RealFrameTime() end
