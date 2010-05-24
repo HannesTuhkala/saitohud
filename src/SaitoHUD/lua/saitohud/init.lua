@@ -87,6 +87,7 @@ Load("sandbox")
 Load("survey")
 Load("resbrowser")
 Load("spectate")
+Load("wire")
 Load("panel")
 
 if postModules ~= "" then
