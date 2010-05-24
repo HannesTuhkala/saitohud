@@ -189,6 +189,12 @@ local function ToolPanel(panel)
     button.DoClick = function(button)
         SaitoHUD.OpenSoundBrowser()
     end
+    
+    local button = panel:AddControl("DButton", {})
+    button:SetText("Expression 2 Extensions")
+    button.DoClick = function(button)
+        SaitoHUD.OpenE2Extensions()
+    end
 end
 
 --- Creates the sampling panel.
