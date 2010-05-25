@@ -101,6 +101,7 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
                 "Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
                 "Model: " .. tostring(tr.Entity:GetModel()),
                 "Material: " .. tostring(tr.Entity:GetMaterial()),
+                "Skin: " .. tostring(tr.Entity:GetSkin()),
                 "Velocity: " .. tostring(tr.Entity:GetVelocity()),
                 "Speed: " .. tostring(tr.Entity:GetVelocity():Length()),
                 "Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
