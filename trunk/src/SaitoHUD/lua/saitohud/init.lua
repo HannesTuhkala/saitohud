@@ -88,6 +88,7 @@ Load("survey")
 Load("resbrowser")
 Load("spectate")
 Load("wire")
+Load("umsg")
 Load("panel")
 
 if postModules ~= "" then
