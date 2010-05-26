@@ -184,6 +184,11 @@ local function ToolPanel(panel)
     panel:ClearControls()
     panel:AddHeader()
     
+    AddToggle(panel, "Umsg Debugging Overlay", "umsg_debug", false)
+    AddToggle(panel, "Peek Into wire_umsg", "umsg_debug_peek", false)
+    
+    panel:AddControl("Label", {Text = "WARNING: Peeking into wire_umsg will cause the messages to be dropped."})
+    
     local button = panel:AddControl("DButton", {})
     button:SetText("Sound Browser")
     button.DoClick = function(button)

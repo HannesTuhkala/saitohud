@@ -103,6 +103,7 @@ pre, code {
     <li><a href="#sampling">Sampling</a></li>
     <li><a href="#surveying">Surveying</a></li>
     <li><a href="#spectating">Spectating</a></li>
+    <li><a href="#debug">Debugging</a>
     <li><a href="#stranded">Stranded Game Mode</a></li>
     <li><a href="#sandbox">Sandbox Game Mode</a>
       <ol>
@@ -675,6 +676,31 @@ pre, code {
     <td>Alias of toggle_spectate.</td>
   </tr>
 </table>
+<h2><a id="debug">Debugging</a></h2>
+<h3>Cvars</h3>
+  <table border="0" cellspacing="0" cellpadding="0">
+    <col width="1%" />
+    <col width="1%" />
+    <col width="1%" />
+    <tr>
+      <th scope="col">Cvar</th>
+      <th scope="col">Type</th>
+      <th scope="col">Default</th>
+      <th scope="col">Description</th>
+    </tr>
+    <tr>
+      <td>umsg_debug</td>
+      <td>bool</td>
+      <td>0</td>
+      <td>Display a listing of umsgs on the HUD.</td>
+    </tr>
+    <tr>
+      <td>umsg_debug_peek</td>
+      <td>bool</td>
+      <td>0</td>
+      <td>Peeks into wire_umsg umsgs to display their targeted entity. The umsg will not get correctly passed on to the respective Wire component if this setting is enabled.</td>
+    </tr>
+  </table>
 <h2><a id="stranded">Stranded Game Mode</a></h2>
 <p>SaitoHUD has the following functions for the <em>Stranded</em> game mode:</p>
 <ul>
