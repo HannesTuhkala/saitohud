@@ -48,6 +48,11 @@ local function LoadSounds(f)
             end
         end
     end
+    
+    if soundBrowserWindow and soundBrowserWindow:IsValid() then
+        soundBrowserWindow:Remove()
+        soundBrowserWindow = nil
+    end
 end
 
 --- Adds nodes for folders to a tree.
@@ -196,9 +201,9 @@ function SaitoHUD.OpenSoundBrowser()
         
         for _, file in pairs(files) do
             menu:AddOption(file, function()
+                soundBrowserWindow:Close()
                 LoadSounds(file)
                 -- Very ugly
-                soundBrowserWindow:Close()
                 SaitoHUD.OpenSoundBrowser()
             end)
         end
