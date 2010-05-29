@@ -60,6 +60,25 @@ local function OrthoTraceClear(ply, cmd, args)
     Rehook()
 end
 
+local function CalculateReflectionAnalysis(startPos, endPos, numReflects, ent)
+    local lines = {}
+    
+    local vec = endPos - startPos
+    local tr = util.QuickTrace(startPos, endPos, filter)
+    table.insert(lines, {tr.StartPos, tr.HitPos})
+    
+    for i = 1, numReflects do
+        local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
+        local lastPoint = tr.HitPos
+        local filter = ent and {ent, LocalPlayer()} or LocalPlayer()
+        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 100000, filter)
+        vec = tr.HitPos - tr.StartPos
+        table.insert(lines, {lastPoint, tr.HitPos})
+    end
+    
+    return lines
+end
+
 --- Console commands to do reflection analysis.
 -- @param ply Player
 -- @param cmd Command
@@ -75,28 +94,52 @@ local function ReflectAnalysis(ply, cmd, args)
         return
     end
     
-    if not reflectTraceMultiple:GetBool() then
-        -- if #reflectionLines > 0 then
-            -- LocalPlayer():ChatPrint("Note: Multiple reflection analyses is disabled")
-        -- end
-        reflectionLines = {}
-    end
-    
-    local lines = {}
+    if not reflectTraceMultiple:GetBool() then reflectionLines = {} end
     
     local tr = SaitoHUD.GetRefTrace()
-    local vec = tr.HitPos - tr.StartPos
-    table.insert(lines, {tr.StartPos, tr.HitPos})
     
-    for i = 1, numReflects do
-        local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
-        local lastPoint = tr.HitPos
-        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 100000, LocalPlayer())
-        vec = tr.HitPos - tr.StartPos
-        table.insert(lines, {lastPoint, tr.HitPos})
+    table.insert(reflectionLines, {
+        Lines = CalculateReflectionAnalysis(tr.StartPos, tr.HitPos, numReflects)
+    })
+    
+    Rehook()
+end
+
+--- Console commands to do reflection analysis from an entity.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ReflectAnalysisEntity(ply, cmd, args)
+    local numReflects = tonumber(args[1])
+    local ang = SaitoHUD.ParseConcmdAngle(args, 1)
+    
+    if #args < 2 or #args > 4 then
+        Msg("Invalid number of arguments\n")
+        return
+    elseif numReflects < 2 then
+        Msg("Minimum number of reflections: 1\n")
+        return
     end
     
-    table.insert(reflectionLines, lines)
+    local tr = SaitoHUD.GetRefTrace()
+    
+    if ValidEntity(tr.Entity) then
+        if not reflectTraceMultiple:GetBool() then reflectionLines = {} end
+        
+        worldAng = tr.Entity:LocalToWorldAngles(ang)
+        
+        table.insert(reflectionLines, {
+            Lines = CalculateReflectionAnalysis(tr.Entity:GetPos(),
+                                                ang:Forward() * 10000 + tr.Entity:GetPos(),
+                                                numReflects, tr.Entity),
+            Entity = tr.Entity,
+            Live = cmd == "reflect_trace_ent_live",
+            Ang = ang,
+            NumReflects = numReflects
+        })
+    else
+        LocalPlayer():ChatPrint("Nothing was found in an eye trace!")
+    end
     
     Rehook()
 end
@@ -513,7 +556,8 @@ local function DoDrawSurveyScreenspace()
     end
     
     surface.SetDrawColor(255, 255, 0, 255)
-    for _, lines in pairs(reflectionLines) do
+    for _, data in pairs(reflectionLines) do
+        local lines = data.Lines
         for k, v in pairs(lines) do
             if reflectTraceColorProgression:GetBool() then
                 surface.SetDrawColor(255 * k / #lines, 255 * (1 - k / #lines),
@@ -569,7 +613,17 @@ local function DrawReflectAnalysisText()
     
     surface.SetDrawColor(255, 255, 0, 255)
     
-    for _, lines in pairs(reflectionLines) do
+    for _, data in pairs(reflectionLines) do
+        if data.Live and ValidEntity(data.Entity) then
+            worldAng = data.Entity:LocalToWorldAngles(data.Ang)
+            
+            data.Lines = CalculateReflectionAnalysis(
+                data.Entity:GetPos(), worldAng:Forward() * 10000 + data.Entity:GetPos(),
+                data.NumReflects, data.Entity)
+        end
+        
+        local lines = data.Lines
+        
         for k, v in pairs(lines) do
             if reflectTraceColorProgression:GetBool() then
                 surface.SetDrawColor(255 * k / #lines, 255 * (1 - k / #lines),
@@ -683,6 +737,8 @@ Rehook()
 concommand.Add("ortho_trace", OrthoTrace)
 concommand.Add("ortho_trace_clear", OrthoTraceClear)
 concommand.Add("reflect_trace", ReflectAnalysis)
+concommand.Add("reflect_trace_ent", ReflectAnalysisEntity)
+concommand.Add("reflect_trace_ent_live", ReflectAnalysisEntity)
 concommand.Add("reflect_trace_clear", ReflectAnalysisClear)
 concommand.Add("measure_add", AddMeasuredPoint)
 concommand.Add("measure_add_ortho", AddOrthoMeasuredPoint)

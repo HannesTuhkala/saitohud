@@ -192,7 +192,7 @@ end
 --- Tries to parse a vector from console command arguments.
 -- @param args Arguments
 -- @param skip Number of initial arguments to ignore
-function SaitoHUD.ParseConcmdVector(args, skip)
+function SaitoHUD.ParseConcmdVector(args, skip, ang)
     if skip == nil then skip = 0 end
     local x, y, z
     
@@ -214,10 +214,17 @@ function SaitoHUD.ParseConcmdVector(args, skip)
     end
     
     if x ~= nil and y ~= nil and z ~= nil then
-        return Vector(x, y, z)
+        return ang and Angle(x, y, z) or Vector(x, y, z)
     else
         return nil
     end
+end
+
+--- Tries to parse an angle from console command arguments.
+-- @param args Arguments
+-- @param skip Number of initial arguments to ignore
+function SaitoHUD.ParseConcmdAngle(args, skip)
+    return SaitoHUD.ParseConcmdVector(args, skip, true)
 end
 
 --- Parses a string into a table, as if it were a console command.
