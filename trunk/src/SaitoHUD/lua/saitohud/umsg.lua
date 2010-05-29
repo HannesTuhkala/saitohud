@@ -20,7 +20,8 @@
 -- This module implements umsg debugging tools.
 
 local doDebug = CreateClientConVar("umsg_debug", "0", true, false)
-local peek = CreateClientConVar("umsg_debug_peek", "0", true, false)
+local peekWire = CreateClientConVar("umsg_debug_peek_wire", "0", true, false)
+local peekTitan = CreateClientConVar("umsg_debug_peek_titan", "1", true, false)
 
 local messages = {}
 local snapshot = {}
@@ -51,22 +52,40 @@ local function StartListening()
     if Hooks then
         local function DoLog(name, msg)
             local logName = name
+            local fakeMsg
             
-            if peek:GetBool() and name == "wire_umsg" then
+            if peekWire:GetBool() and name == "wire_umsg" then
                 local entIndex = msg:ReadShort()
                 local ent = ents.GetByIndex(entIndex)
                 logName = name .. ":" .. (ValidEntity(ent) and tostring(ent) or "?")
-                messages[logName] = messages[logName] and messages[logName] + 1 or 1
                 
                 -- Does not appear to work!
                 msg:Reset()
+            elseif peekTitan:GetBool() and name == "x" then -- Titan
+                local payload = msg:ReadString()
+                local success, decodedData = pcall(glon.decode, payload)
+                
+                fakeMsg = {}
+                fakeMsg.ReadString = function() return payload end
+                
+                if success then
+                    local entIndex = decodedData[1]
+                    local ent = Entity(entIndex)
+                    local value = decodedData[3]
+                    local key = decodedData[2]
+                    
+                    logName = name .. ":" .. (ValidEntity(ent) and tostring(ent) or "?") .. ":" .. key
+                end
             end
             
             messages[logName] = messages[logName] and messages[logName] + 1 or 1
+            
+            if fakeMsg then return fakeMsg end
         end
         
         usermessage.IncomingMessage = function(messageName, msg)
-            pcall(DoLog, messageName, msg)
+            local success, fakeMsg = pcall(DoLog, messageName, msg)
+            if success and fakeMsg then msg = fakeMsg end
             _OldUserMessageIncoming(messageName, msg)
         end
         
