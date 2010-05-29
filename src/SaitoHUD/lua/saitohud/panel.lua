@@ -185,7 +185,8 @@ local function ToolPanel(panel)
     panel:AddHeader()
     
     AddToggle(panel, "Umsg Debugging Overlay", "umsg_debug", false)
-    AddToggle(panel, "Peek Into wire_umsg", "umsg_debug_peek", false)
+    AddToggle(panel, "Peek Into wire_umsg", "umsg_debug_peek_wire", false)
+    AddToggle(panel, "Peek Into x (Titan)", "umsg_debug_peek_titan", false)
     
     panel:AddControl("Label", {Text = "WARNING: Peeking into wire_umsg will cause the messages to be dropped."})
     
