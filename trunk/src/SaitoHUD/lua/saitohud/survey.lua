@@ -63,14 +63,19 @@ end
 local function CalculateReflectionAnalysis(startPos, endPos, numReflects, ent)
     local lines = {}
     
+    local filter = ent and {ent, LocalPlayer()} or LocalPlayer()
     local vec = endPos - startPos
-    local tr = util.QuickTrace(startPos, endPos, filter)
+	local data = {}
+	data.start = startPos
+	data.endpos = endPos
+	data.filter = filter
+	local tr = util.TraceLine(data)
+
     table.insert(lines, {tr.StartPos, tr.HitPos})
     
     for i = 1, numReflects do
         local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
         local lastPoint = tr.HitPos
-        local filter = ent and {ent, LocalPlayer()} or LocalPlayer()
         tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 100000, filter)
         vec = tr.HitPos - tr.StartPos
         table.insert(lines, {lastPoint, tr.HitPos})
