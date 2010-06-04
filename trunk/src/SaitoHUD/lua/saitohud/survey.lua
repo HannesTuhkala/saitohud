@@ -94,7 +94,7 @@ local function ReflectAnalysis(ply, cmd, args)
     if #args ~= 1 then
         Msg("Invalid number of arguments\n")
         return
-    elseif numReflects < 2 then
+    elseif numReflects < 1 then
         Msg("Minimum number of reflections: 1\n")
         return
     end
@@ -121,7 +121,7 @@ local function ReflectAnalysisEntity(ply, cmd, args)
     if #args < 2 or #args > 4 then
         Msg("Invalid number of arguments\n")
         return
-    elseif numReflects < 2 then
+    elseif numReflects < 1 then
         Msg("Minimum number of reflections: 1\n")
         return
     end
@@ -135,7 +135,7 @@ local function ReflectAnalysisEntity(ply, cmd, args)
         
         table.insert(reflectionLines, {
             Lines = CalculateReflectionAnalysis(tr.Entity:GetPos(),
-                                                ang:Forward() * 10000 + tr.Entity:GetPos(),
+                                                ang:Forward() * 100000 + tr.Entity:GetPos(),
                                                 numReflects, tr.Entity),
             Entity = tr.Entity,
             Live = cmd == "reflect_trace_ent_live",
@@ -623,7 +623,7 @@ local function DrawReflectAnalysisText()
             worldAng = data.Entity:LocalToWorldAngles(data.Ang)
             
             data.Lines = CalculateReflectionAnalysis(
-                data.Entity:GetPos(), worldAng:Forward() * 10000 + data.Entity:GetPos(),
+                data.Entity:GetPos(), worldAng:Forward() * 100000 + data.Entity:GetPos(),
                 data.NumReflects, data.Entity)
         end
         
