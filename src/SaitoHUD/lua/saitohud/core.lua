@@ -93,7 +93,8 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
         if showEntityInfo then
             local skin = tr.Entity:GetSkin()
             table.Add(lines,{
-                "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
+                "#" .. tostring(tr.Entity:EntIndex()) .. " [" .. tostring(tr.HitPos:Distance(SaitoHUD.GetRefPos())) .. "]",
+                "Current Pos: " .. tostring(SaitoHUD.GetRefPos()),
                 "Hit Pos: " .. tostring(tr.HitPos),
                 "Class: " .. tostring(tr.Entity:GetClass()),
                 "Position: " .. tostring(tr.Entity:GetPos()),
@@ -101,8 +102,8 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
                 "Angle: " .. tostring(tr.Entity:GetAngles()),
                 "Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
                 "Model: " .. tostring(tr.Entity:GetModel()),
-                "Material: " .. tostring(tr.Entity:GetMaterial()),
-                "Skin: " .. (skin and tostring(skin) or "N/A"),
+                "Material: " .. tostring(tr.Entity:GetMaterial()) .. 
+                    "(skin: " .. (skin and tostring(skin) or "N/A") .. ")",
                 "Velocity: " .. tostring(tr.Entity:GetVelocity()),
                 "Speed: " .. tostring(tr.Entity:GetVelocity():Length()),
                 "Local: " .. tostring(tr.Entity:WorldToLocal(tr.HitPos)),
@@ -132,6 +133,7 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
         if tr.Hit and showEntityInfo then
             lines = {
                 "[" .. tostring(tr.HitPos:Distance(LocalPlayer():GetPos())) .. "]",
+                "Current Pos: " .. tostring(SaitoHUD.GetRefPos()),
                 "Hit Pos: " .. tostring(tr.HitPos),
             }
         end
