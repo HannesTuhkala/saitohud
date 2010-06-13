@@ -18,12 +18,14 @@
 
 --- This file is responsible for a lot of the HUD overlays.
 
+local useSteamFriends = CreateClientConVar("friends_use_steam", "1", true, false)
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
 local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
 local alwaysDrawFriendTags = CreateClientConVar("friend_tags_always", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local simpleNameTags = CreateClientConVar("name_tags_simple", "0", true, false)
 local rainbowFriends = CreateClientConVar("name_tags_rainbow_friends", "0", true, false)
+local friendColor = CreateClientConVar("name_tags_friend_color", "255,255,0", true, false)
 local boldFriends = CreateClientConVar("name_tags_bold_friends", "1", true, false)
 local playerDistances = CreateClientConVar("name_tags_distances", "1", true, false)
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
@@ -38,6 +40,8 @@ local lastOverlayMatch = 0
 local triadsFilter = nil
 local overlayFilter = nil
 local bboxFilter = nil
+local lastFriendColor = ""
+local friendColorObj = Color(255, 255, 0)
 -- These are used to cache the filter results for short periods of time
 local triadsMatches = {}
 local overlayMatches = {}
@@ -47,6 +51,16 @@ local peakSpeeds = {}
 local peakEntityInfo = {}
 
 local Rehook = function() end
+
+local function GetFriendColor()
+    if lastFriendColor ~= friendColor:GetString() then
+        local c = string.Explode(",", friendColor:GetString())
+        friendColorObj = Color(tonumber(c[1]) or 0, tonumber(c[2]) or 0, tonumber(c[3]) or 0)
+        lastFriendColor = friendColor:GetString()
+    end
+    
+    return friendColorObj
+end
 
 local function LoadFriends()
     friendIDs = {}
@@ -191,6 +205,8 @@ local function OverlaysPaint()
                 text = ent:GetClass()
             elseif ot == "model" then
                 text = ent:GetModel()
+            elseif ot == "id" then
+                text = tostring(ent:EntIndex())
             elseif ot == "material" then
                 text = ent:GetMaterial()
             elseif ot == "speed" then
@@ -326,17 +342,21 @@ local function NameTagsPaint()
             local shadowColor = Color(0, 0, 0, 255)
             local bold = false
             
-            if drawNameTags:GetBool() or (alwaysDrawFriendTags:GetBool() and friendIDs[steamID]) then       
+            local isFriend = friendIDs[steamID] or 
+                (useSteamFriends:GetBool() and ply:GetFriendStatus() == "friend")
+            
+            if drawNameTags:GetBool() or (alwaysDrawFriendTags:GetBool() and isFriend) then       
                 if SaitoHUD.NameTagsColorHook and not SaitoHUD.ShouldIgnoreHook() then
                     color, shadowColor = SaitoHUD.NameTagsColorHook(ply)
                 else
-                    if friendIDs[steamID] then
+                    if isFriend then
                         bold = boldFriends:GetBool()
                         
                         if rainbowFriends:GetBool() then
                             color = HSVToColor(math.sin(CurTime() * 360 / 500) * 360, 1, 1)
                         else
-                            color = friendIDs[steamID].color
+                            color = friendIDs[steamID] and friendIDs[steamID].color or
+                                GetFriendColor()
                         end
                     end
                 end
