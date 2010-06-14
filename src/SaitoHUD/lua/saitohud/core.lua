@@ -32,7 +32,8 @@ function SaitoHUD.AntiUnfairTriggered()
     local folder = tostring(GAMEMODE.Folder)
     return __SaitoHUDUnfair == true and 
         string.find(name:lower(), "sandbox") == nil and 
-        string.find(folder:lower(), "sandbox") == nil
+        string.find(folder:lower(), "sandbox") == nil and 
+        string.find(folder:lower(), "spaceage") == nil
 end
 
 --- Returns where hooks are disabled.
