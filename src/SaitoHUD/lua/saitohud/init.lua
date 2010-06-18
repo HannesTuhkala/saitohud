@@ -79,6 +79,7 @@ Load("filters") -- Entity filtering engine
 Load("lib")
 Load("core")
 Load("util")
+Load("friends")
 Load("listgest")
 Load("overlays") -- Entity overlay information
 Load("sampling") -- Entity path tracking
