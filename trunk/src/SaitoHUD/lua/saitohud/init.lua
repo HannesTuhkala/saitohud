@@ -86,6 +86,7 @@ Load("sampling") -- Entity path tracking
 Load("stranded")
 Load("sandbox")
 Load("survey")
+Load("measure")
 Load("resbrowser")
 Load("spectate")
 Load("wire")
