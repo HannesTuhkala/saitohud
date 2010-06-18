@@ -164,6 +164,58 @@ function SaitoHUD.ParseCSV(data)
     return result
 end
 
+--- Write CSV data.
+-- @param data
+-- @return CSV
+function SaitoHUD.WriteCSV(data)
+    local output = ""
+    
+    for _, v in pairs(data) do
+        local line = ""
+        for _, p in pairs(v) do
+            if type(p) == 'boolean' then
+                line = line .. ",\"" .. (p and "true" or "false") .. "\""
+            else
+                line = line .. ",\"" .. tostring(p):gsub("[\"\\]", "\\%1") .. "\""
+            end
+        end
+        
+        output = output .. "\n" .. line:sub(2)
+    end
+    
+    return output:sub(2)
+end
+
+--- Shortcut function to load a CSV file from disk and drop the header row.
+-- If the file doesn't exist or it's blank, an empty table will be returned.
+-- @param path
+-- @param headers List of headers to drop, in order
+-- @return Table with entries
+function SaitoHUD.LoadCSV(path, headers)
+    headers = headers or {}
+    
+    local data = file.Read(path)
+    if data == nil or data == "" then return {} end
+    
+    data = SaitoHUD.ParseCSV(data)
+    if #data == 0 then return {} end
+    
+    -- Remove headers
+    local dropFirstRow = false
+    for k, v in pairs(headers) do
+        if data[1][k] == v then
+            dropFirstRow = true
+        else
+            dropFirstRow = false
+            break
+        end
+    end
+    
+    if dropFirstRow then table.remove(data, 1) end
+    
+    return data
+end
+
 --- Function to autocomplete console commands with player names.
 -- @param cmd
 -- @param args

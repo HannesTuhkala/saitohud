@@ -18,14 +18,12 @@
 
 --- This file is responsible for a lot of the HUD overlays.
 
-local useSteamFriends = CreateClientConVar("friends_use_steam", "1", true, false)
 local drawEntityInfo = CreateClientConVar("entity_info", "1", true, false)
 local showPlayerInfo = CreateClientConVar("entity_info_player", "0", true, false)
 local alwaysDrawFriendTags = CreateClientConVar("friend_tags_always", "0", true, false)
 local drawNameTags = CreateClientConVar("name_tags", "0", true, false)
 local simpleNameTags = CreateClientConVar("name_tags_simple", "0", true, false)
 local rainbowFriends = CreateClientConVar("name_tags_rainbow_friends", "0", true, false)
-local friendColor = CreateClientConVar("name_tags_friend_color", "255,255,0", true, false)
 local boldFriends = CreateClientConVar("name_tags_bold_friends", "1", true, false)
 local playerDistances = CreateClientConVar("name_tags_distances", "1", true, false)
 local playerBoxes = CreateClientConVar("player_boxes", "0", true, false)
@@ -34,14 +32,11 @@ local overlayFilterText = CreateClientConVar("overlay_filter_text", "class", tru
 local overlayFilterPrint = CreateClientConVar("overlay_filter_print_removed", "0", true, false)
 local evaluateOnEveryDraw = CreateClientConVar("overlays_continuous_eval", "0", true, false)
 
-local friendIDs = {}
 local lastTriadsFilter = nil -- Legacy support
 local lastOverlayMatch = 0
 local triadsFilter = nil
 local overlayFilter = nil
 local bboxFilter = nil
-local lastFriendColor = ""
-local friendColorObj = Color(255, 255, 0)
 -- These are used to cache the filter results for short periods of time
 local triadsMatches = {}
 local overlayMatches = {}
@@ -51,40 +46,6 @@ local peakSpeeds = {}
 local peakEntityInfo = {}
 
 local Rehook = function() end
-
-local function GetFriendColor()
-    if lastFriendColor ~= friendColor:GetString() then
-        local c = string.Explode(",", friendColor:GetString())
-        friendColorObj = Color(tonumber(c[1]) or 0, tonumber(c[2]) or 0, tonumber(c[3]) or 0)
-        lastFriendColor = friendColor:GetString()
-    end
-    
-    return friendColorObj
-end
-
-local function LoadFriends()
-    friendIDs = {}
-    
-    local data = file.Read("saitohud/friends.txt")
-    
-    if data ~= nil and data ~= "" then
-        data = SaitoHUD.ParseCSV(data)
-        
-        if #data > 0 then
-            -- Remove the header
-            if data[1][1] == "Nickname" and data[1][2] == "SteamID" then
-                table.remove(data, 1)
-            end
-            
-            for _, v in pairs(data) do
-                local id = "STEAM_" .. v[2]:gsub("(STEAM_)", ""):upper():Trim()
-                friendIDs[id] = {
-                    color = Color(tonumber(v[3]), tonumber(v[4]), tonumber(v[5]), 255),
-                }
-            end
-        end
-    end
-end
 
 --- Draw a triad.
 -- @param p1 Point
@@ -334,7 +295,6 @@ local function NameTagsPaint()
         
         if doDraw then
             local name = ply:GetName()
-            local steamID = ply:SteamID()
             local screenPos = (ply:GetPos() + Vector(0, 0, 50)):ToScreen()
             local distance = math.Round(ply:GetPos():Distance(refPos))
             
@@ -342,8 +302,7 @@ local function NameTagsPaint()
             local shadowColor = Color(0, 0, 0, 255)
             local bold = false
             
-            local isFriend = friendIDs[steamID] or 
-                (useSteamFriends:GetBool() and ply:GetFriendStatus() == "friend")
+            local isFriend = SaitoHUD.IsFriend(ply)
             
             if drawNameTags:GetBool() or (alwaysDrawFriendTags:GetBool() and isFriend) then       
                 if SaitoHUD.NameTagsColorHook and not SaitoHUD.ShouldIgnoreHook() then
@@ -355,8 +314,7 @@ local function NameTagsPaint()
                         if rainbowFriends:GetBool() then
                             color = HSVToColor(math.sin(CurTime() * 360 / 500) * 360, 1, 1)
                         else
-                            color = friendIDs[steamID] and friendIDs[steamID].color or
-                                GetFriendColor()
+                            color = SaitoHUD.GetFriendColor(ply)
                         end
                     end
                 end
@@ -635,5 +593,4 @@ cvars.AddChangeCallback("player_boxes", Rehook)
 cvars.AddChangeCallback("player_markers", Rehook)
 cvars.AddChangeCallback("overlay_filter_text", ClearOverlayCaches)
 
-LoadFriends()
 Rehook()
