@@ -53,26 +53,30 @@ function SaitoHUD.WriteFriends()
 end
 
 --- Add a friend to the friends list.
--- @param ply Player
+-- @param ply Player or Steam ID
 -- @param nickname Nickname
 -- @param color Color
 function SaitoHUD.AddFriend(ply, nickname, color)
-    if not ply then Error("Player object not passed") end
+    if type(ply) == "Player" then
+        ply = ply:SteamID()
+    end
     
     color.a = 255
     
-    friendIDs[ply:SteamID()] = {
+    friendIDs[ply] = {
         Nickname = nickname,
         Color = color,
     }
 end
 
 --- Remove a friend from the friends list.
--- @param ply Player
+-- @param ply Player or Steam ID
 function SaitoHUD.RemoveFriend(ply)
-    if not ply then Error("Player object not passed") end
+    if type(ply) == "Player" then
+        ply = ply:SteamID()
+    end
     
-    friendIDs[ply:SteamID()] = nil
+    friendIDs[ply] = nil
 end
 
 --- Returns whether a user is a friend. This may return true if the player is
