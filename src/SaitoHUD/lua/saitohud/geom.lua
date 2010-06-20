@@ -19,6 +19,8 @@
 
 -- Geometry library.
 
+local subclassVector = CreateClientConVar("geom_subclass_vector", "0", true, false)
+
 local GEOM = {}
 SaitoHUD.GEOM = GEOM
 
@@ -34,28 +36,73 @@ GEOM.Angles = {}
 -- @param updateFunc Function that should return a new Vector or nil
 -- @return Class table (with a __call)
 function GEOM.MakeDynamicVectorType()
-    local v = {
-        _CachedVector = Vector(0, 0, 0),
-        _LastUpdate = 0,
-    }
+    local v = {}
     local mt = {
         __call = function(t, ...)
-            local instance = {}
             local arg = {...}
-            v.Initialize(instance, unpack(arg))
-            setmetatable(instance, v)
-            return instance
-        end,
-        __index = function(t, key)
-            if CurTime() - t._LastUpdate ~= 0 then
-                local v = t:Update()
-                if v then t._CachedVector = v end
+            
+            local instance = {}
+            instance._CachedVector = Vector(0, 0, 0)
+            instance._LastUpdate = 0
+            instance._Update = function(self)
+                if CurTime() - self._LastUpdate ~= 0 then
+                    local vec = v.Update(self)
+                    if vec then self._CachedVector = vec end
+                end
             end
-            return t._CachedVector.__index(t, key)
+            
+            setmetatable(instance, {
+                __index = function(t, key)
+                    t:_Update()
+                    local r = t._CachedVector[key]
+                    if type(r) == 'function' then
+                        return function(self, ...)
+                            local arg = {...}
+                            return self._CachedVector[key](self._CachedVector, unpack(arg))
+                        end
+                    end
+                    return r
+                end
+            })
+            
+            v.Initialize(instance, unpack(arg))
+            return instance
         end
     }
     setmetatable(v, mt)
     return v
+end
+
+--- Overrides the Vector object so that dynamic vectors can work seamlessly.
+local function OverrideVectorForDynamic()
+    if not g_GEOMOrigVector then g_GEOMOrigVector = {} end
+
+    local keys = {
+        'Cross', 'Distance', 'Dot', 'DotProduct', '__add', '__sub', '__mul',
+        '__div', '__mod', '__pow'
+    }
+
+    local vecMt = FindMetaTable("Vector")
+
+    for _, key in pairs(keys) do
+        if not g_GEOMOrigVector[key] then
+            MsgN("Stored " .. key)
+            g_GEOMOrigVector[key] = vecMt[key]
+        end
+        
+        vecMt[key] = function(self, ...)
+            local arg = {...}
+            if type(self) == 'table' and self._CachedVector then
+                self = self._CachedVector
+            end
+            if type(arg[1]) == 'table' and arg[1]._CachedVector then
+                arg[1] = arg[1]._CachedVector
+            end
+            return g_GEOMOrigVector[key](self, unpack(arg))
+        end
+    end
+    
+    MsgN("Vector subclassed for seamless GOEM functionality")
 end
 
 GEOM.EntityRelVector = GEOM.MakeDynamicVectorType()
@@ -113,6 +160,12 @@ function GEOM.GetBuiltInPoint(key)
     end
 end
 
+--- Used to get a built-in line.
+-- @param key Key
+-- @return Line or nil
+function GEOM.GetBuiltInLine(key)
+end
+
 function GEOM.SetPoint(key, v)
     GEOM.Points[key] = v
 end
@@ -141,4 +194,8 @@ function GEOM.PointLineSegmentProjection(pt, line)
     if b < 0 then return line.pt1 end
     if b > 1 then return line.pt2 end
     return line.pt1 + b * (line.pt2 - line.pt1)
+end
+
+if subclassVector:GetBool() then
+    OverrideVectorForDynamic()
 end

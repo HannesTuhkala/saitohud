@@ -35,6 +35,22 @@ local function AddPoint(ply, cmd, args)
     print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
 end
 
+--- Create a live point.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function AddLivePoint(ply, cmd, args)
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "name", NumArgs = 1, },
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT },
+        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY },
+    })
+    if not r then return end
+    
+    GEOM.SetPoint(r.name, GEOM.EntityRelVector(r.vec.x, r.vec.y, r.vec.z, r.ent))
+    print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
+end
+
 --- Create a line.
 -- @param ply Player
 -- @param cmd Command
@@ -150,6 +166,7 @@ local function HUDPaint()
 end
 
 concommand.Add("geom_point", AddPoint)
+concommand.Add("geom_point_live", AddLivePoint)
 concommand.Add("geom_line", AddLine)
 concommand.Add("geom_project_point_segment", ProjectPointSegment)
 

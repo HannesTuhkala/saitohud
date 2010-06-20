@@ -23,18 +23,22 @@ SaitoHUD.MeasurePoints = {}
 SaitoHUD.MeasureLength = 0
 
 local Rehook = nil
+local containsLive = false
 
 --- Recalculate the measured total.
 local function RecalcMeasuredTotal()
     SaitoHUD.MeasureLength = 0
+    containsLive = false
     
     if #SaitoHUD.MeasurePoints > 1 then
         local last = SaitoHUD.MeasurePoints[1]
+        if type(last) == 'table' then containsLive = true end
         
         for i = 2, #SaitoHUD.MeasurePoints do
             local pt = SaitoHUD.MeasurePoints[i]
             SaitoHUD.MeasureLength = SaitoHUD.MeasureLength + pt:Distance(last)
             last = pt
+            if type(last) == 'table' then containsLive = true end
         end
     end
 end
@@ -446,6 +450,7 @@ end
 
 --- Draw survey HUDPaint stuff.
 local function DrawSurvey()
+    if containsLive then RecalcMeasuredTotal() end
     DrawMeasuringLines()
 end
 

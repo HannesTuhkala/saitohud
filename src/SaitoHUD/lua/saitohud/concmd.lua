@@ -38,6 +38,7 @@ end
 
 SaitoHUD.VAR_CONCMD_GEOM_POINT = "VAR_CONCMD_GEOM_POINT"
 SaitoHUD.VAR_CONCMD_GEOM_LINE = "VAR_CONCMD_GEOM_LINE"
+SaitoHUD.VAR_CONCMD_ENTITY = "VAR_CONCMD_ENTITY"
 
 --- Parse a console command's arguments using a variable number of
 -- arguments.
@@ -55,11 +56,13 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
         local type = param.Type
         local wantedNumArgs = param.NumArgs or 1
         local cast = param.Cast
+        local optional = param.Optional
         
         -- Preprocessing
         if type == SaitoHUD.VAR_CONCMD_GEOM_POINT then
             if #args == 0 then
                 if not param.ImplicitTrace then
+                    if optional then return result end
                     print("Insufficient number of arguments")
                     return
                 end
@@ -91,6 +94,7 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
             end
         elseif type == SaitoHUD.VAR_CONCMD_GEOM_LINE then
             if #args == 0 then
+                if optional then return result end
                 print("Insufficient number of arguments")
                 return
             elseif args[1]:sub(1, 1) == "#" then
@@ -104,7 +108,7 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
                 end
             elseif args[1]:sub(1, 1) == "$" then
                 local id = table.remove(args, 1):Trim():sub(2)
-                local segment = SaitoHUD.GEOM.GetBuiltInLineSegment(id)
+                local segment = SaitoHUD.GEOM.GetBuiltInLine(id)
                 
                 if segment then
                     result[name] = segment
@@ -116,6 +120,40 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
                 print("GEOM library: Line segments must specified by name")
                 return
             end
+        elseif type == SaitoHUD.VAR_CONCMD_ENTITY then
+            if #args == 0 then
+                if optional then return result end
+                print("Insufficient number of arguments")
+                return
+            elseif args[1]:sub(1, 1) == "#" then
+                local id = tonumber(table.remove(args, 1):Trim():sub(2))
+                
+                if not id then
+                    print("Entity ID required")
+                    return
+                else
+                    local ent = ents.GetByIndex(id)
+                    if ValidEntity(ent) then
+                        result[name] = ent
+                    else
+                        print(string.format("Unknown entity with ID %d", id))
+                        return
+                    end
+                end
+            elseif args[1]:sub(1, 1) == "$" then
+                local id = table.remove(args, 1):Trim():sub(2)
+                
+                if id == "trace" then
+                    local tr = SaitoHUD.GetRefTrace()
+                    return tr.HitPos
+                else
+                    print(string.format("No built-in entity by name of '%s'", id))
+                    return
+                end
+            else
+                print("Unknown entity argument")
+                return
+            end
         elseif type ~= nil then
             Error("ParseVarConcmd() got an unknown type: " .. type)
         end
@@ -125,6 +163,7 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
             if wantedNumArgs == 1 then
                 -- Not enough arguments?
                 if #args == 0 then
+                    if optional then return result end
                     print("Insufficient number of arguments")
                     return
                 end
@@ -138,6 +177,7 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
                 while wantedNumArgs > #extracted do
                     -- Not enough arguments?
                     if #args == 0 then
+                        if optional then return result end
                         print("Insufficient number of arguments")
                         return
                     end
