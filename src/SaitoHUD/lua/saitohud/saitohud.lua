@@ -173,10 +173,10 @@ function SaitoHUD.OpenHelp()
     
     local contents = ""
     
-    if file.Exists("../addons/SaitoHUD/docs.html") then
-        contents = file.Read("../addons/SaitoHUD/docs.html")
+    if file.Exists("../addons/SaitoHUD/docs.txt") then
+        contents = file.Read("../addons/SaitoHUD/docs.txt")
     else
-        Error("addons/SaitoHUD/docs.html doesn't exist\n")
+        Error("addons/SaitoHUD/docs.txt doesn't exist\n")
     end
     
     local frame = vgui.Create("DFrame")

@@ -870,7 +870,7 @@ Improved Wire Tool,tool_wire_improved</pre>
   </table>
   
   <div id="footer">
-  	<span id="footer-id">$Id$</span>
+  	<span id="footer-id">$Id: docs.html 156 2010-06-18 22:35:16Z the.sk89q $</span>
     &copy; sk89q, BoJaN.
   </div>
 </div>
