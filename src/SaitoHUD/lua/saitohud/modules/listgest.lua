@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: listgest.lua 63 2010-04-20 20:24:37Z the.sk89q $
 
 -- This modules provides list gesturing features.
 

@@ -44,23 +44,12 @@ end
 -- @param cmd Command
 -- @param args Arguments
 local function AddMeasuredPoint(ply, cmd, args)
-    local vec = nil
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+    })
+    if not r then return end
     
-    if #args == 1 or #args == 3 then
-        vec = SaitoHUD.ParseConcmdVector(args)
-    elseif #args ~= 0 then
-        Msg("Invalid number of arguments\n")
-        return
-    else
-        local tr = SaitoHUD.GetRefTrace()
-        vec = tr.HitPos
-    end
-    
-    if vec == nil then
-        Msg("Invalid arguments\n")
-        return
-    end
-    
+    local vec = r.vec
     local last = SaitoHUD.MeasurePoints[#SaitoHUD.MeasurePoints]
     
     table.insert(SaitoHUD.MeasurePoints, vec)
@@ -72,7 +61,6 @@ local function AddMeasuredPoint(ply, cmd, args)
                             last:Distance(vec)))
         print(string.format("Total distance: %f", SaitoHUD.MeasureLength))
     end
-    
     
     SaitoHUD.UpdateMeasuringPanel()
     Rehook()
@@ -144,37 +132,20 @@ end
 -- @param cmd Command
 -- @param args Arguments
 local function InsertMeasuredPoint(ply, cmd, args)
-    local vec = nil
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "index" },
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+    })
+    if not r then return end
     
-    if #args == 2 or #args == 4 then
-        vec = SaitoHUD.ParseConcmdVector(args, 1)
-    elseif #args ~= 1 then
-        Msg("Invalid number of arguments\n")
-        return
-    else
-        local tr = SaitoHUD.GetRefTrace()
-        vec = tr.HitPos
-    end
-    
-    if vec == nil then
-        Msg("Invalid arguments\n")
-        return
-    end
-    
-    local index = tonumber(args[1])
-    
-    if not index then
-        Msg("Invalid index\n")
-    end
-    
-    index = math.floor(index)
+    local index = math.floor(r.index)
     
     if index < 1 or index > #SaitoHUD.MeasurePoints + 1 then
         Msg("Invalid index\n")
         return
     end
     
-    table.insert(SaitoHUD.MeasurePoints, index, vec)
+    table.insert(SaitoHUD.MeasurePoints, index, r.vec)
     print("Inserted point at #" .. index)
     
     RecalcMeasuredTotal()
@@ -228,31 +199,20 @@ end
 -- @param cmd Command
 -- @param args Arguments
 local function ReplaceMeasuredPoint(ply, cmd, args)
-    local vec = nil
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "index" },
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+    })
+    if not r then return end
     
-    if #args == 2 or #args == 4 then
-        vec = SaitoHUD.ParseConcmdVector(args, 1)
-    elseif #args ~= 1 then
-        Msg("Invalid number of arguments\n")
-        return
-    else
-        local tr = SaitoHUD.GetRefTrace()
-        vec = tr.HitPos
-    end
-    
-    if vec == nil then
-        Msg("Invalid arguments\n")
-        return
-    end
-    
-    local index = tonumber(args[1])
+    local index = math.floor(tonumber(r.index))
     
     if not SaitoHUD.MeasurePoints[index] then
         Msg("No such index\n")
         return
     end
     
-    SaitoHUD.MeasurePoints[index] = vec
+    SaitoHUD.MeasurePoints[index] = r.vec
     print("Replaced point #" .. index)
     
     RecalcMeasuredTotal()
@@ -265,24 +225,13 @@ end
 -- @param cmd Command
 -- @param args Arguments
 local function RemoveMeasuredPoint(ply, cmd, args)
-    local vec = nil
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "index" },
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+    })
+    if not r then return end
     
-    if #args == 2 or #args == 4 then
-        vec = SaitoHUD.ParseConcmdVector(args, 1)
-    elseif #args ~= 1 then
-        Msg("Invalid number of arguments\n")
-        return
-    else
-        local tr = SaitoHUD.GetRefTrace()
-        vec = tr.HitPos
-    end
-    
-    if vec == nil then
-        Msg("Invalid arguments\n")
-        return
-    end
-    
-    local index = tonumber(args[1])
+    local index = math.floor(tonumber(r.index))
     
     if not SaitoHUD.MeasurePoints[index] then
         Msg("No such index\n")

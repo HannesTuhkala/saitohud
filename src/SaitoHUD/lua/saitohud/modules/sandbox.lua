@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: sandbox.lua 129 2010-05-20 22:09:39Z the.sk89q $
 
 -- Sandbox related functions.
 

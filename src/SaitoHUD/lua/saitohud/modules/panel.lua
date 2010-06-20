@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: panel.lua 146 2010-05-29 00:51:10Z the.sk89q $
 
 -- Panel GUI.
 
@@ -376,10 +376,8 @@ local function MeasuringPanel(panel)
                             "",
                             function(text)
                                 text = text:Trim()
-                                if text:match("[%-0-9%.]+,? [%-0-9%.]+,? [%-0-9%.]+") then
-                                    args = string.Explode(" ", text)
-                                    RunConsoleCommand("measure_add", unpack(args))
-                                end
+                                args = string.Explode(" ", text)
+                                RunConsoleCommand("measure_add", unpack(args))
                             end)
     end, false)
     AddButton(panel, "Add Orthogonal Line", "measure_add_ortho", false)
@@ -408,10 +406,8 @@ local function MeasuringPanel(panel)
                                 "",
                                 function(text)
                                     text = text:Trim()
-                                    if text:match("[%-0-9%.]+,? [%-0-9%.]+,? [%-0-9%.]+") then
-                                        args = string.Explode(" ", text)
-                                        RunConsoleCommand("measure_insert", line:GetValue(1), unpack(args))
-                                    end
+                                    args = string.Explode(" ", text)
+                                    RunConsoleCommand("measure_insert", line:GetValue(1), unpack(args))
                                 end)
         end)
         menu:AddOption("Add Orthogonal Line Before", function()
@@ -426,10 +422,8 @@ local function MeasuringPanel(panel)
                                 "",
                                 function(text)
                                     text = text:Trim()
-                                    if text:match("[%-0-9%.]+,? [%-0-9%.]+,? [%-0-9%.]+") then
-                                        args = string.Explode(" ", text)
-                                        RunConsoleCommand("measure_replace", line:GetValue(1), unpack(args))
-                                    end
+                                    args = string.Explode(" ", text)
+                                    RunConsoleCommand("measure_replace", line:GetValue(1), unpack(args))
                                 end)
         end)
         menu:AddOption("Delete Point", function()
@@ -500,10 +494,12 @@ end
 
 --- Selectively update the measuring panel.
 function SaitoHUD.UpdateMeasuringPanel()
-    pointsList:Clear()
-    
-    for k, pt in pairs(SaitoHUD.MeasurePoints) do
-        local line = pointsList:AddLine(tostring(k), tostring(pt))
+    if pointsList then
+        pointsList:Clear()
+        
+        for k, pt in pairs(SaitoHUD.MeasurePoints) do
+            local line = pointsList:AddLine(tostring(k), tostring(pt))
+        end
     end
 end
 
