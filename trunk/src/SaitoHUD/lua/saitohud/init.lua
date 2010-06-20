@@ -16,30 +16,38 @@
 -- 
 -- $Id$
 
-local reloading = false
-
-if SaitoHUD ~= nil then
-    reloading = true 
-end
-
-SaitoHUD = {}
-SaitoHUD.Reloading = reloading
-
 local postModules = CreateClientConVar("saitohud_modules", "", true, false):GetString()
 local preModules = CreateClientConVar("saitohud_modules_pre", "", true, false):GetString()
 local profile = CreateClientConVar("saitohud_profile", "0", true, false):GetBool()
 
+local reloading = false
+if SaitoHUD ~= nil then reloading = true end
+
+SaitoHUD = {}
+SaitoHUD.Reloading = reloading
+
+include("saitohud/saitohud.lua")
+include("saitohud/functions.lua")
+include("saitohud/concmd.lua")
+include("saitohud/filters.lua")
+include("saitohud/friends.lua")
+include("saitohud/geom.lua")
+
+--- Load a module.
 local function Load(module)
-    path = "saitohud/" .. module .. ".lua"
+    path = "saitohud/modules/" .. module .. ".lua"
     MsgN("Loading: " .. path .. "...")
     local start = SysTime()
     include(path)
+    
+    -- Profiling
     if profile then
         local t = SysTime() - start
         print(string.format(" >>> %.3fms", t * 1000))
     end
 end
 
+--- Load a modules from a comma-delimited list.
 local function LoadList(str)
     local modules = string.Explode(",", str)
     for _, module in pairs(modules) do
@@ -50,6 +58,7 @@ local function LoadList(str)
     end
 end
 
+--- Remove existing SaitoHUD hooks.
 local function RemoveExistingHooks()
     for name, list in pairs(hook.GetTable()) do
         for k, f in pairs(list) do
@@ -75,12 +84,9 @@ if preModules ~= "" then
 end
 
 Msg("Loading built-in modules...\n")
-Load("filters") -- Entity filtering engine
-Load("lib")
-Load("core")
 Load("util")
-Load("friends")
 Load("listgest")
+Load("geom")
 Load("overlays") -- Entity overlay information
 Load("sampling") -- Entity path tracking
 Load("stranded")

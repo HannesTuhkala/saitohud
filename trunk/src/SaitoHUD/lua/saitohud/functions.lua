@@ -15,9 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: lib.lua 155 2010-06-18 19:37:23Z the.sk89q $
 
 -- Generic library functions.
+
+--- Makes a psuedo class.
+-- @return Table
+function SaitoHUD.MakeClass(base)
+    local t = {}
+    
+    setmetatable(t, {
+        __call = function(self, ...)
+            local arg = {...}
+            local instance = {}
+            setmetatable(instance, {__index = t, __tostring = t.__tostring})
+            if t.Initialize then instance:Initialize(unpack(arg)) end
+            return instance
+        end,
+        __index = base
+    })
+    
+    return t
+end
 
 --- Safely remove a hook.
 -- @param name Name of hook

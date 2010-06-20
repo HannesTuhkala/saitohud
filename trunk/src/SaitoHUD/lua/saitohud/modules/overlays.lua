@@ -14,7 +14,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id$
+-- $Id: overlays.lua 155 2010-06-18 19:37:23Z the.sk89q $
 
 --- This file is responsible for a lot of the HUD overlays.
 
