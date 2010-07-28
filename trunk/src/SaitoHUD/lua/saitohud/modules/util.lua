@@ -35,8 +35,8 @@ local function RenderFlashlight()
         light.r = 255
         light.g = 255 
         light.b = 255
-        light.Brightness = 1
-        light.Size = 2000
+        light.Brightness = 0.25
+        light.Size = 250
         light.Decay = 0 
         light.DieTime = CurTime() + 0.3
     end
@@ -49,7 +49,7 @@ local function RenderFlashlight()
         light.g = 255 
         light.b = 255
         light.Brightness = 0.01
-        light.Size = 5000
+        light.Size = 250
         light.Decay = 0 
         light.DieTime = CurTime() + 0.3
     end 
