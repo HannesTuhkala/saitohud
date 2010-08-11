@@ -99,6 +99,7 @@ Load("resbrowser")
 Load("spectate")
 Load("wire")
 Load("umsg")
+Load("calculator")
 Load("panel")
 
 if postModules ~= "" then
