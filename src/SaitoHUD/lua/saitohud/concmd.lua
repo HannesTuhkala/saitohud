@@ -122,9 +122,19 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
             end
         elseif type == SaitoHUD.VAR_CONCMD_ENTITY then
             if #args == 0 then
-                if optional then return result end
-                print("Insufficient number of arguments")
-                return
+                if not param.ImplicitTrace then
+                    if optional then return result end
+                    print("Insufficient number of arguments")
+                    return
+                end
+                
+                local tr = SaitoHUD.GetRefTrace()
+                if ValidEntity(tr.Entity) or optional then
+                    result[name] = tr.Entity
+                else
+                    print("No entity in trace")
+                    return
+                end
             elseif args[1]:sub(1, 1) == "#" then
                 local id = tonumber(table.remove(args, 1):Trim():sub(2))
                 
