@@ -31,6 +31,7 @@ local playerMarkers = CreateClientConVar("player_markers", "0", true, false)
 local overlayFilterText = CreateClientConVar("overlay_filter_text", "class", true, false)
 local overlayFilterPrint = CreateClientConVar("overlay_filter_print_removed", "0", true, false)
 local evaluateOnEveryDraw = CreateClientConVar("overlays_continuous_eval", "0", true, false)
+local triadsFilterGuide = CreateClientConVar("triads_filter_guide", "1", true, false)
 
 local lastTriadsFilter = nil -- Legacy support
 local lastOverlayMatch = 0
@@ -52,17 +53,17 @@ local Rehook = function() end
 -- @param ang Angle
 local function DrawTriad(p1, ang)
     local p2 = p1 + ang:Forward() * 16
-    local p3 = p1 - ang:Right() * 16
+    local p3 = p1 + ang:Right() * 16
     local p4 = p1 + ang:Up() * 16
     
     p1, p2, p3, p4 = p1:ToScreen(), p2:ToScreen(), p3:ToScreen(), p4:ToScreen()
     
     surface.SetDrawColor(255, 0, 0, 255)
-    surface.DrawLine(p1.x, p1.y, p2.x, p2.y)
+    surface.DrawLine(p1.x, p1.y, p2.x, p2.y) -- Forward
     surface.SetDrawColor(0, 255, 0, 255)
-    surface.DrawLine(p1.x, p1.y, p3.x, p3.y)
+    surface.DrawLine(p1.x, p1.y, p3.x, p3.y) -- Right
     surface.SetDrawColor(0, 0, 255, 255)
-    surface.DrawLine(p1.x, p1.y, p4.x, p4.y)
+    surface.DrawLine(p1.x, p1.y, p4.x, p4.y) -- Up
 end
 
 --- Builds the cache of matched of entities. This is to significantly increase
@@ -152,6 +153,16 @@ local function OverlaysPaint()
             local pos = ent:GetPos()
             DrawTriad(pos, ent:GetAngles())
         end
+    end
+    
+    if triadsFilterGuide:GetBool() and #triadsMatches then
+        local w = ScrW()
+        surface.SetDrawColor(255, 0, 0, 255)
+        surface.DrawLine(w - 20, 30, w - 5, 38) -- Forward
+        surface.SetDrawColor(0, 200, 0, 255)
+        surface.DrawLine(w - 35, 38, w - 20, 30) -- Right
+        surface.SetDrawColor(0, 0, 255, 255)
+        surface.DrawLine(w - 20, 30, w - 20, 10) -- Up
     end
     
     local ot = overlayFilterText:GetString()
