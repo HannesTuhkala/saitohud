@@ -415,9 +415,9 @@ hook.Add("OnPlayerChat", "SaitoHUD.Calculator", function(ply, text, teamChat, is
             local ret, val = SaitoHUD.CalcExpr(expr)
         
             if ret then
-                RunConsoleCommand("say", "= " .. val)
+                RunConsoleCommand(teamChat and "say_team" or "say", "= " .. val)
             else
-                RunConsoleCommand("say", "Error: " .. val)
+                RunConsoleCommand(teamChat and "say_team" or "say", "Error: " .. val)
             end
         end
     end
