@@ -845,6 +845,11 @@ Improved Wire Tool,tool_wire_improved</pre>
       <th scope="col">Description</th>
     </tr>
     <tr>
+      <td>calculator</td>
+      <td>void</td>
+      <td>Opens the calculator.</td>
+    </tr>
+    <tr>
       <td>toggle_hud</td>
       <td>void</td>
       <td>Toggles the display of the HUD.</td>
