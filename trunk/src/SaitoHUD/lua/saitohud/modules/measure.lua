@@ -415,7 +415,7 @@ local function DrawMeasuringLines()
 
         local yOffset = ScrH() * 0.3 - 50
         local color = Color(255, 200, 255, 255)
-        draw.SimpleText("Measured Total: " .. SaitoHUD.MeasureLength,
+        draw.SimpleText("Measured Total: " .. string.format("%.7f", SaitoHUD.MeasureLength),
                         "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
     elseif #SaitoHUD.MeasurePoints == 1 then
         local dim = 5
