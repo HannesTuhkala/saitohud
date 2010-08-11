@@ -39,6 +39,12 @@ http://saitohud.googlecode.com/svn/wiki/images/reflection_analysis.jpg
 
 http://saitohud.googlecode.com/svn/wiki/images/measuring.jpg
 
+= Tools =
+
+== Calculator ==
+
+http://saitohud.googlecode.com/svn/wiki/images/calculator.png
+
 = Sandbox Gamemode =
 
 == Gesture Menu ==
