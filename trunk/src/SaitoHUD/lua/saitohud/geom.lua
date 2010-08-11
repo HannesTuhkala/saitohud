@@ -51,19 +51,26 @@ function GEOM.MakeDynamicVectorType()
                 end
             end
             
-            setmetatable(instance, {
-                __index = function(t, key)
-                    t:_Update()
-                    local r = t._CachedVector[key]
-                    if type(r) == 'function' then
-                        return function(self, ...)
-                            local arg = {...}
-                            return self._CachedVector[key](self._CachedVector, unpack(arg))
-                        end
+            local mt = {}
+            mt.__index = function(t, key)
+                t:_Update()
+                local r = t._CachedVector[key]
+                if type(r) == 'function' then
+                    return function(self, ...)
+                        local arg = {...}
+                        return self._CachedVector[key](self._CachedVector, unpack(arg))
                     end
-                    return r
                 end
-            })
+                return r
+            end
+            mt.__add = function(a, b) return a._CachedVector.__add(a, b) end
+            mt.__sub = function(a, b) return a._CachedVector.__sub(a, b) end
+            mt.__mul = function(a, b) return a._CachedVector.__mul(a, b) end
+            mt.__div = function(a, b) return a._CachedVector.__div(a, b) end
+            mt.__mod = function(a, b) return a._CachedVector.__mod(a, b) end
+            mt.__pow = function(a, b) return a._CachedVector.__pow(a, b) end
+            
+            setmetatable(instance, mt)
             
             v.Initialize(instance, unpack(arg))
             return instance
@@ -86,7 +93,6 @@ local function OverrideVectorForDynamic()
 
     for _, key in pairs(keys) do
         if not g_GEOMOrigVector[key] then
-            MsgN("Stored " .. key)
             g_GEOMOrigVector[key] = vecMt[key]
         end
         
