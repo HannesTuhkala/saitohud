@@ -29,7 +29,9 @@ local PANEL = {}
 
 function PANEL:Init()
     self.LastAnswer = 0
-    self.LastExpr = nil
+    self.Buffer = {}
+    self.BufferIndex = 0
+    self.Env = {}
     
     self:SetTitle("SaitoHUD Calculator")
     self:SetSizable(true)
@@ -61,66 +63,150 @@ function PANEL:Init()
             panel:SetCaretPos(4)
         end
     end
+    self.InputEntry.OnKeyCodeTyped = function(panel, code)
+        if code == KEY_ENTER and not panel:IsMultiline() and panel:GetEnterAllowed() then
+            panel:FocusNext()
+            panel:OnEnter()
+        end
+        
+        if #self.Buffer == 0 then return end
+        
+        if code == KEY_UP then
+            self.BufferIndex = self.BufferIndex - 1
+            if self.BufferIndex < 1 then
+                self.BufferIndex = #self.Buffer
+            end
+            
+            local val = self.Buffer[self.BufferIndex]
+            panel:SetText(val)
+            panel:SetCaretPos(string.len(val))
+        elseif code == KEY_DOWN then
+            self.BufferIndex = self.BufferIndex + 1
+            if self.BufferIndex > #self.Buffer then
+                self.BufferIndex = 1
+            end
+            
+            local val = self.Buffer[self.BufferIndex]
+            panel:SetText(val)
+            panel:SetCaretPos(string.len(val))
+        end
+    end
     self.InputEntry.OnEnter = function()
-        self:Evaluate()
+        self:OnEnter()
     end
     
     self.CalcBtn = vgui.Create("DButton", self)
     self.CalcBtn:SetText(">")
     self.CalcBtn:SetWide(20)
     self.CalcBtn.DoClick = function()
-        self:Evaluate()
+        self:OnEnter()
     end
     
-    self.Log:AddItem(vgui.Create("SaitoHUDCalculatorInfo", self))
+    self:AddIntro()
 end
 
-function PANEL:Evaluate()
+function PANEL:OnEnter()
     local text = self.InputEntry:GetValue():Trim()
+    
+    -- Clear
     if text == "clear" then
+        self.Env = {}
         self.Log:Clear()
-        self.InputEntry:SetText("")
-        self.InputEntry:RequestFocus()
-        
-        self.Log:AddItem(vgui.Create("SaitoHUDCalculatorInfo", self))
+        self:AddIntro()
+    
+    -- Clear memory
+    elseif text == "clearmem" then
+        self:AddInfo({"Memory cleared of " .. table.Count(self.Env) .. " variables"})
+        self.Env = {}
+    
+    -- List variables
+    elseif text == "listmem" then
+        local lines = {}
+        for k, v in pairs(self.Env) do
+            table.insert(lines, k .. " = " .. v)
+        end
+        self:AddInfo(lines)
+    
+    -- Copy
     elseif text == "copy" then
         SetClipboardText(tostring(self.LastAnswer))
         self.InputEntry:SetText("")
         self:Close()
+        return
+    
+    -- Quit + copy
     elseif text == "qc" then
         SetClipboardText(tostring(self.LastAnswer))
         self.InputEntry:SetText("")
         self:Close()
+        return
+    
+    -- Quit
     elseif text == "q" then
         self.InputEntry:SetText("")
         self:Close()
+        return
+    
+    -- Evaluate
     elseif text ~= "" then
-        self.InputEntry:SetText("")
-        local ret, val = SaitoHUD.CalcExpr(text, {
-            ans = self.LastAnswer,
-        })
-        self:AddEvaluation(text, tostring(val))
-        if ret then
-            self.LastExpr = text
-            self.LastAnswer = val
-        end
-        self.InputEntry:RequestFocus()
-    elseif text == "" and self.LastExpr then
-        local ret, val = SaitoHUD.CalcExpr(self.LastExpr, {
-            ans = self.LastAnswer,
-        })
-        self:AddEvaluation(self.LastExpr, tostring(val))
-        if ret then
-            self.LastAnswer = val
-        end
-        self.InputEntry:RequestFocus()
+        self:Evaluate(text)
+    
+    -- Previous evaluation
+    elseif text == "" and #self.Buffer > 0 then
+        self:Evaluate(self.Buffer[#self.Buffer])
     end
+
+    self.InputEntry:SetText("")
+    self.InputEntry:RequestFocus()
 end
 
-function PANEL:AddEvaluation(input, output)
+function PANEL:AddEvaluation(input, output, isErr)
     local line = vgui.Create("SaitoHUDCalculatorLine", self)
-    line:Setup(input, output)
+    line:Setup(input, output, isErr)
     self.Log:AddItem(line)
+end
+
+function PANEL:Evaluate(expr)    
+    local ret, val, env = SaitoHUD.CalcExpr(expr, self.Env)
+    self:AddEvaluation(expr, tostring(val), not ret)
+    if ret then       
+        self.LastAnswer = val
+        self.Env = env
+        self.Env.ans = self.LastAnswer
+    end
+    
+    -- Remove from buffer
+    for k, v in pairs(self.Buffer) do
+        if v == expr then
+            table.remove(self.Buffer, k)
+            break
+        end
+    end
+    
+    -- Add to buffer
+    table.insert(self.Buffer, expr)
+    while #self.Buffer > 40 do
+        table.remove(self.Buffer, 1)
+    end
+    
+    self.BufferIndex = #self.Buffer + 1
+end
+
+function PANEL:AddIntro()
+    self:AddInfo({
+        "clear - Clear the log and memory",
+        "clearmem - Clear the memory",
+        "listmem - List the variables",
+        "q - Close",
+        "qc - Close and copy to clipboard",
+        "copy - Copy to clipboard",
+    })
+end
+
+function PANEL:AddInfo(lines)
+    local panel = vgui.Create("SaitoHUDCalculatorInfo", self)
+    panel:Setup(lines)
+    self.Log:AddItem(panel)
 end
 
 function PANEL:PerformLayout()
@@ -151,7 +237,7 @@ function PANEL:Paint(panel)
 end
 
 function PANEL:ApplySchemeSettings()
-    self:SetTextColor(Color(0, 0, 0, 255))
+    self:SetTextColor(self.IsError and Color(200, 0, 0, 255) or Color(0, 0, 0, 255))
     self:SetHighlightColor(Color(100, 100, 100, 255))
     self:SetCursorColor(Color(0, 0, 0, 255))
 end
@@ -168,7 +254,7 @@ function PANEL:Init()
     self.CreateTime = CurTime()
 end
 
-function PANEL:Setup(input, output)    
+function PANEL:Setup(input, output, isErr)    
     self.Input = vgui.Create("SaitoHUDCalculatorTextEntry", self)
     self.Input:SetPos(3, 2)
     self.Input:SetText(input)
@@ -177,6 +263,7 @@ function PANEL:Setup(input, output)
     self.Output = vgui.Create("SaitoHUDCalculatorTextEntry", self)
     self.Output:SetText(output)
     self.Output:SizeToContents()
+    self.Output.IsError = isErr
     
     self:SetTall(self.Input:GetTall() + self.Output:GetTall() + 5)
     
@@ -186,7 +273,7 @@ function PANEL:Setup(input, output)
     self.RemoveBtn:SetTooltip("Remove this line.")
     self.RemoveBtn.DoClick = function()
         self:Remove()
-        self:GetParent().InvalidateLayout()
+        self:GetParent():InvalidateLayout()
     end
 end
 
@@ -218,28 +305,26 @@ vgui.Register("SaitoHUDCalculatorLine", PANEL, "DPanel")
 
 local PANEL = {}
 
-function PANEL:Init()
-    local lines = {
-        "clear - Clear the log",
-        "q - Close",
-        "qc - Close and copy to clipboard",
-        "copy - Copy to clipboard",
-    }
+function PANEL:Setup(lines)
+    local height = #lines * 14.5
     
-    self.Labels = {}
+    self.Label = vgui.Create("SaitoHUDCalculatorTextEntry", self)
+    self.Label:SetPos(3, 3)
+    self.Label:SetText(table.concat(lines, "\n"))
+    self.Label:SetWide(200)
+    self.Label:SetMultiline(true)
+    self.Label:SetTall(height)
     
-    local height = 3
+    self:SetTall(height + 6)
     
-    for i, text in pairs(lines) do
-        local label = vgui.Create("SaitoHUDCalculatorTextEntry", self)
-        label:SetPos(3, height)
-        label:SetText(text)
-        label:SetWide(200)
-        table.insert(self.Labels, label)
-        height = height + label:GetTall() - 5
+    self.RemoveBtn = vgui.Create("DButton", self)
+    self.RemoveBtn:SetSize(6, self:GetTall())
+    self.RemoveBtn:SetText("")
+    self.RemoveBtn:SetTooltip("Remove this line.")
+    self.RemoveBtn.DoClick = function()
+        self:Remove()
+        self:GetParent():InvalidateLayout()
     end
-    
-    self:SetTall(height + 3 + 8)
 end
 
 function PANEL:Paint()
@@ -250,8 +335,9 @@ end
 function PANEL:PerformLayout()
     local wide = self:GetWide()
     
-    for _, lbl in pairs(self.Labels) do
-        lbl:SetWide(wide - 6)
+    if self.Label then
+        self.Label:SetWide(wide - 6)
+        self.RemoveBtn:SetPos(wide - self.RemoveBtn:GetWide(), 0)
     end
 end
 
@@ -290,13 +376,28 @@ end
 -- @return Success or not
 -- @return Error message or result
 function SaitoHUD.CalcExpr(str, vars)
-    local ret, err = pcall(CompileString, "_result = " .. str, "calc")
+    local setVar = "_result"
+    local code = "_result = " .. str
+    
+    -- Detect attempts at setting a variable
+    local m = string.match(str, "^([A-Za-z_][A-Za-z0-9_]*) *=")
+    if m then
+        setVar = m
+        code = str
+    end
+    
+    -- Compile code; note that the error is caught in the current version
+    -- of Gmod (it's a bug)
+    local ret, err = pcall(CompileString, code, "calc")
     if not ret or type(err) ~= 'function' then
         return false, "Parsing error"
     end
     
     local f = err
+    local missingVars = {}
+    local missingVarsIndex = {}
     
+    -- Build the environment
     local env = {
         abs = math.abs,
         acos = math.acos,
@@ -329,6 +430,23 @@ function SaitoHUD.CalcExpr(str, vars)
         gr = 1.618033988749,
     }
     
+    setmetatable(env, {
+        __index = function(t, k)
+            if not missingVarsIndex[k] then
+                table.insert(missingVars, k)
+                missingVarsIndex[k] = true
+            end
+            return 0
+        end,
+    })
+    
+    -- Keep track of the standard environment so we can get rid of it
+    local stdEnvKeys = {}
+    for k, v in pairs(env) do
+        stdEnvKeys[k] = true
+    end
+    
+    -- Add in the provided environment
     if vars then
         for k, v in pairs(vars) do
             env[k] = v
@@ -337,16 +455,37 @@ function SaitoHUD.CalcExpr(str, vars)
     
     setfenv(f, env)
     
-    for i = 1, 3 do -- Workaround for coroutine issues
+    -- Workaround for coroutine issues
+    for i = 1, 3 do
+        -- Run in a coroutine so we can set a runtime checks
         local co = coroutine.create(f)
         debug.sethook(co, MakeHook(f, 100, 5, 0.1), "crl")
-        local ret, done, err = pcall(coroutine.resume, co) -- Gmod has issues
+        local ret, succ, err = pcall(coroutine.resume, co) -- Gmod has issues
         
         if ret then
-            if done then
-                return true, tonumber(getfenv(f)._result) or 0
+            -- Corountine didn't fail us, so let's see if it actually
+            -- executed without an error
+            if succ then
+                -- Check for missing variables
+                if #missingVars == 1 then
+                    return false, string.format("'%s' is undefined", missingVars[1])
+                elseif #missingVars > 1 then
+                    return false, string.format("%s are undefined",
+                        table.concat(missingVars, ", "))
+                else
+                    local retEnv = getfenv(f)
+                    local cleaned = {}
+                    
+                    for k, v in pairs(retEnv) do
+                        if not stdEnvKeys[k] and k ~= "_result" then
+                            cleaned[k] = tonumber(v) or 0
+                        end
+                    end
+                    
+                    return true, tonumber(retEnv[setVar]) or 0, cleaned
+                end
             else
-                return false, getfenv(f)._err
+                return false, tostring(getfenv(f)._err)
             end
         end
     end
