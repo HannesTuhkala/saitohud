@@ -18,37 +18,59 @@
 
 --- GEOM interface.
 
+local autoLive = CreateClientConVar("geom_auto_live", "0", true, false)
+
 local GEOM = SaitoHUD.GEOM
 
 --- Create a point.
 -- @param ply Player
 -- @param cmd Command
 -- @param args Arguments
-local function AddPoint(ply, cmd, args)
+local function AddPoint(ply, cmd, args)    
     local r = SaitoHUD.ParseVarConcmd(args, {
         { Name = "name", NumArgs = 1, },
         { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true },
     })
     if not r then return end
     
-    GEOM.SetPoint(r.name, r.vec)
+    if cmd == "geom_point_live" or (r.ent and autoLive:GetBool()) then
+        GEOM.SetPoint(r.name, GEOM.EntityRelVector(r.vec.x, r.vec.y, r.vec.z, r.ent))
+    else
+        GEOM.SetPoint(r.name, r.vec)
+    end
+    
     print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
 end
 
---- Create a live point.
+--- Create an entity-relative point
 -- @param ply Player
 -- @param cmd Command
 -- @param args Arguments
-local function AddLivePoint(ply, cmd, args)
+local function AddEntPoint(ply, cmd, args)
     local r = SaitoHUD.ParseVarConcmd(args, {
         { Name = "name", NumArgs = 1, },
-        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT },
-        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY },
+        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true },
     })
     if not r then return end
     
-    GEOM.SetPoint(r.name, GEOM.EntityRelVector(r.vec.x, r.vec.y, r.vec.z, r.ent))
-    print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
+    local pos
+    
+    if cmd:find("geom_point_center") then
+        pos = r.ent:GetPos()
+    elseif cmd:find("geom_point_bbox") then
+        pos = r.ent:LocalToWorld(r.ent:OBBCenter())
+    elseif cmd:find("geom_point_mass") then
+    
+    end
+    
+    if cmd:find("live") or autoLive:GetBool() then
+        GEOM.SetPoint(r.name, GEOM.EntityRelVector(pos.x, pos.y, pos.z, r.ent))
+    else
+        GEOM.SetPoint(r.name, pos)
+    end
+    
+    print(string.format("Point #%s: %s -> %s", r.name, tostring(pos)))
 end
 
 --- Create a line.
@@ -133,8 +155,8 @@ local function HUDPaint()
     for key, pt in pairs(GEOM.Points) do
         local scr = pt:ToScreen()
         
-        surface.SetDrawColor(100, 0, 100, 255)
-        surface.SetTextColor(100, 0, 100, 255)
+        surface.SetDrawColor(0, 255, 255, 255)
+        surface.SetTextColor(0, 255, 255, 255)
             
         if scr.visible then
             DrawCross(pt)
@@ -166,7 +188,13 @@ local function HUDPaint()
 end
 
 concommand.Add("geom_point", AddPoint)
-concommand.Add("geom_point_live", AddLivePoint)
+concommand.Add("geom_point_live", AddPoint)
+concommand.Add("geom_point_center", AddEntPoint)
+concommand.Add("geom_point_center_live", AddEntPoint)
+concommand.Add("geom_point_bbox", AddEntPoint)
+concommand.Add("geom_point_bbox_live", AddEntPoint)
+concommand.Add("geom_point_mass", AddEntPoint)
+concommand.Add("geom_point_mass_live", AddEntPoint)
 concommand.Add("geom_line", AddLine)
 concommand.Add("geom_project_point_segment", ProjectPointSegment)
 
