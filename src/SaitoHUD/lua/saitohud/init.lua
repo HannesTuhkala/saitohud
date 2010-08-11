@@ -36,9 +36,11 @@ include("saitohud/geom.lua")
 --- Load a module.
 local function Load(module)
     path = "saitohud/modules/" .. module .. ".lua"
-    MsgN("Loading: " .. path .. "...")
+    if profile then
+        MsgN("Loading: " .. path .. "...")
+    end
     local start = SysTime()
-    include(path)
+    pcall(include, path)
     
     -- Profiling
     if profile then
