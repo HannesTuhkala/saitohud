@@ -48,7 +48,7 @@ function PANEL:Init()
                         Color(255, 255, 255, 255))
     end
     
-    local operators = {"*", "+", "+", "/", "%"}
+    local operators = {"*", "+", "-", "/", "%"}
     
     self.InputEntry = vgui.Create("DTextEntry", self)
     self.InputEntry:SetText("")
