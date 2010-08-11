@@ -39,6 +39,9 @@ local readableTypes = {
     ["xwl"] = "wirelink",
     ["c"] = "complex",
     ["q"] = "quaternion",
+    ["g"] = "generic",
+    ["xcd"] = "code",
+    ["f"] = "function",
 }
 
 --- Turn the arguments into a list of readable ones.
@@ -137,6 +140,66 @@ local function PopulateE2ExtensionsList(lst)
     end
 end
 
+--- Prints the function list.
+-- @param lst List panel
+local function DumpE2ExtensionsList(lst)
+    local data = file.Read("saitohud/e2_std_funcs.txt")
+    local standardFunctions = {}
+    
+    if data then
+        local lines = string.Explode("\n", data)
+        for _, v in pairs(lines) do
+            v = v:Trim()
+            if v ~= "" then
+                standardFunctions[v] = true
+            end
+        end
+    end
+    
+    local funcs = {}
+    
+    for signature, info in pairs(wire_expression2_funcs) do
+        local cls, args
+        local func, inner = signature:match("([^%(]+)%((.*)%)")
+        
+        -- Index set function
+        if not func:find("op:") and not standardFunctions[signature] then
+            -- Try to extract the class and arguments
+            if inner:find(":") then
+                local res = string.Explode(":", inner)
+                cls, args = res[1], res[2]
+            else
+                cls = ""
+                args = inner
+            end
+            
+            local text = string.format("%s %s(%s)",
+                info[2] ~= "" and (readableTypes[info[2]] or info[2]) or "",
+                (readableTypes[cls] and readableTypes[cls] .. ":" or cls) .. 
+                func, MakeReadableArgs(args, info.argnames))
+            
+            table.insert(funcs, {
+                info[2] ~= "" and (readableTypes[info[2]] or info[2]) or "void",
+                readableTypes[cls] and readableTypes[cls] .. ":" or cls,
+                func,
+                MakeReadableArgs(args, info.argnames)
+            })
+        end
+    end
+    
+    table.SortByMember(funcs, 3, function(a, b) return a > b end)
+    
+    local out = ""
+    
+    for _, v in pairs(funcs) do
+        local text = string.format("<tr><td>%s</td><td style=\"text-align: right\">%s</td><td><strong>%s</strong>(%s)</td></tr>\n",
+            v[1], v[2], v[3], v[4] == "" and "" or " " .. v[4] .. " ")
+        out = out .. text
+    end
+    
+    file.Write("saitohud_dump_e2_funcs.txt", out)
+end
+
 --- Opens the E2 extensions window.
 function SaitoHUD.OpenE2Extensions()
     if not wire_expression2_funcs then
@@ -215,3 +278,4 @@ function SaitoHUD.OpenE2Extensions()
 end
 
 concommand.Add("e2_extensions", function() SaitoHUD.OpenE2Extensions() end)
+concommand.Add("dump_e2_extensions", DumpE2ExtensionsList)
