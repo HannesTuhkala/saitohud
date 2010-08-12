@@ -71,7 +71,7 @@ local function CalculateReflectionAnalysis(startPos, endPos, numReflects, ent)
     for i = 1, numReflects do
         local v = vec - 2 * vec:DotProduct(tr.HitNormal) * tr.HitNormal
         local lastPoint = tr.HitPos
-        tr = util.QuickTrace(tr.HitPos, v:GetNormal() * 100000, filter)
+        tr = util.QuickTrace(tr.HitPos + v:GetNormal() * -0.01, v:GetNormal() * 100000, filter)
         vec = tr.HitPos - tr.StartPos
         table.insert(lines, {lastPoint, tr.HitPos})
     end
