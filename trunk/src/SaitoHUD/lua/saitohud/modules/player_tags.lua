@@ -43,7 +43,6 @@ local function NameTagsPaint()
         local distance = math.Round(ply:GetPos():Distance(refPos))
         local color = Color(255, 255, 255, 255)
         local shadowColor = Color(0, 0, 0, 255)
-        local bold = false
         local isFriend = SaitoHUD.IsFriend(ply)
         
         if all or (alwaysFriends and isFriend) then
