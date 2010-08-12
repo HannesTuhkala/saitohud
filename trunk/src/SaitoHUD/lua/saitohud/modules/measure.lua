@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements measuring tools.
-
 SaitoHUD.MeasurePoints = {}
 SaitoHUD.MeasureLength = 0
 

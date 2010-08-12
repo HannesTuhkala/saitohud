@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -14,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: stranded.lua 63 2010-04-20 20:24:37Z the.sk89q $
+-- $Id$
 
 local checkSeeable = CreateClientConVar("stranded_res_seeable", "1", true, false)
 local resDistance = CreateClientConVar("stranded_res_distance", "500", true, false)

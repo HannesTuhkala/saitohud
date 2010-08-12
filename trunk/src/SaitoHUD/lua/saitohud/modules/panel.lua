@@ -15,9 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: panel.lua 146 2010-05-29 00:51:10Z the.sk89q $
-
--- Panel GUI.
+-- $Id$
 
 local pointsList
 local quickFilters = {}

@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements free spectating.
-
 local spectateLock = CreateClientConVar("free_spectate_lock", "1", true, false)
 local spectateRate = CreateClientConVar("free_spectate_rate", "1000", true, false)
 local spectateSlowFactor = CreateClientConVar("free_spectate_slow_factor", "4", true, false)
@@ -28,20 +26,26 @@ local viewPos = Vector()
 local viewAng = Angle()
 local spectating = false
 local origViewAngle = Angle()
-local listenPresses = {"+forward", "+back", "+moveleft", "+moveright", "+jump", "+speed", "+duck", "+walk"}
+local listenPresses = {
+    "+forward", "+back", "+moveleft", "+moveright",
+    "+jump", "+speed", "+duck", "+walk"
+}
 local keyPressed = {}
-local lastTrace = nil
-local lastTraceTime = 0
 
---- Handle movements.
--- @param usercmd
+------------------------------------------------------------
+-- Hooks
+------------------------------------------------------------
+
+local data = {}
+
+--- Control view angle.
 local function CreateMove(usercmd)
     viewAng.p = math.Clamp(viewAng.p + usercmd:GetMouseY() * 0.025, -90, 90)
     viewAng.y = viewAng.y - usercmd:GetMouseX() * 0.025
+    
     if spectateLock:GetBool() then
         usercmd:SetViewAngles(origViewAngle)
     else
-        local data = {}
         data.start = viewPos
         data.endpos = viewPos + viewAng:Forward() * 50000
         data.filter = LocalPlayer()
@@ -51,9 +55,6 @@ local function CreateMove(usercmd)
 end
 
 --- Handle key presses.
--- @param ply
--- @param bind
--- @param pressed
 local function PlayerBindPress(ply, bind, pressed)
     for _, key in pairs(listenPresses) do
         if bind:find(key) then
@@ -69,10 +70,6 @@ local function PlayerBindPress(ply, bind, pressed)
 end
 
 --- Set the view.
--- @param ply
--- @param origin
--- @param angles
--- @param fov
 local function CalcView(ply, origin, angles, fov)
     local view = {}
     view.origin = viewPos
@@ -81,7 +78,7 @@ local function CalcView(ply, origin, angles, fov)
     return view
 end
 
---- Spectate think function.
+--- Do movement.
 local function Think()
     local rate = keyPressed["+speed"] and spectateRate:GetFloat() * 2 or spectateRate:GetFloat()
     if keyPressed["+walk"] then rate = rate / spectateSlowFactor:GetFloat() end
@@ -96,106 +93,94 @@ end
 
 --- HUDPaint function.
 local function HUDPaint()
-    if spectateNotice:GetBool() then
-        local text = "Free Spectating"
-        
-        if not spectateLock:GetBool() then
-            text = "(UNLOCKED) Free Spectating"
-        end
-        
-        draw.SimpleText(text, "Trebuchet22", ScrW() / 2 + 1, ScrH() * .8 + 1,
-                        Color(0, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-        draw.SimpleText(text, "Trebuchet22", ScrW() / 2, ScrH() * .8,
-                        Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    if not spectateNotice:GetBool() then return end
+    
+    local text = "Free Spectating"
+    
+    if not spectateLock:GetBool() then
+        text = "(UNLOCKED) Free Spectating"
+    end
+    
+    draw.SimpleText(text, "Trebuchet22", ScrW() / 2 + 1, ScrH() * .8 + 1,
+                    Color(0, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    draw.SimpleText(text, "Trebuchet22", ScrW() / 2, ScrH() * .8,
+                    Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+end
+
+------------------------------------------------------------
+-- Override
+------------------------------------------------------------
+
+-- Have to protect old trace functions
+if not _R.Player._GetEyeTrace then _R.Player._GetEyeTrace = _R.Player.GetEyeTrace end
+if not util._GetPlayerTrace then util._GetPlayerTrace = util.GetPlayerTrace end
+
+local data = {} -- util.GetEyeTrace()
+local lastTrace = nil
+local lastTraceTime = 0
+
+function _R.Player:GetEyeTrace()
+    local localPly = LocalPlayer()
+    
+    if not spectating or self ~= localPly then
+        return self:_GetEyeTrace()
+    end
+    
+    -- No point to do traces more than needed
+    if lastTraceTime == CurTime() then
+        return lastTrace
+    end
+    
+    data.start = viewPos
+    data.endpos = viewPos + viewAng:Forward() * 16384 
+    data.filter = localPly
+    lastTrace = util.TraceLine(data)
+    return lastTrace
+end
+
+local data = {} -- util.GetPlayerTrace()
+
+function util.GetPlayerTrace(ply)
+    local localPly = LocalPlayer()
+    
+    if spectating and ply == localPly then
+        return localPly:GetEyeTrace()
+    else
+        return util._GetPlayerTrace(ply)
     end
 end
 
---- Start spectating.
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
+local data = {} -- SaitoHUD.GetRefTrace()
+
+function SaitoHUD.GetRefTrace()
+    return LocalPlayer():GetEyeTrace()
+end
+
+function SaitoHUD.GetRefPos()
+    return spectating and viewPos or LocalPlayer():GetPos()
+end
+
+------------------------------------------------------------
+-- Control
+------------------------------------------------------------
+
 local function ToggleSpectate(ply, cmd, args)
     spectating = not spectating
     
-    if spectating and not SaitoHUD.AntiUnfairTriggered() then
-        origViewAngle = LocalPlayer():EyeAngles()
-        viewPos = LocalPlayer():GetShootPos()
-        viewAng = LocalPlayer():EyeAngles() -- Need to make a copy
-        
-        hook.Add("CreateMove", "SaitoHUD.Spectate", CreateMove)
-        hook.Add("PlayerBindPress", "SaitoHUD.Spectate", PlayerBindPress)
-        hook.Add("CalcView", "SaitoHUD.Spectate", CalcView)
-        hook.Add("Think", "SaitoHUD.Spectate", Think)
-        hook.Add("ShouldDrawLocalPlayer", "SaitoHUD.Spectate", function() return true end)
-        hook.Add("HUDPaint", "SaitoHUD.Spectate", HUDPaint)
-    else
-        keyPressed = {}
-        hook.Remove("PlayerBindPress", "SaitoHUD.Spectate")
-        hook.Remove("CreateMove", "SaitoHUD.Spectate")
-        hook.Remove("CalcView", "SaitoHUD.Spectate")
-        hook.Remove("Think", "SaitoHUD.Spectate")
-        hook.Remove("ShouldDrawLocalPlayer", "SaitoHUD.Spectate")
-        hook.Remove("HUDPaint", "SaitoHUD.Spectate")
-    end
-end
-
---- Override trace functions.
-local function OverrideTraceFunctions()
-    function SaitoHUD.GetRefTrace()
-        if spectating then
-            if lastTraceTime == CurTime() then
-                return lastTrace
-            end
-            
-            local data = {}
-            data.start = viewPos
-            data.endpos = viewPos + viewAng:Forward() * 16384 
-            data.filter = LocalPlayer()
-            lastTrace = util.TraceLine(data)
-            return lastTrace
-        else
-            return util.TraceLine(util.GetPlayerTrace(LocalPlayer()))
-        end
-    end
-
-    function SaitoHUD.GetRefPos()
-        return spectating and viewPos or LocalPlayer():GetPos()
-    end
-
-    local playerMt = FindMetaTable("Player")
-    if not _SH_OldEyeTrace then _SH_OldEyeTrace = playerMt.GetEyeTrace end
-    if not _SH_OldGetPlayerTrace then _SH_OldGetPlayerTrace = util.GetPlayerTrace end
-
-    function util.GetPlayerTrace(ply)
-        if spectating and ply == LocalPlayer() then
-            local data = {}
-            data.start = viewPos
-            data.endpos = viewPos + viewAng:Forward() * 16384 
-            data.filter = LocalPlayer()
-            return util.TraceLine(data)
-        else
-            return _SH_OldGetPlayerTrace(ply)
-        end
-    end
-
-    function playerMt:GetEyeTrace()
-        if spectating then
-            if lastTraceTime == CurTime() then
-                return lastTrace
-            end
-            
-            local data = {}
-            data.start = viewPos
-            data.endpos = viewPos + viewAng:Forward() * 16384 
-            data.filter = LocalPlayer()
-            lastTrace = util.TraceLine(data)
-            return lastTrace
-        else
-            return _SH_OldEyeTrace(self)
-        end
-    end
+    local localPly = LocalPlayer()
+    origViewAngle = localPly:EyeAngles()
+    viewPos = localPly:GetShootPos()
+    viewAng = localPly:EyeAngles() -- Need to make a copy
+    
+    SaitoHUD.HookIfTrue(spectating, "SaitoHUD.Spectate", {
+        CreateMove = CreateMove,
+        PlayerBindPress = PlayerBindPress,
+        CalcView = CalcView,
+        Think = Think,
+        ShouldDrawLocalPlayer = function() return true end,
+        HUDPaint = HUDPaint,
+    }, true)
 end
 
 concommand.Add("free_spectate", ToggleSpectate)
 concommand.Add("toggle_spectate", ToggleSpectate)
-OverrideTraceFunctions()

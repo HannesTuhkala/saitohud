@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements Wiremod utilities.
-
 local e2ExtensionsWindow
 
 local readableTypes = {

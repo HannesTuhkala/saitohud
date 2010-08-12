@@ -18,9 +18,6 @@
 
 --- Calculator functions.
 
-local clCmd = CreateClientConVar("calc_cl_cmd", "", true, false)
-local othersCmd = CreateClientConVar("calc_others_cmd", "", true, false)
-
 ------------------------------------------------------------
 -- SaitoHUDCalculator
 ------------------------------------------------------------
@@ -519,45 +516,4 @@ concommand.Add("calculator", function()
     end
     g_SaitoHUDCalculator = frame
     
-end)
-
-hook.Add("OnPlayerChat", "SaitoHUD.Calculator", function(ply, text, teamChat, isDead)
-    local clCmd = clCmd:GetString()
-    local othersCmd = othersCmd:GetString()
-    
-    if clCmd ~= "" and ply == LocalPlayer() then
-        if text:sub(1, string.len(clCmd)) == clCmd then
-            local expr = text:sub(string.len(clCmd) + 1)
-            local ret, val = SaitoHUD.CalcExpr(expr)
-            timer.Simple(0.01, function()
-                if ret then
-                    chat.AddText(Color(255, 255, 255), "= ", tostring(val))
-                else
-                    chat.AddText(Color(255, 255, 0), "Error: " .. val)
-                end
-            end)
-            
-            return false
-        end
-    elseif othersCmd ~= "" and ply ~= LocalPlayer() then
-        if text:sub(1, string.len(othersCmd)) == othersCmd then
-            if not ply.SHLastCalc then ply.SHLastCalc = 0 end
-            
-            -- Anti-spam
-            if RealTime() - ply.SHLastCalc < 1 then
-                return
-            end
-            
-            ply.SHLastCalc = RealTime()
-            
-            local expr = text:sub(string.len(othersCmd) + 1)
-            local ret, val = SaitoHUD.CalcExpr(expr)
-        
-            if ret then
-                RunConsoleCommand(teamChat and "say_team" or "say", "= " .. val)
-            else
-                RunConsoleCommand(teamChat and "say_team" or "say", "Error: " .. val)
-            end
-        end
-    end
 end)

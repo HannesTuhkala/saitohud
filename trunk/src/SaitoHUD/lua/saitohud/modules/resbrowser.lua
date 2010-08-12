@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements the resource browser in a terrible way.
-
 local soundFolders = {}
 local soundList = {}
 local soundBrowserWindow

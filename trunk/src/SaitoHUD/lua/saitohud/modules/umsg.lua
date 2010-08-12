@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements umsg debugging tools.
-
 local doDebug = CreateClientConVar("umsg_debug", "0", true, false)
 local peekWire = CreateClientConVar("umsg_debug_peek_wire", "0", true, false)
 local peekTitan = CreateClientConVar("umsg_debug_peek_titan", "1", true, false)

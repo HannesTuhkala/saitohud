@@ -15,76 +15,79 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: cinematography.lua 63 2010-04-20 20:24:37Z the.sk89q $
+-- $Id$
 
--- This module has some minor features.
+------------------------------------------------------------
+-- Super flashlight
+------------------------------------------------------------
 
-local traceAims = CreateClientConVar("trace_aims", "0", true, false)
 local selfLight = CreateClientConVar("super_flashlight_self", "0", true, false)
+local brightLight = CreateClientConVar("super_flashlight_bright", "0", true, false)
 
 local lightEnabled = false
-local hideHUD = false
-local toggledCommands = {}
 
---- Renders the dynamic light for the super flashlight.
 local function RenderFlashlight()
-    local light = DynamicLight(123120000)
+    local bright = brightLight:GetBool()
     
-    if light and not selfLight:GetBool() then 
-        light.Pos = LocalPlayer():GetEyeTrace().HitPos
+    if not selfLight:GetBool() then
+        local light = DynamicLight(123120000)
+        if light then 
+            local tr = SaitoHUD.GetRefTrace()
+            light.Pos = tr.HitPos + tr.HitNormal * 100
+            light.r = 255
+            light.g = 255 
+            light.b = 255
+            light.Brightness = 0.25
+            light.Size = bright and 5000 or 1000
+            light.Decay = 0 
+            light.DieTime = CurTime() + 0.3
+        end
+    end
+    
+    local light = DynamicLight(123120001) 
+    if light then 
+        light.Pos = SaitoHUD.GetRefPos() + Vector(0, 0, 40)
         light.r = 255
         light.g = 255 
         light.b = 255
         light.Brightness = 0.25
-        light.Size = 250
-        light.Decay = 0 
-        light.DieTime = CurTime() + 0.3
-    end
-    
-    local light = DynamicLight(123120001) 
-    
-    if light then 
-        light.Pos = LocalPlayer():GetPos()
-        light.r = 255
-        light.g = 255 
-        light.b = 255
-        light.Brightness = 0.01
-        light.Size = 250
+        light.Size = bright and 5000 or 1000
         light.Decay = 0 
         light.DieTime = CurTime() + 0.3
     end 
-end  
+end
 
---- Toggles the flash light.
-local function ToggleFlashLight()
+concommand.Add("super_flashlight", function()
     lightEnabled = not lightEnabled
     
     surface.PlaySound("items/flashlight1.wav")
     
-    if lightEnabled and not SaitoHUD.AntiUnfairTriggered() then
-        LocalPlayer():ChatPrint("Light Enabled")
-        hook.Add("Think", "SaitoHUD.Super.Flashlight", RenderFlashlight)
-    else
-        SaitoHUD.RemoveHook("Think", "SaitoHUD.Super.Flashlight")
-    end
-end
+    SaitoHUD.HookIfTrue(lightEnabled, "SaitoHUD.FlashLight", {
+        Think = RenderFlashlight,
+    }, true)
+end)
 
---- Toggles the HUD hiding hook.
-local function ToggleHideHUD(ply, cmd, args)
+------------------------------------------------------------
+-- HUD hide
+------------------------------------------------------------
+
+local hideHUD = false
+
+concommand.Add("toggle_hud", function(ply, cmd, args)
     hideHUD = not hideHUD
     
-    if hideHUD then
-        hook.Add("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD", function() return false end)
-    else
-        SaitoHUD.RemoveHook("HUDShouldDraw", "SaitoHUD.Cinematography.HideHUD")
-    end
-end
+    SaitoHUD.HookIfTrue(hideHUD, "SaitoHUD.FlashLight", {
+        HUDShouldDraw = function() return false end,
+    })
+end)
 
---- Console command toggle a concommand.
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
-local function ToggleConCmd(ply, cmd, args)
+------------------------------------------------------------
+-- Toggled console commands
+------------------------------------------------------------
+
+local toggledCommands = {}
+
+concommand.Add("toggle_concmd", function(ply, cmd, args)
     if #args ~= 1 then
         Msg("Invalid number of arguments\n")
         return
@@ -101,70 +104,58 @@ local function ToggleConCmd(ply, cmd, args)
         toggledCommands[cmd] = true
         chat.AddText(Color(0, 255, 0), "+" .. cmd)
     end
-end
+end)
 
---- Actually draws the trace aim lines and endpoint boxes.
-local function DrawTraceAimsHelper()
-    for _, ply in pairs(player.GetAll()) do
-        local doDraw = true
-        
-        if SaitoHUD.ShouldDrawAimTraceHook and not SaitoHUD.ShouldIgnoreHook() then
-            if not SaitoHUD.ShouldDrawAimTraceHook(ply) then
-                doDraw = false
-            end
-        end
-        
-        if ply ~= LocalPlayer() and ply:Alive() and doDraw then
-            local shootPos = ply:GetShootPos()
-            local eyeAngles = ply:EyeAngles()
-            
-            local data = {}
-            data.start = shootPos
-            data.endpos = shootPos + eyeAngles:Forward() * 10000
-            data.filter = ply
-            local tr = util.TraceLine(data)
-            local distance = tr.HitPos:Distance(shootPos)
-            
-            -- Draw the end point
-            cam.Start3D2D(tr.HitPos + tr.HitNormal * 0.2,
-                          tr.HitNormal:Angle() + Angle(90, 0, 0), 1)
-            if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
-                surface.SetDrawColor(255, 255, 0, 200)
-            else
-                surface.SetDrawColor(0, 0, 255, 150)
-            end
-            surface.DrawRect(-5, -5, 10, 10)
-            cam.End3D2D()
-            
-            -- Draw the line
-            cam.Start3D2D(shootPos, eyeAngles, 1)
-            if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
-                surface.SetDrawColor(255, 255, 0, 255)
-            else
-                surface.SetDrawColor(0, 0, 255, 200)
-            end
-            surface.DrawLine(0, 0, distance, 0)
-            cam.End3D2D()
-        end
+------------------------------------------------------------
+-- Aim traces
+------------------------------------------------------------
+
+local traceAims = CreateClientConVar("trace_aims", "0", true, false)
+local data = {}
+
+local function DrawPlayerAim(ply)
+    if ply == LocalPlayer() or not ply:Alive() then return end
+    
+    local shootPos = ply:GetShootPos()
+    local eyeAngles = ply:EyeAngles()
+    
+    data.start = shootPos
+    data.endpos = shootPos + eyeAngles:Forward() * 10000
+    data.filter = ply
+    
+    local tr = util.TraceLine(data)
+    local distance = tr.HitPos:Distance(shootPos)
+    
+    -- Draw the end point
+    cam.Start3D2D(tr.HitPos + tr.HitNormal * 0.2,
+                  tr.HitNormal:Angle() + Angle(90, 0, 0), 1)
+    if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
+        surface.SetDrawColor(255, 255, 0, 200)
+    else
+        surface.SetDrawColor(0, 0, 255, 150)
     end
+    surface.DrawRect(-5, -5, 10, 10)
+    cam.End3D2D()
+    
+    -- Draw the line
+    cam.Start3D2D(shootPos, eyeAngles, 1)
+    if ValidEntity(tr.Entity) and tr.Entity:IsPlayer() then
+        surface.SetDrawColor(255, 255, 0, 255)
+    else
+        surface.SetDrawColor(0, 0, 255, 200)
+    end
+    surface.DrawLine(0, 0, distance, 0)
+    cam.End3D2D()
 end
 
---- RenderScreenspaceEffects hook that calls DrawTraceAimsHelper. We separate the
--- actual drawing function away because, for whatever reason, if it creates an
--- error, the game will be put in an undefined state that only a restart of the
--- game can fix.
 local function DrawTraceAims()
-    if traceAims:GetBool() and not SaitoHUD.AntiUnfairTriggered() then
-        cam.Start3D(EyePos(), EyeAngles())
-        -- Wrap the call in pcall() because an error here causes mayhem, so it
-        -- is best if any errors are caught
-        pcall(DrawTraceAimsHelper)
-        cam.End3D()
+    cam.Start3D(EyePos(), EyeAngles())
+    for _, ply in pairs(player.GetAll()) do
+        pcall(DrawPlayerAim, ply)
     end
+    cam.End3D()
 end
 
-concommand.Add("super_flashlight", ToggleFlashLight)
-concommand.Add("toggle_concmd", ToggleConCmd)
-concommand.Add("toggle_hud", ToggleHideHUD)
-
-hook.Add("RenderScreenspaceEffects", "SaitoHUD.AimTrace", DrawTraceAims)
+SaitoHUD.HookOnCvar("trace_aims", "SaitoHUD.AimTrace", {
+    RenderScreenspaceEffects = DrawTraceAims,
+}, true)

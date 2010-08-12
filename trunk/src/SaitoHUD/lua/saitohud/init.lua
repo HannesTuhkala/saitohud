@@ -1,5 +1,6 @@
 -- SaitoHUD
--- Copyright (c) 2009, 2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2009-2010 sk89q <http://www.sk89q.com>
+-- Copyright (c) 2010 BoJaN
 -- 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,6 +33,7 @@ include("saitohud/concmd.lua")
 include("saitohud/filters.lua")
 include("saitohud/friends.lua")
 include("saitohud/geom.lua")
+include("saitohud/overlays.lua")
 
 --- Load a module.
 local function Load(module)
@@ -89,15 +91,17 @@ Msg("Loading built-in modules...\n")
 Load("util")
 Load("listgest")
 Load("geom")
-Load("overlays") -- Entity overlay information
-Load("sampling") -- Entity path tracking
+Load("overlays") 
+Load("player_tags") 
+Load("sampling")
 Load("stranded")
 Load("sandbox")
 Load("survey")
 Load("measure")
 Load("resbrowser")
 Load("spectate")
-Load("wire")
+Load("e2_extensions")
+Load("entity_info") 
 Load("umsg")
 Load("calculator")
 Load("panel")
