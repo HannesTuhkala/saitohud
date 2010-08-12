@@ -32,9 +32,10 @@ function PANEL:Init()
     
     self:SetTitle("SaitoHUD Calculator")
     self:SetSizable(true)
-    self:SetSize(300, 400)
+    self:SetSize(250, 300)
     self:ShowCloseButton(true)
     self:SetDraggable(true)
+    self:SetScreenLock(true)
     
     -- Make list view
     self.Log = vgui.Create("DPanelList", self)
@@ -98,8 +99,11 @@ function PANEL:Init()
     self.CalcBtn.DoClick = function()
         self:OnEnter()
     end
+    self.CalcBtn:SetTall(self.InputEntry:GetTall())
     
     self:AddIntro()
+    
+    self:SetPos(10, ScrH() - self:GetTall() - 10)
 end
 
 function PANEL:OnEnter()
@@ -143,6 +147,10 @@ function PANEL:OnEnter()
         self.InputEntry:SetText("")
         self:Close()
         return
+    
+    -- Quit
+    elseif text == "x" then
+        gui.EnableScreenClicker(false)
     
     -- Evaluate
     elseif text ~= "" then
@@ -212,13 +220,13 @@ function PANEL:PerformLayout()
     local wide = self:GetWide()
     local tall = self:GetTall()
     
-    self.Log:StretchToParent(10, 28, 10, 43)
+    self.Log:StretchToParent(6, 26, 6, 33)
     
-    self.InputEntry:SetPos(10, tall - self.CalcBtn:GetTall() - 10)
-    self.InputEntry:SetWide(wide - self.CalcBtn:GetWide() - 25)
+    self.InputEntry:SetPos(6, tall - self.CalcBtn:GetTall() - 6)
+    self.InputEntry:SetWide(wide - self.CalcBtn:GetWide() - 15)
     
-    self.CalcBtn:SetPos(wide - self.CalcBtn:GetWide() - 10,
-                        tall - self.CalcBtn:GetTall() - 10)
+    self.CalcBtn:SetPos(wide - self.CalcBtn:GetWide() - 6,
+                        tall - self.CalcBtn:GetTall() - 6)
 end
 
 vgui.Register("SaitoHUDCalculator", PANEL, "DFrame")
@@ -460,29 +468,30 @@ function SaitoHUD.CalcExpr(str, vars)
         local ret, succ, err = pcall(coroutine.resume, co) -- Gmod has issues
         
         if ret then
-            -- Corountine didn't fail us, so let's see if it actually
-            -- executed without an error
-            if succ then
-                -- Check for missing variables
-                if #missingVars == 1 then
-                    return false, string.format("'%s' is undefined", missingVars[1])
-                elseif #missingVars > 1 then
-                    return false, string.format("%s are undefined",
-                        table.concat(missingVars, ", "))
-                else
-                    local retEnv = getfenv(f)
-                    local cleaned = {}
-                    
-                    for k, v in pairs(retEnv) do
-                        if not stdEnvKeys[k] and k ~= "_result" then
-                            cleaned[k] = tonumber(v) or 0
+            -- Check for missing variables
+            if #missingVars == 1 then
+                return false, string.format("'%s' is undefined", missingVars[1])
+            elseif #missingVars > 1 then
+                return false, string.format("%s are undefined",
+                    table.concat(missingVars, ", "))
+            elseif succ then
+                local retEnv = getfenv(f)
+                local cleaned = {}
+                
+                for k, v in pairs(retEnv) do
+                    if not stdEnvKeys[k] and k ~= "_result" then
+                        if type(v) ~= 'function' and type(v) ~= 'number' then
+                            v = 0
                         end
+                        cleaned[k] = v
                     end
-                    
-                    return true, tonumber(retEnv[setVar]) or 0, cleaned
                 end
+                
+                return true, tonumber(retEnv[setVar]) or 0, cleaned
             else
-                return false, tostring(getfenv(f)._err)
+                local exceptionError = getfenv(f)._err
+                if exceptionError == 0 then exceptionError = nil end
+                return false, exceptionError or err
             end
         end
     end
@@ -508,7 +517,6 @@ concommand.Add("calculator", function()
     
     local frame = vgui.Create("SaitoHUDCalculator")
     frame:GetDeleteOnClose(false)
-    frame:Center()
     frame:MakePopup()
     frame.SaitoHUDRef = SaitoHUD
     frame.Close = function()
