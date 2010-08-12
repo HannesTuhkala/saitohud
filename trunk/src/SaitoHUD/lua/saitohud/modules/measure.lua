@@ -454,11 +454,11 @@ end
 
 Rehook = function()
     if #SaitoHUD.MeasurePoints > 0 then
-        hook.Add("RenderScreenspaceEffects", "SaitoHUD.Survey", DrawSurveyScreenspace)
-        hook.Add("HUDPaint", "SaitoHUD.Survey", DrawSurvey)
+        hook.Add("RenderScreenspaceEffects", "SaitoHUD.Measure", DrawSurveyScreenspace)
+        hook.Add("HUDPaint", "SaitoHUD.Measure", DrawSurvey)
     else
-        hook.Remove("RenderScreenspaceEffects", "SaitoHUD.Survey")
-        hook.Remove("HUDPaint", "SaitoHUD.Survey")
+        pcall(hook.Remove, "RenderScreenspaceEffects", "SaitoHUD.Measure")
+        pcall(hook.Remove, "HUDPaint", "SaitoHUD.Measure")
     end
 end
 
