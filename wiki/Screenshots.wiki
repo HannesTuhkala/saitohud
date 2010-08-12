@@ -21,6 +21,10 @@ http://saitohud.googlecode.com/svn/wiki/images/bbox_filter.jpg
 
 http://saitohud.googlecode.com/svn/wiki/images/overlay_filter.jpg
 
+== Velocity Arrows Filter ==
+
+http://saitohud.googlecode.com/svn/wiki/images/vel_vectors.jpg
+
 = Sampling =
 
 http://saitohud.googlecode.com/svn/wiki/images/sampling.jpg
