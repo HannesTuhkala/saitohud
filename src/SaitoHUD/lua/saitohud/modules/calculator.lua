@@ -148,9 +148,9 @@ function PANEL:OnEnter()
         self:Close()
         return
     
-    -- Quit
-    elseif text == "x" then
-        gui.EnableScreenClicker(false)
+    -- Help
+    elseif text == "?" or text == "help" then
+        self:AddIntro()
     
     -- Evaluate
     elseif text ~= "" then
