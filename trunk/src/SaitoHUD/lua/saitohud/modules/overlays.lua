@@ -211,3 +211,35 @@ SaitoHUD.RegisterOverlay("overlay", OVERLAY)
 
 concommand.Add("overlay_filter_clear_cache", ClearOverlayCaches)
 cvars.AddChangeCallback("overlay_filter_text", ClearOverlayCaches)
+
+------------------------------------------------------------
+-- Velocities
+------------------------------------------------------------
+
+local OVERLAY = {}
+
+function OVERLAY.DrawEnt(ent)
+    local pos = ent:GetPos()
+    local vel = ent:GetVelocity()
+    local len = vel:Length()
+    local adjVel = vel / 10
+    
+    if len > 0 then
+        local p1 = pos
+        local p2 = pos + adjVel
+        local d = math.Clamp(2 * math.exp(0.0004 * len), 5, 20)
+        p1, p2 = p1:ToScreen(), p2:ToScreen()
+        surface.SetDrawColor(255, 255, 0, 255)
+        surface.DrawLine(p1.x, p1.y, p2.x, p2.y)
+        local ang = math.atan2(p2.y - p1.y, p2.x - p1.x) - math.rad(135)
+        local x = d * math.cos(ang) + p2.x
+        local y = d * math.sin(ang) + p2.y
+        surface.DrawLine(p2.x, p2.y, x, y)
+        local ang = math.atan2(p2.y - p1.y, p2.x - p1.x) - math.rad(-135)
+        local x = d * math.cos(ang) + p2.x
+        local y = d * math.sin(ang) + p2.y
+        surface.DrawLine(p2.x, p2.y, x, y)
+    end
+end
+
+SaitoHUD.RegisterOverlay("vel_vec", OVERLAY)

@@ -322,6 +322,13 @@ local function EntityHighlightingPanel(panel)
     ctrl:SetToolTip("Enter a filter and then press ENTER")
     
 	AddQuickFilterList(panel, "bbox_filter", "Bounding Box", ctrl)
+    
+    -- Triads filter
+    
+    local ctrl = AddInput(panel, "Velocity Vectors Filter:", "vel_vec_filter", false, true)
+    ctrl:SetToolTip("Enter a filter and then press ENTER")
+    
+	AddQuickFilterList(panel, "vel_vec_filter", "Velocity Vectors", ctrl)
 end
 
 --- Creates the surveying panel.

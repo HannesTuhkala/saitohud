@@ -353,6 +353,11 @@ pre, code {
     <td>Draws bounding boxes at the location of matched entities..</td>
   </tr>
   <tr>
+    <td>vel_vec_filter<span class="cheat-deterrent">*</span></td>
+    <td nowrap="nowrap">filter filter(...)</td>
+    <td>Draws velocity arrows at the location of matched entities..</td>
+  </tr>
+  <tr>
     <td>toggle_triads<span class="cheat-deterrent">*</span></td>
     <td nowrap="nowrap">void</td>
     <td>Legacy function to toggle triads on all entities on and off.</td>
