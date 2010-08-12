@@ -295,9 +295,9 @@ end
 -- a substring of any item in a list
 -- @param lst Whitelist
 -- @param v Item to check
-function entityFilter.SatisfiesListSubstring(lst, v, explicit, strict)    
+function entityFilter.SatisfiesListSubstring(lst, v, isBlacklist, strict)    
     if lst == nil then
-        if explicit then
+        if isBlacklist then
             return false
         else
             return true
@@ -313,20 +313,38 @@ function entityFilter.SatisfiesListSubstring(lst, v, explicit, strict)
     end
     
     if not strict then
-        for _, test in pairs(lst) do
-            if not v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
-                return false
+        if isBlacklist then
+            for _, test in pairs(lst) do
+                if v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
+                    return true
+                end
             end
+            return false
+        else
+            for _, test in pairs(lst) do
+                if not v:lower():find(test:lower()) then -- TODO: Possibly lowercase text beforehand
+                    return false
+                end
+            end
+            return true
         end
     else
-        for _, test in pairs(lst) do
-            if v != test then -- TODO: Possibly lowercase text beforehand
-                return false
+        if isBlacklist then
+            for _, test in pairs(lst) do
+                if v == test then -- TODO: Possibly lowercase text beforehand
+                    return true
+                end
             end
+            return false
+        else
+            for _, test in pairs(lst) do
+                if v != test then -- TODO: Possibly lowercase text beforehand
+                    return false
+                end
+            end
+            return true
         end
     end
-    
-    return true
 end
 
 SaitoHUD.FilterContext = FilterContext
