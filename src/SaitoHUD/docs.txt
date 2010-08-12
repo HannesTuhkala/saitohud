@@ -787,22 +787,9 @@ Improved Wire Tool,tool_wire_improved</pre>
     </tr>
     <tr>
       <td>trace_aims<span class="cheat-deterrent">*</span></td>
-
       <td>bool</td>
       <td>0</td>
       <td>Enable the drawing of lines that trace the aims of players. The lines begin near the eyes of players and end at the surface that the line collides with. If a player is targetted, the color of the line will change.</td>
-    </tr>
-    <tr>
-      <td>calc_cl_cmd</td>
-      <td>string</td>
-      <td></td>
-      <td>Client side command to invoke the calculator. You need to put a space at the end of the cvar's value if you want at least one space.</td>
-    </tr>
-    <tr>
-      <td>calc_others_cmd</td>
-      <td>string</td>
-      <td></td>
-      <td>Client side command to allow others invoke the calculator. You need to put a space at the end of the cvar's value if you want at least one space.</td>
     </tr>
     <tr>
       <td>super_flashlight_self</td>
@@ -864,6 +851,10 @@ Improved Wire Tool,tool_wire_improved</pre>
       <td>void</td>
       <td>Toggles a powerful flashlight that illuminates the area immediately around you and the area that you are looking at. This works by creating two dynamic lights, one at your location, and another at the location that your aim vector collides at.</td>
     </tr>
+    <tr>
+      <td>super_flashlight_bright</td>
+      <td>void</td>
+      <td>Makes the super flashlight brighter.</td>
     <tr>
       <td>sound_browser</td>
       <td>void</td>
