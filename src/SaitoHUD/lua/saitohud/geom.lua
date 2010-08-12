@@ -15,9 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: core.lua 153 2010-06-14 04:40:25Z the.sk89q $
-
--- Geometry library.
+-- $Id$
 
 local subclassVector = CreateClientConVar("geom_subclass_vector", "0", true, false)
 

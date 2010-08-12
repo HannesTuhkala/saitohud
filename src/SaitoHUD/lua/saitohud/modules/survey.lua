@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements surveying tools.
-
 local orthoTraceText = CreateClientConVar("ortho_trace_text", "1", true, false)
 local reflectTraceNodes = CreateClientConVar("reflect_trace_nodes", "1", true, false)
 local reflectTraceMultiple = CreateClientConVar("reflect_trace_multiple", "0", true, false)

@@ -15,9 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: lib.lua 155 2010-06-18 19:37:23Z the.sk89q $
-
--- Generic library functions.
+-- $Id$
 
 --- Makes a psuedo class.
 -- @return Table
@@ -36,6 +34,67 @@ function SaitoHUD.MakeClass(base)
     })
     
     return t
+end
+
+--- Create hooks based on a cvar.
+-- @param name Name of cvar
+-- @param id ID of hook
+-- @param hooks List of hooks
+function SaitoHUD.HookOnCvar(name, id, hooks, checkAUT)
+    local rehook = function()
+        local enabled = false
+        
+        if type(name) == 'table' then
+            for _, v in pairs(name) do
+                enabled = GetConVar(v):GetBool()
+                if enabled then break end
+            end
+        else
+            enabled = GetConVar(name):GetBool()
+        end
+        
+        if checkAUT and SaitoHUD.AntiUnfairTriggered() then
+            enabled = false
+        end
+        
+        if enabled then
+            for h, f in pairs(hooks) do
+                hook.Add(h, id, f)
+            end
+        else
+            for h, f in pairs(hooks) do
+                pcall(hook.Remove, h, id)
+            end
+        end
+    end
+    
+    name = type(name) == 'table' and name or { name }
+    
+    for _, v in pairs(name) do
+        cvars.AddChangeCallback(v, rehook)
+    end
+    
+    rehook()
+end
+
+--- Create hooks if a value is true.
+-- @param enabled Hook or not
+-- @param id ID of hook
+-- @param hooks List of hooks
+function SaitoHUD.HookIfTrue(enabled, id, hooks, checkAUT)
+    if checkAUT and SaitoHUD.AntiUnfairTriggered() then
+        enabled = false
+    end
+    
+    if enabled then
+        for h, f in pairs(hooks) do
+            hook.Add(h, id, f)
+        end
+    else
+        for h, f in pairs(hooks) do
+            pcall(hook.Remove, h, id)
+        end
+    end
 end
 
 --- Safely remove a hook.

@@ -17,8 +17,6 @@
 -- 
 -- $Id$
 
--- This module implements Winamp-related functions.
-
 require("WinAmp_Interface")
 
 local foundWinamp = winamp.SetupWinAmp()

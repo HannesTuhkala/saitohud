@@ -15,9 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -- 
--- $Id: lib.lua 147 2010-05-29 18:02:06Z the.sk89q $
-
--- Friends support.
+-- $Id$
 
 local useSteamFriends = CreateClientConVar("friends_use_steam", "1", true, false)
 local friendColor = CreateClientConVar("friend_color", "255,255,0", true, false)

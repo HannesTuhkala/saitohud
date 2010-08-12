@@ -16,95 +16,13 @@
 -- 
 -- $Id$
 
---- GEOM interface.
-
 local autoLive = CreateClientConVar("geom_auto_live", "0", true, false)
 
 local GEOM = SaitoHUD.GEOM
 
---- Create a point.
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
-local function AddPoint(ply, cmd, args)    
-    local r = SaitoHUD.ParseVarConcmd(args, {
-        { Name = "name", NumArgs = 1, },
-        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
-        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true },
-    })
-    if not r then return end
-    
-    if cmd == "geom_point_live" or (r.ent and autoLive:GetBool()) then
-        GEOM.SetPoint(r.name, GEOM.EntityRelVector(r.vec.x, r.vec.y, r.vec.z, r.ent))
-    else
-        GEOM.SetPoint(r.name, r.vec)
-    end
-    
-    print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
-end
-
---- Create an entity-relative point
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
-local function AddEntPoint(ply, cmd, args)
-    local r = SaitoHUD.ParseVarConcmd(args, {
-        { Name = "name", NumArgs = 1, },
-        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true },
-    })
-    if not r then return end
-    
-    local pos
-    
-    if cmd:find("geom_point_center") then
-        pos = r.ent:GetPos()
-    elseif cmd:find("geom_point_bbox") then
-        pos = r.ent:LocalToWorld(r.ent:OBBCenter())
-    elseif cmd:find("geom_point_mass") then
-    
-    end
-    
-    if cmd:find("live") or autoLive:GetBool() then
-        GEOM.SetPoint(r.name, GEOM.EntityRelVector(pos.x, pos.y, pos.z, r.ent))
-    else
-        GEOM.SetPoint(r.name, pos)
-    end
-    
-    print(string.format("Point #%s: %s -> %s", r.name, tostring(pos)))
-end
-
---- Create a line.
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
-local function AddLine(ply, cmd, args)
-    local r = SaitoHUD.ParseVarConcmd(args, {
-        { Name = "name", NumArgs = 1, },
-        { Name = "pt1", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
-        { Name = "pt2", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
-    })
-    if not r then return end
-    
-    GEOM.SetLine(r.name, GEOM.Line(r.pt1, r.pt2))
-    print(string.format("Line #%s: %s -> %s", r.name, tostring(r.pt1), tostring(r.pt2)))
-end
-
---- Project a point onto a segment.
--- @param ply Player
--- @param cmd Command
--- @param args Arguments
-local function ProjectPointSegment(ply, cmd, args)
-    local r = SaitoHUD.ParseVarConcmd(args, {
-        { Name = "name", NumArgs = 1, },
-        { Name = "pt", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
-        { Name = "segment", Type = SaitoHUD.VAR_CONCMD_GEOM_LINE, },
-    })
-    if not r then return end
-    
-    GEOM.SetPoint(r.name, GEOM.PointLineSegmentProjection(r.pt, r.segment))
-    print(string.format("Point-line segment projection #%s: %s -> %s", r.name,
-                        tostring(r.pt), tostring(r.segment)))
-end
+------------------------------------------------------------
+-- Drawing
+------------------------------------------------------------
 
 local function DrawCross(pt)
     local scr = pt:ToScreen()
@@ -187,6 +105,97 @@ local function HUDPaint()
     end
 end
 
+hook.Add("HUDPaint", "SaitoHUD.GEOMView", HUDPaint)
+
+------------------------------------------------------------
+-- Commands
+------------------------------------------------------------
+
+--- Create a point.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function AddPoint(ply, cmd, args)    
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "name", NumArgs = 1, },
+        { Name = "vec", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, ImplicitTrace = true },
+        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true,
+            Optional = true },
+    })
+    if not r then return end
+    
+    if cmd == "geom_point_live" or (r.ent and autoLive:GetBool()) then
+        GEOM.SetPoint(r.name, GEOM.EntityRelVector(r.vec.x, r.vec.y, r.vec.z, r.ent))
+    else
+        GEOM.SetPoint(r.name, r.vec)
+    end
+    
+    print(string.format("Point #%s: %s -> %s", r.name, tostring(r.vec)))
+end
+
+--- Create an entity-relative point
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function AddEntPoint(ply, cmd, args)
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "name", NumArgs = 1, },
+        { Name = "ent", Type = SaitoHUD.VAR_CONCMD_ENTITY, ImplicitTrace = true },
+    })
+    if not r then return end
+    
+    local pos
+    
+    if cmd:find("geom_point_center") then
+        pos = r.ent:GetPos()
+    elseif cmd:find("geom_point_bbox") then
+        pos = r.ent:LocalToWorld(r.ent:OBBCenter())
+    elseif cmd:find("geom_point_mass") then
+    
+    end
+    
+    if cmd:find("live") or autoLive:GetBool() then
+        GEOM.SetPoint(r.name, GEOM.EntityRelVector(pos.x, pos.y, pos.z, r.ent))
+    else
+        GEOM.SetPoint(r.name, pos)
+    end
+    
+    print(string.format("Point #%s: %s -> %s", r.name, tostring(pos)))
+end
+
+--- Create a line.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function AddLine(ply, cmd, args)
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "name", NumArgs = 1, },
+        { Name = "pt1", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
+         { Name = "pt2", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
+    })
+    if not r then return end
+    
+    GEOM.SetLine(r.name, GEOM.Line(r.pt1, r.pt2))
+    print(string.format("Line #%s: %s -> %s", r.name, tostring(r.pt1), tostring(r.pt2)))
+end
+
+--- Project a point onto a segment.
+-- @param ply Player
+-- @param cmd Command
+-- @param args Arguments
+local function ProjectPointSegment(ply, cmd, args)
+    local r = SaitoHUD.ParseVarConcmd(args, {
+        { Name = "name", NumArgs = 1, },
+        { Name = "pt", Type = SaitoHUD.VAR_CONCMD_GEOM_POINT, },
+        { Name = "segment", Type = SaitoHUD.VAR_CONCMD_GEOM_LINE, },
+    })
+    if not r then return end
+    
+    GEOM.SetPoint(r.name, GEOM.PointLineSegmentProjection(r.pt, r.segment))
+    print(string.format("Point-line segment projection #%s: %s -> %s", r.name,
+                        tostring(r.pt), tostring(r.segment)))
+end
+
 concommand.Add("geom_point", AddPoint)
 concommand.Add("geom_point_live", AddPoint)
 concommand.Add("geom_point_center", AddEntPoint)
@@ -197,5 +206,3 @@ concommand.Add("geom_point_mass", AddEntPoint)
 concommand.Add("geom_point_mass_live", AddEntPoint)
 concommand.Add("geom_line", AddLine)
 concommand.Add("geom_project_point_segment", ProjectPointSegment)
-
-hook.Add("HUDPaint", "SaitoHUD.GEOMView", HUDPaint)

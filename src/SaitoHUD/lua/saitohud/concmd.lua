@@ -155,7 +155,7 @@ function SaitoHUD.ParseVarConcmd(args, params, maxLeftOver)
                 
                 if id == "trace" then
                     local tr = SaitoHUD.GetRefTrace()
-                    return tr.HitPos
+                    result[name] = tr.Entity
                 else
                     print(string.format("No built-in entity by name of '%s'", id))
                     return
