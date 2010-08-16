@@ -34,7 +34,7 @@ local function NameTagsPaint()
     local alwaysFriends = alwaysDrawFriendTags:GetBool()
     local showDistances = playerDistances:GetBool()
     local simpleTags = simpleNameTags:GetBool()
-    local bold = boldFriends:GetBool()
+    local boldFriends = boldFriends:GetBool()
     local rainbow = rainbowFriends:GetBool()
     
     for _, ply in pairs(player.GetAll()) do
@@ -44,6 +44,7 @@ local function NameTagsPaint()
         local color = Color(255, 255, 255, 255)
         local shadowColor = Color(0, 0, 0, 255)
         local isFriend = SaitoHUD.IsFriend(ply)
+        local bold = boldFriends and isFriend
         
         if all or (alwaysFriends and isFriend) then
             -- Friend name colors
