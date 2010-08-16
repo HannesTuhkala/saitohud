@@ -199,6 +199,12 @@ local function ToolPanel(panel)
     button.DoClick = function(button)
         SaitoHUD.OpenE2Extensions()
     end
+    
+    local button = panel:AddControl("DButton", {})
+    button:SetText("Hook Manager")
+    button.DoClick = function(button)
+        SaitoHUD.OpenHookManager()
+    end
 end
 
 --- Creates the sampling panel.
