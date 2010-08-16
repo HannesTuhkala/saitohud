@@ -34,6 +34,8 @@ include("saitohud/filters.lua")
 include("saitohud/friends.lua")
 include("saitohud/geom.lua")
 include("saitohud/overlays.lua")
+include("saitohud/vgui/DCustomListView.lua")
+include("saitohud/vgui/DListView_CheckboxLine.lua")
 
 --- Load a module.
 local function Load(module)
@@ -104,6 +106,7 @@ Load("e2_extensions")
 Load("entity_info") 
 Load("umsg")
 Load("calculator")
+Load("hook_manager")
 Load("panel")
 
 if postModules ~= "" then
