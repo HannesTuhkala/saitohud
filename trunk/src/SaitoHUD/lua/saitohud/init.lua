@@ -17,25 +17,34 @@
 -- 
 -- $Id$
 
+local moduleLoadList = {
+    "util",
+    "listgest",
+    "geom",
+    "overlays", 
+    "player_tags", 
+    "sampling",
+    "stranded",
+    "sandbox",
+    "survey",
+    "measure",
+    "resbrowser",
+    "spectate",
+    "e2_extensions",
+    "entity_info", 
+    "umsg",
+    "calculator",
+    "hook_manager",
+    "panel",
+}
+
+------------------------------------------------------------
+-- Functions / build module list
+------------------------------------------------------------
+
 local postModules = CreateClientConVar("saitohud_modules", "", true, false):GetString()
 local preModules = CreateClientConVar("saitohud_modules_pre", "", true, false):GetString()
 local profile = CreateClientConVar("saitohud_profile", "0", true, false):GetBool()
-
-local reloading = false
-if SaitoHUD ~= nil then reloading = true end
-
-SaitoHUD = {}
-SaitoHUD.Reloading = reloading
-
-include("saitohud/saitohud.lua")
-include("saitohud/functions.lua")
-include("saitohud/concmd.lua")
-include("saitohud/filters.lua")
-include("saitohud/friends.lua")
-include("saitohud/geom.lua")
-include("saitohud/overlays.lua")
-include("saitohud/vgui/DCustomListView.lua")
-include("saitohud/vgui/DListView_CheckboxLine.lua")
 
 --- Load a module.
 local function Load(module)
@@ -53,17 +62,6 @@ local function Load(module)
     end
 end
 
---- Load a modules from a comma-delimited list.
-local function LoadList(str)
-    local modules = string.Explode(",", str)
-    for _, module in pairs(modules) do
-        local module = string.Trim(module)
-        if module ~= "" then
-            Load(module)
-        end
-    end
-end
-
 --- Remove existing SaitoHUD hooks.
 local function RemoveExistingHooks()
     for name, list in pairs(hook.GetTable()) do
@@ -75,43 +73,49 @@ local function RemoveExistingHooks()
     end
 end
 
-Msg("====== Loading SaitoHUD ======\n")
+-- Modules loaded at the beginning
+for _, v in pairs(string.Explode(",", preModules)) do
+    v = v:Trim()
+    if v ~= "" then table.insert(moduleLoadList, 1, v) end
+end
+
+-- Modules loaded at the end
+for _, v in pairs(string.Explode(",", postModules)) do
+    v = v:Trim()
+    if v ~= "" then table.insert(moduleLoadList, v) end
+end
+
+------------------------------------------------------------
+-- Load
+------------------------------------------------------------
+
+-- Reloading check
+local reloading = false
+if SaitoHUD ~= nil then reloading = true end
 
 if reloading then
-    Msg("Reloading detected!\n")
     RemoveExistingHooks()
 end
 
+SaitoHUD = {}
+SaitoHUD.Reloading = reloading
+
+include("saitohud/saitohud.lua")
+include("saitohud/functions.lua")
+include("saitohud/concmd.lua")
+include("saitohud/filters.lua")
+include("saitohud/friends.lua")
+include("saitohud/geom.lua")
+include("saitohud/overlays.lua")
+include("saitohud/vgui/DCustomListView.lua")
+include("saitohud/vgui/DListView_CheckboxLine.lua")
+
+Msg("====== Loading SaitoHUD ======\n")
+
 local start = SysTime()
 
-if preModules ~= "" then
-    Msg("Loading early modules...\n")
-    LoadList(preModules)
-end
-
-Msg("Loading built-in modules...\n")
-Load("util")
-Load("listgest")
-Load("geom")
-Load("overlays") 
-Load("player_tags") 
-Load("sampling")
-Load("stranded")
-Load("sandbox")
-Load("survey")
-Load("measure")
-Load("resbrowser")
-Load("spectate")
-Load("e2_extensions")
-Load("entity_info") 
-Load("umsg")
-Load("calculator")
-Load("hook_manager")
-Load("panel")
-
-if postModules ~= "" then
-    MsgN("Loading additional modules...\n")
-    LoadList(postModules)
+for _, v in pairs(moduleLoadList) do
+    Load(v)
 end
 
 if profile then
