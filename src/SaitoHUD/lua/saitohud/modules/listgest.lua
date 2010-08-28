@@ -22,6 +22,7 @@ SaitoHUD.Gesturing = false
 local menu = {}
 local lastIndex = 0
 local lastMXDist = 0
+local listgest_submenu_sensitivity = CreateClientConVar("listgest_submenu_sensitivity", "50", true, false)
 
 --- Builds the list gesture menu.
 local function GetMenu(Name)
@@ -96,7 +97,7 @@ local function HUDPaint()
     end
     
     --Navigate to sub-menu
-    if MXDist - lastMXDist > 50 or MXDist - lastMXDist < -50 then
+    if MXDist - lastMXDist > listgest_submenu_sensitivity:GetInt() or MXDist - lastMXDist < -listgest_submenu_sensitivity:GetInt() then
         lastMXDist = MXDist
         
         if SaitoHUD.isGestMenu(menu[index].action) then
