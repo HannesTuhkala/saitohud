@@ -21,13 +21,13 @@ SaitoHUD.Gesturing = false
 
 local menu = {}
 local lastIndex = 0
+local lastMXDist = 0
 
 --- Builds the list gesture menu.
-local function GetMenu()
+local function GetMenu(Name)
     local menu = {}
     local numHooks = SaitoHUD.CountHooks("SaitoHUDProvideMenu")
-    local registered = SaitoHUD.CallHookAggregate("SaitoHUDProvideMenu", numHooks)
-    
+    local registered = SaitoHUD.CallHookAggregate("SaitoHUDProvideMenu", numHooks, Name)
     for _, items in pairs(registered) do
         table.Add(menu, items)
     end
@@ -42,7 +42,7 @@ end
 --- Starts list gesture; called from the +listgest concmd.
 local function StartGesture(ply, cmd, args)
     SaitoHUD.Gesturing = true
-    menu = GetMenu()
+    menu = GetMenu("")
     lastIndex = 0
     gui.EnableScreenClicker(true)
 end
@@ -55,6 +55,10 @@ local function EndGesture(ply, cmd, args)
     
     if menu[lastIndex] then
         local entry = menu[lastIndex]
+        
+        --If it's a submenu, just return and do nothing
+        if SaitoHUD.isGestMenu(entry.action) then return end
+        
         if type(entry.action) == "function" then
             entry.action(entry)
         elseif type(entry.action) == "string" then
@@ -72,6 +76,13 @@ local function HUDPaint()
     local mDistance = math.max(math.abs(scY - mY) - 5, 0)
     local index = 1
     
+    local MXDist = (scX-mX)
+    
+    surface.SetFont("HudHintTextLarge")
+    surface.SetTextColor(255, 255, 255, 200)
+    surface.SetTextPos(10,350)
+    surface.DrawText(tostring(MXDist))
+    
     if mY > scY then
         index = math.min(math.floor(mDistance / 15) + 1, table.Count(menu))
     else
@@ -80,7 +91,22 @@ local function HUDPaint()
     end
     
     if index ~= lastIndex then
+        lastMXDist = MXDist
         surface.PlaySound("weapons/pistol/pistol_empty.wav")
+    end
+    
+    --Navigate to sub-menu
+    if MXDist - lastMXDist > 50 or MXDist - lastMXDist < -50 then
+        lastMXDist = MXDist
+        
+        if SaitoHUD.isGestMenu(menu[index].action) then
+            menu = GetMenu(menu[index].action)
+            lastIndex = 0
+            lastMXDist = 0
+            
+            gui.SetMousePos(scX,scY)
+            surface.PlaySound("weapons/pistol/pistol_empty.wav")
+        end
     end
     
     lastIndex = index
