@@ -14,15 +14,14 @@
 -- 
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
--- 
+-- ``
 -- $Id$
 
-local menu = {}
+local menus = {}
 
---- Loads the sandbox menu from file.
--- A default one will be used if the file does not exist.
-function SaitoHUD.LoadSandboxMenu()
-    local data = file.Read("saitohud/sandbox/menu.txt")
+local function AddMenu(Filename)
+    local data = file.Read("saitohud/sandbox/"..Filename)
+    local newMenu = {}
     
     if data ~= nil and data ~= "" then
         data = SaitoHUD.ParseCSV(data)
@@ -34,30 +33,55 @@ function SaitoHUD.LoadSandboxMenu()
             end
             
             for _, v in pairs(data) do
-                table.insert(menu, {text = v[1], action = v[2]})
+                table.insert(newMenu, {text = v[1], action = v[2]})
             end
         end
     else
         -- Default menu
-        table.insert(menu, {text = "Easy Precision Tool", action = "tool_easy_precision"})
-        table.insert(menu, {text = "Weld Tool", action = "tool_weld"})
-        table.insert(menu, {text = "Remover Tool", action = "tool_remover"})
-        table.insert(menu, {text = "No Collide Tool", action = "tool_nocollide"})
-        table.insert(menu, {text = "Adv. Duplicator Tool", action = "tool_adv_duplicator"})
-        table.insert(menu, {text = "Expression 2 Tool", action = "tool_wire_expression2"})
-        table.insert(menu, {text = "Improved Wire Tool", action = "tool_wire_improved"})    
-        table.insert(menu, {text = "Wire Debugger Tool", action = "tool_wire_debugger"})
+        table.insert(newMenu, {text = "Easy Precision Tool", action = "tool_easy_precision"})
+        table.insert(newMenu, {text = "Weld Tool", action = "tool_weld"})
+        table.insert(newMenu, {text = "Remover Tool", action = "tool_remover"})
+        table.insert(newMenu, {text = "No Collide Tool", action = "tool_nocollide"})
+        table.insert(newMenu, {text = "Adv. Duplicator Tool", action = "tool_adv_duplicator"})
+        table.insert(newMenu, {text = "Expression 2 Tool", action = "tool_wire_expression2"})
+        table.insert(newMenu, {text = "Improved Wire Tool", action = "tool_wire_improved"})    
+        table.insert(newMenu, {text = "Wire Debugger Tool", action = "tool_wire_debugger"})
+    end
+    menus[Filename] = newMenu
+end
+--- Loads the sandbox menu from file.
+-- A default one will be used if the file does not exist.
+function SaitoHUD.LoadSandboxMenu()
+    local files = file.Find("saitohud/sandbox/*.txt")
+    print("Loading Sandbox Menu")
+    
+    print("Creating Menu: menu.txt");
+    AddMenu("menu.txt")
+    for k, v in pairs(files) do
+        if string.sub(v,1,5) == "menu_" then
+            print("Creating Menu: "..v);
+            AddMenu(v)
+        end
     end
 end
 
+function SaitoHUD.isGestMenu(Menu)
+    for k,v in pairs(menus) do
+        if k == Menu then return true end
+    end
+    
+    return false
+end
+
 -- Hook for the menu
-local function SandboxMenu(numItems)
+local function SandboxMenu(numItems, menu)
      -- We only want this gesture menu to appear if there's nothing else
     if numItems > 1 then
         return {}
     end
     
-    return menu
+    if menu == "" or menu == nil then menu = "menu.txt" end
+    return menus[menu]
 end
 
 hook.Add("SaitoHUDProvideMenu", "SaitoHUD.Sandbox", SandboxMenu)
