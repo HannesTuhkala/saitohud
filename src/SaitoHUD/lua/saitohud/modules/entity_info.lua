@@ -33,7 +33,7 @@ local function EntityInfoPaint()
         
         local yOffset = ScrH() * 0.3
         for _, s in pairs(lines) do
-            draw.SimpleText(s, "TabLarge", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
+            draw.SimpleText(s, "Default", ScrW() - 16, yOffset, color, 2, ALIGN_TOP)
             yOffset = yOffset + 14
         end
     end

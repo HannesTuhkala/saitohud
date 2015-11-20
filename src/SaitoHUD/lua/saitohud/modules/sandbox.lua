@@ -52,7 +52,7 @@ end
 --- Loads the sandbox menu from file.
 -- A default one will be used if the file does not exist.
 function SaitoHUD.LoadSandboxMenu()
-    local files = file.Find("saitohud/sandbox/*.txt")
+    local files = file.Find("saitohud/sandbox/*.txt", "GAME")
     print("Loading Sandbox Menu")
     
     print("Creating Menu: menu.txt");

@@ -112,14 +112,15 @@ end
 ------------------------------------------------------------
 
 -- Have to protect old trace functions
-if not _R.Player._GetEyeTrace then _R.Player._GetEyeTrace = _R.Player.GetEyeTrace end
+metaPlayer = FindMetaTable("Player")
+if not metaPlayer._GetEyeTrace then metaPlayer._GetEyeTrace = metaPlayer.GetEyeTrace end
 if not util._GetPlayerTrace then util._GetPlayerTrace = util.GetPlayerTrace end
 
 local data = {} -- util.GetEyeTrace()
 local lastTrace = nil
 local lastTraceTime = 0
 
-function _R.Player:GetEyeTrace()
+function metaPlayer:GetEyeTrace()
     local localPly = LocalPlayer()
     
     if not spectating or self ~= localPly then

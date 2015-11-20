@@ -85,8 +85,8 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
     
     local lines = {}
     
-    if ValidEntity(tr.Entity) then
-        local r, g, b, a = tr.Entity:GetColor();
+    if IsValid(tr.Entity) then
+        local color = tr.Entity:GetColor();
         lines = {}
         
         if showEntityInfo then
@@ -99,7 +99,7 @@ function SaitoHUD.GetEntityInfoLines(showPlayerInfo,showEntityInfo)
                 "Position: " .. tostring(tr.Entity:GetPos()),
                 "Size: " .. tostring(tr.Entity:OBBMaxs()-tr.Entity:OBBMins()),
                 "Angle: " .. tostring(tr.Entity:GetAngles()),
-                "Color: " .. string.format("%0.2f %.2f %.2f %.2f", r, g, b, a),
+                "Color: " .. string.format("%0.2f %.2f %.2f %.2f", color.r, color.g, color.b, color.a),
                 "Model: " .. tostring(tr.Entity:GetModel()),
                 "Material: " .. tostring(tr.Entity:GetMaterial()) .. 
                     " (skin: " .. (skin and tostring(skin) or "N/A") .. ")",
@@ -205,6 +205,6 @@ concommand.Add("saitohud_help", function() SaitoHUD.OpenHelp() end)
 
 --- We store it now so that players can't disable it mid-game -- that's not enough
 -- of a deterrent. However, if people wish to disable the feature, they can.
-if __SaitoHUDUnfair == nil and not file.Exists("saitohud/no_deterrent.lck") then
+if __SaitoHUDUnfair == nil and not file.Exists("saitohud/no_deterrent.lck", "GAME") then
     __SaitoHUDUnfair = true
 end
